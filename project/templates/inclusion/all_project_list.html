@@ -1,0 +1,42 @@
+<li class="dropdown">
+    <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true"
+       aria-expanded="false"><strong>项目</strong>  {% if request.tracer.project %} ({{ request.tracer.project.name }}
+        ) {% endif %}<span
+            class="caret"></span></a>
+    <ul class="dropdown-menu">
+        {% if my %}
+            <li><i class="fa fa-user-circle-o" aria-hidden="true">
+                <a style="text-decoration: none;color: black"> 我创建的项目</a></i></li>
+            <li role="separator" class="divider"></li>
+
+            <div style="max-height: 180px;overflow-y: scroll">
+                {% for item in my %}
+                    <li><a class="fa fa-book" href="{% url 'web:dashboard' item.id %}"
+                           style="text-decoration: none;color: lightslategray;margin-left: 10px">&nbsp;&nbsp;《{{ item.name }}》</a>
+                    </li>
+                    {% if not forloop.last %}
+                        <li role="separator" class="divider"></li>
+                    {% endif %}
+                {% endfor %}
+            </div>
+
+
+        {% endif %}
+
+        {% if join %}
+            <li role="separator" class="divider"></li>
+            <li><i class="fa fa-handshake-o" aria-hidden="true"></i> 我参与的项目</li>
+            <li role="separator" class="divider"></li>
+            <div style="max-height: 180px;overflow-y: scroll">
+                {% for item in join %}
+                    <li><a class="fa fa-book" style="text-decoration: none;color: lightslategray;margin-left: 10px"
+                           href="{% url 'web:dashboard' item.project.id %}">&nbsp;&nbsp;《{{ item.project.name }}》</a>
+                    </li>
+                    {% if not forloop.last %}
+                        <li role="separator" class="divider"></li>
+                    {% endif %}
+                {% endfor %}
+            </div>
+        {% endif %}
+    </ul>
+</li>

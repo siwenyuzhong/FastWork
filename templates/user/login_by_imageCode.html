@@ -1,0 +1,91 @@
+{% extends 'base/login-base.html' %}
+{% load static %}
+{% block title %}
+    FastWork - 用户登录
+{% endblock %}
+
+{% block css %}
+    <link href="{% static 'index-5.1-bootstrap/bootstrap-5.1.css' %}" rel="stylesheet">
+    <link rel="stylesheet" href="{% static 'css/account.css' %}">
+    <style>
+        .error-msg {
+            color: red;
+            position: absolute;
+            font-size: 13px;
+        }
+    </style>
+{% endblock %}
+
+{% block logo %}
+        <img style="width: 150px;height: 50px;margin-bottom: -10px" src="{% static 'img/fastwork.png' %}">
+{% endblock %}
+
+{% block content %}
+    <div class="account" style="margin-top: 80px">
+        <div class="title" style="margin-bottom: 20px">登录<a href="" style="text-decoration: none;color: black">FastWork</a></div>
+        <form method="post" novalidate>
+            {% csrf_token %}
+            {% for field in form %}
+                {% if field.name == 'code' %}
+                    <div class="form-group">
+{#                        <label class="col-sm-4 control-label" for="{{ field.id_for_label }}">{{ field.label }}</label>#}
+                        <div class="row">
+                            <div class="form-group">
+                                <div class="row">
+                                    <div class="col-md-8">
+                                        {{ field }}
+                                        <span class="error-msg">{{ field.errors.0 }}</span>
+                                    </div>
+                                    <div class="col-md-4" style="margin-left: -12px">
+                                        <img src="{% url 'user:image_code' %}" id="imageCode">
+                                    </div>
+
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                {% else %}
+                    <div class="form-group">
+{#                        <label for="{{ field.id_for_label }}">{{ field.label }}</label>#}
+                        {{ field }}
+                        <span class="error-msg">{{ field.errors.0 }}</span>
+                    </div>
+                {% endif %}
+            {% endfor %}
+
+            <div class="row" style="margin-top: -15px">
+                <div class="col-xs-3">
+                    <input type="submit" class="btn btn-primary" value="登  录">
+                    {% if enable_dingding == "True" %}
+                        <a href="" style="margin-left: 20px">
+                            <img src="/static/dingding/dingding.png"
+                                 style="width: 70px;height: 28px;margin-top: 5px"></a>
+                    {% endif %}
+                    {% if enable_okta == 'True' %}
+                        <a href="" style="margin-left: 5px">
+                            <img src="/static/okta/okta.png" style="width: 75px;height: 40px;margin-top: 6px"></a>
+                    {% endif %}
+                </div>
+            </div>
+        </form>
+    </div>
+{% endblock %}
+
+
+{% block js %}
+    <script src="{% static 'js/jquery-3.4.1.min.js' %}"></script>
+    <script src="{% static 'plugin/bootstrap/js/bootstrap.min.js' %}"></script>
+    <script>
+        $(function () {
+            $("#imageCode").click(function () {
+                //获取原来的地址
+                var oldSrc = $(this).attr('src');
+                //点击更换图片
+                $(this).attr('src', oldSrc + "?")
+            })
+        })
+    </script>
+{% endblock %}
+
+
+

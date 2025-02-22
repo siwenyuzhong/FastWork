@@ -1,0 +1,201 @@
+{% extends 'base/without_project_base.html' %}
+{% load static %}
+{% block title %}
+    管理员面板
+{% endblock %}
+
+{% block css %}
+    <style>
+        .content {
+            height: calc(100vh - 120px);
+            overflow: scroll;
+            margin-left: -1px;
+        }
+    </style>
+{% endblock %}
+
+
+{% block content %}
+    <div class="container-fluid content" style="margin-top: 20px">
+
+        <div class="col-sm-12">
+            <div class="panel-heading">
+                <ol class="breadcrumb">
+                    <li><a href="{% url 'project:list' %}"
+                           style="color: #337ab7">项目大厅</a></li>
+                    <li class="active">管理员面板</li>
+                </ol>
+            </div>
+        </div>
+
+        <div class="col-sm-12" style="">
+            <div class="container-fluid">
+                <div class="panel panel-default">
+                    <div class="panel-body">
+                        <div class="alert alert-warning alert-dismissible" role="alert">
+                            <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span
+                                    aria-hidden="true">&times;</span></button>
+                            <strong>说明!</strong> 平台首次初始化，需先执行[root@localhost tools]#/Users/chenweiyong/ENVS/fastwork/bin/python3 tools/init_before_use_fastwork.py之后，在此绑定：角色和菜单【超管&所有菜单】、角色和用户【超管&管理员账号】。
+                        </div>
+                    </div>
+                    <hr>
+                    <div class="panel-body">
+                        <div class="wrapper wrapper-content animated fadeInRight">
+                            <div class="wrapper wrapper-content">
+                                <div class="row">
+                                    <div class="col-sm-12">
+                                        <label for="">角色</label>
+
+                                        <select class="form-control" name="type" id="selected_role">
+                                            <option id="selected_role"
+                                                    value={{ structure.type }}> {{ structure.get_type_display|default:"--选择角色--" }} </option>
+
+                                            {% for foo in objects_all %}
+                                                <option id="selected_role"
+                                                        value="{{ foo.title }}">{{ foo.title }}</option>
+                                            {% endfor %}
+                                        </select>
+
+                                        <label for="">菜单</label>
+                                        <select class="form-control" name="type" id="selected_menu" multiple
+                                                style="height: 200px">
+                                            {% for foo in menu_objects_all %}
+                                                <option id="selected_menu"
+                                                        value="{{ foo.id }}">{{ foo.title }}</option>
+                                            {% endfor %}
+                                        </select>
+
+                                        <button type="button" id="bind_role_menu" class="btn btn-primary"
+                                                data-dismiss="modal" style="background-color: #167be0;margin-top: 10px">
+                                            角色绑定菜单
+                                        </button>
+                                    </div>
+
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <hr>
+                    <div class="panel-body">
+                        <div class="wrapper wrapper-content animated fadeInRight">
+                            <div class="wrapper wrapper-content">
+                                <div class="row">
+
+                                    <div class="col-sm-12">
+                                        <label for="">角色</label>
+
+                                        <select class="form-control" name="type" id="selected_user_role">
+                                            <option id="selected_user_role"
+                                                    value={{ structure.type }}> {{ structure.get_type_display|default:"--选择角色--" }} </option>
+
+                                            {% for foo in objects_all %}
+                                                <option id="selected_user_role"
+                                                        value="{{ foo.title }}">{{ foo.title }}</option>
+                                            {% endfor %}
+                                        </select>
+
+                                        <label for="">用户</label>
+                                        <select class="form-control" name="type" id="selected_user">
+                                            <option id="selected_user"
+                                                    value={{ structure.type }}> {{ structure.get_type_display|default:"--选择用户--" }} </option>
+                                            {% for foo in objects_all__exclude %}
+                                                <option id="selected_user"
+                                                        value="{{ foo.id }}">{{ foo.username }}</option>
+                                            {% endfor %}
+                                        </select>
+
+                                        <button type="button" id="bind_user_role" class="btn btn-primary"
+                                                data-dismiss="modal" style="background-color: #167be0;margin-top: 10px">
+                                            角色绑定用户
+                                        </button>
+                                    </div>
+
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+{% endblock %}
+
+{% block js %}
+    <script>
+        $("#bind_role_menu").click(function () {
+            //公用参数
+            var selected_role_index = document.getElementById("selected_role").selectedIndex;
+            var selected_role = document.getElementById("selected_role").options[selected_role_index].text;
+
+            o = document.getElementById("selected_menu");
+            var intvalue = "";
+            for (i = 0; i < o.length; i++) {
+                if (o.options[i].selected) {
+                    intvalue += o.options[i].value + ",";
+                }
+            }
+
+            var selected_menu = intvalue.substr(0, intvalue.length - 1)
+
+
+            if (selected_role === "--选择角色--" || selected_menu === "") {
+                alert("必填项不能为空");
+                return false;
+            } else {
+                $.ajax({
+                    url: "{% url 'rbac:admin-page' %}",
+                    type: "POST",
+                    dataType: 'json',
+                    data: {
+                        'selected_role': selected_role,
+                        'selected_menu': selected_menu,
+                        'csrfmiddlewaretoken': '{{ csrf_token }}'
+                    },
+                    success: function (data) {
+                        if (data.status === 200) {
+                            alert(data.msg);
+                            location.href = "{% url 'rbac:admin-page' %}"
+                        } else {
+                            alert(data.msg)
+                        }
+                    }
+                })
+            }
+
+        })
+        $("#bind_user_role").click(function () {
+            //公用参数
+            var selected_user_role_index = document.getElementById("selected_user_role").selectedIndex;
+            var selected_user_role = document.getElementById("selected_user_role").options[selected_user_role_index].text;
+
+            var selected_user_index = document.getElementById("selected_user").selectedIndex;
+            var selected_user = document.getElementById("selected_user").options[selected_user_index].text;
+
+            if (selected_user_role === "--选择角色--" || selected_user === "--选择用户--") {
+                alert("必填项不能为空");
+                return false;
+            } else {
+                $.ajax({
+                    url: "{% url 'rbac:admin-page-bind' %}",
+                    type: "POST",
+                    dataType: 'json',
+                    data: {
+                        'selected_user_role': selected_user_role,
+                        'selected_user': selected_user,
+                        'csrfmiddlewaretoken': '{{ csrf_token }}'
+                    },
+                    success: function (data) {
+                        if (data.status === 200) {
+                            alert(data.msg);
+                            location.href = "{% url 'rbac:admin-page' %}"
+                        } else {
+                            alert(data.msg)
+                        }
+                    }
+                })
+            }
+
+        })
+    </script>
+{% endblock %}

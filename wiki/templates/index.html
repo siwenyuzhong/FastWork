@@ -1,0 +1,228 @@
+{% extends 'base/5.1_base.html' %}
+{% load static %}
+
+{% block logo %}
+    {#    <small style="font-size: 5px">Better Project Management.</small>#}
+    <img style="width: 150px;height: 50px;margin-bottom: -10px" src="{% static 'img/fastwork.png' %}">
+{% endblock %}
+
+{% block css %}
+    <link href="{% static 'index-5.1-bootstrap/bootstrap-5.1.css' %}" rel="stylesheet">
+    <style>
+        .btn-outline-primary {
+            color: #0d6efd;
+            border-color: #0d6efd
+        }
+
+        .btn-outline-primary:hover {
+            color: #fff;
+            background-color: #0d6efd;
+            border-color: #0d6efd
+        }
+
+        .btn-check:focus + .btn-outline-primary, .btn-outline-primary:focus {
+            box-shadow: 0 0 0 .25rem rgba(13, 110, 253, .5)
+        }
+
+        .btn-check:active + .btn-outline-primary, .btn-check:checked + .btn-outline-primary, .btn-outline-primary.active, .btn-outline-primary.dropdown-toggle.show, .btn-outline-primary:active {
+            color: #fff;
+            background-color: #0d6efd;
+            border-color: #0d6efd
+        }
+
+        .btn-check:active + .btn-outline-primary:focus, .btn-check:checked + .btn-outline-primary:focus, .btn-outline-primary.active:focus, .btn-outline-primary.dropdown-toggle.show:focus, .btn-outline-primary:active:focus {
+            box-shadow: 0 0 0 .25rem rgba(13, 110, 253, .5)
+        }
+
+        .btn-outline-primary.disabled, .btn-outline-primary:disabled {
+            color: #0d6efd;
+            background-color: transparent
+        }
+
+    </style>
+{% endblock %}
+
+{% block title %}
+    FastWork - 更好的掌握和管理你的项目进度
+{% endblock %}
+{% block header %}
+    {#    <div class="pricing-header p-3 pb-md-4 mx-auto text-center">#}
+    {#        <h3 class="display-0 fw-normal">FastWork 介绍</h3>#}
+    {#        <p class="fs-5 text-muted">因受到日常工作中的问题困扰。项目管理、实施中出现如文档杂乱、开发工具太多导致归纳混乱等问题。#}
+    {#            在项目结项工作中出现难以入手的尴尬场景，以深痛的工作教训为背景，FastWork 就此诞生，目前版本1.0。</p>#}
+    {#    </div>#}
+    <div class="pricing-header p-3 pb-md-4 mx-auto text-center">
+        <h3 class="display-0 fw-normal">FastWork 介绍</h3>
+        {#        <p class="fs-5 text-muted">因受到日常工作中的问题困扰。项目管理、实施中出现如文档杂乱、开发工具太多导致归纳混乱等问题。#}
+        {#            在项目结项工作中出现难以入手的尴尬场景，以深痛的工作教训为背景，FastWork 就此诞生，目前版本1.0。</p>#}
+        <p class="fs-5 text-muted">日常项目实施过程中，最常遇到的问题就是项目的模型以及写过的工具变得多且杂乱，随着时间推移，再整理归档起来往往难以下手，
+            FastWork 就是以此背景为前提下诞生。
+        </p>
+    </div>
+{% endblock %}
+
+{% block content %}
+    <div class="container py-3">
+        <main>
+            <div class="row row-cols-1 row-cols-md-3 mb-3 text-center">
+                <div class="col">
+                    <div class="card mb-4 rounded-3 shadow-sm">
+                        <div class="card-header py-3">
+                            <h5 class="my-0 fw-normal">工具库</h5>
+                        </div>
+                        <div class="card-body">
+                            <ul class="list-unstyled mt-3 mb-4">
+                                <li>支持工具在线创建、编辑</li>
+                                <li>支持工具的删除、下载</li>
+                                <li>支持工具分享、一键导出、远程执行等</li>
+                                <li></li>
+                            </ul>
+                            <a href="{% url 'web:rebuild_project_list' %}" class="w-100 btn btn-lg btn-outline-primary">快速体验
+                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
+                                     class="bi bi-arrow-right-circle" viewBox="0 0 16 16">
+                                    <path fill-rule="evenodd"
+                                          d="M1 8a7 7 0 1 0 14 0A7 7 0 0 0 1 8zm15 0A8 8 0 1 1 0 8a8 8 0 0 1 16 0zM4.5 7.5a.5.5 0 0 0 0 1h5.793l-2.147 2.146a.5.5 0 0 0 .708.708l3-3a.5.5 0 0 0 0-.708l-3-3a.5.5 0 1 0-.708.708L10.293 7.5H4.5z"/>
+                                </svg>
+                            </a>
+
+                        </div>
+                    </div>
+                </div>
+                <div class="col">
+                    <div class="card mb-4 rounded-3 shadow-sm">
+                        <div class="card-header py-3">
+                            <h5 class="my-0 fw-normal">知识文档</h5>
+                        </div>
+                        <div class="card-body">
+                            <ul class="list-unstyled mt-3 mb-4">
+                                <li>支持知识文档的新建、编辑</li>
+                                <li>支持知识文档分享、下载</li>
+                                <li>支持知识文档导出、导入等</li>
+                            </ul>
+                            <a href="{% url 'web:rebuild_project_list' %}" class="w-100 btn btn-lg btn-outline-primary">快速体验
+                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
+                                     class="bi bi-arrow-right-circle" viewBox="0 0 16 16">
+                                    <path fill-rule="evenodd"
+                                          d="M1 8a7 7 0 1 0 14 0A7 7 0 0 0 1 8zm15 0A8 8 0 1 1 0 8a8 8 0 0 1 16 0zM4.5 7.5a.5.5 0 0 0 0 1h5.793l-2.147 2.146a.5.5 0 0 0 .708.708l3-3a.5.5 0 0 0 0-.708l-3-3a.5.5 0 1 0-.708.708L10.293 7.5H4.5z"/>
+                                </svg>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                <div class="col">
+                    <div class="card mb-4 rounded-3 shadow-sm">
+                        <div class="card-header py-3">
+                            <h5 class="my-0 fw-normal">文件仓库</h5>
+                        </div>
+                        <div class="card-body">
+                            <ul class="list-unstyled mt-3 mb-4">
+                                <li>支持文件上传、下载、删除</li>
+                                <li>支持文件一键上传、录入</li>
+                                <li>支持文件分享等</li>
+                            </ul>
+                            <a href="{% url 'web:rebuild_project_list' %}" class="w-100 btn btn-lg btn-outline-primary">快速体验
+                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
+                                     class="bi bi-arrow-right-circle" viewBox="0 0 16 16">
+                                    <path fill-rule="evenodd"
+                                          d="M1 8a7 7 0 1 0 14 0A7 7 0 0 0 1 8zm15 0A8 8 0 1 1 0 8a8 8 0 0 1 16 0zM4.5 7.5a.5.5 0 0 0 0 1h5.793l-2.147 2.146a.5.5 0 0 0 .708.708l3-3a.5.5 0 0 0 0-.708l-3-3a.5.5 0 1 0-.708.708L10.293 7.5H4.5z"/>
+                                </svg>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                <div class="col">
+                    <div class="card mb-4 rounded-3 shadow-sm">
+                        <div class="card-header py-3">
+                            <h5 class="my-0 fw-normal">项目管理</h5>
+                        </div>
+                        <div class="card-body">
+                            <ul class="list-unstyled mt-3 mb-4">
+                                <li>支持项目总览、时间范围查询</li>
+                                <li>支持项目问题管理</li>
+                                <li>支持项目详情、项目人员信息查看</li>
+                            </ul>
+                            <a href="{% url 'web:rebuild_project_list' %}" class="w-100 btn btn-lg btn-outline-primary">快速体验
+                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
+                                     class="bi bi-arrow-right-circle" viewBox="0 0 16 16">
+                                    <path fill-rule="evenodd"
+                                          d="M1 8a7 7 0 1 0 14 0A7 7 0 0 0 1 8zm15 0A8 8 0 1 1 0 8a8 8 0 0 1 16 0zM4.5 7.5a.5.5 0 0 0 0 1h5.793l-2.147 2.146a.5.5 0 0 0 .708.708l3-3a.5.5 0 0 0 0-.708l-3-3a.5.5 0 1 0-.708.708L10.293 7.5H4.5z"/>
+                                </svg>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                <div class="col">
+                    <div class="card mb-4 rounded-3 shadow-sm">
+                        <div class="card-header py-3">
+                            <h5 class="my-0 fw-normal">问题管理</h5>
+                        </div>
+                        <div class="card-body">
+                            <ul class="list-unstyled mt-3 mb-4">
+                                <li>支持任务安排创建、跟踪、指派</li>
+                                <li>支持任务类型筛</li>
+                                <li>支持任邀请成员协作等</li>
+                            </ul>
+                            <a href="{% url 'web:rebuild_project_list' %}" class="w-100 btn btn-lg btn-outline-primary">快速体验
+                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
+                                     class="bi bi-arrow-right-circle" viewBox="0 0 16 16">
+                                    <path fill-rule="evenodd"
+                                          d="M1 8a7 7 0 1 0 14 0A7 7 0 0 0 1 8zm15 0A8 8 0 1 1 0 8a8 8 0 0 1 16 0zM4.5 7.5a.5.5 0 0 0 0 1h5.793l-2.147 2.146a.5.5 0 0 0 .708.708l3-3a.5.5 0 0 0 0-.708l-3-3a.5.5 0 1 0-.708.708L10.293 7.5H4.5z"/>
+                                </svg>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                <div class="col">
+                    <div class="card mb-4 rounded-3 shadow-sm">
+                        <div class="card-header py-3">
+                            <h5 class="my-0 fw-normal">定时任务</h5>
+                        </div>
+                        <div class="card-body">
+                            <ul class="list-unstyled mt-3 mb-4">
+                                <li>三种类型任务创建</li>
+                                <li>支持告警事件触发</li>
+                                <li>支持钉钉群消息告警</li>
+                            </ul>
+                            <a href="{% url 'web:rebuild_project_list' %}" class="w-100 btn btn-lg btn-outline-primary">
+                                快速体验
+                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
+                                     class="bi bi-arrow-right-circle" viewBox="0 0 16 16">
+                                    <path fill-rule="evenodd"
+                                          d="M1 8a7 7 0 1 0 14 0A7 7 0 0 0 1 8zm15 0A8 8 0 1 1 0 8a8 8 0 0 1 16 0zM4.5 7.5a.5.5 0 0 0 0 1h5.793l-2.147 2.146a.5.5 0 0 0 .708.708l3-3a.5.5 0 0 0 0-.708l-3-3a.5.5 0 1 0-.708.708L10.293 7.5H4.5z"/>
+                                </svg>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+{% endblock %}
+
+{% block footer %}
+    <footer class="pt-4 my-md-5 pt-md-5 border-top">
+        <div class="row" style="margin-top: -30px">
+            <div class="col-12 col-md">
+                <a class="fs-4 text-dark text-decoration-none" href="{% url 'web:index' %}">
+                    <img style="width: 150px;height: 50px;" src="{% static 'img/fastwork.png' %}">
+                </a>
+                <small class="d-block mb-3 text-muted">
+                    <a href="https://beian.miit.gov.cn" target="_blank">皖ICP备2022004243号</a>
+                </small>
+            </div>
+            <div class="col-6 col-md">
+            </div>
+            <div class="col-6 col-md"></div>
+            <div class="col-6 col-md">
+                <ul class="list-unstyled text-small" style="float: right">
+                    <li class="mb-1"><a class="link-secondary text-decoration-none" href="#">关于</a></li>
+                </ul>
+            </div>
+        </div>
+    </footer>
+{% endblock %}
+
+
+{% block js %}
+    <script src="{% static 'index-5.1-bootstrap/bootstrap.bundle.min.js' %}"></script>
+{% endblock %}

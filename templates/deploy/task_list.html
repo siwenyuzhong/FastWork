@@ -1,0 +1,103 @@
+{% extends 'base/site-base.html' %}
+{% load static %}
+{% block css %}
+    <style>
+        .content {
+            height: calc(100vh - 120px);
+            overflow: scroll;
+            margin-left: -1px;
+        }
+    </style>
+{% endblock %}
+{% block title %}
+    FastWork - {{ programme_object.title }} - 发布历史记录
+{% endblock %}
+
+{% block content %}
+    <div class="container-fluid content" style="margin-top: 20px">
+
+        <div class="col-sm-12">
+            <div class="panel-heading">
+                <ol class="breadcrumb">
+                    <li><a href="{% url 'project:list' %}" style="color: #337ab7">项目大厅</a></li>
+                    <li><a href="{% url 'deploy:deplot-programme-list' %}?project_id={{ request.tracer.project.id }}"
+                           style="color: #337ab7">工程列表</a></li>
+                    <li class="active">{{ programme_object.title }}-{{ programme_object.get_env_display }} / 发布任务
+                    </li>
+                </ol>
+            </div>
+        </div>
+
+        <div class="col-sm-12" style="margin-top: -20px">
+            <div class="col-lg-6">
+                <div class="input-group">
+                    <a class="btn btn-default" style="margin-bottom: 5px;color: black"
+                       href="{% url 'deploy:deplot-task-add' %}?project_id={{ request.tracer.project.id }}&programme_id={{ programme_object.id }}">
+                        <i class="fa fa-plus" aria-hidden="true"></i> 新增发布
+                    </a>
+                </div>
+            </div>
+
+        </div>
+
+        <div class="col-sm-12">
+            <div class="container-fluid">
+                <div class="panel panel-default">
+                    <div class="panel-body">
+                        <div>
+                            <table class="table table-bordered">
+                                <thead>
+                                <tr>
+                                    <th style="text-align: center">ID</th>
+                                    <th>标识</th>
+                                    <th style="text-align: center">创建时间</th>
+                                    <th style="text-align: center">状态</th>
+                                    <th style="text-align: center">项目配置</th>
+                                    <th style="text-align: center">操作</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                {% for task in task_list %}
+                                    <tr>
+                                        <th style="text-align: center">{{ task.id }}</th>
+                                        <th>{{ task.uid }}</th>
+                                        <th style="text-align: center">{{ task.date }}</th>
+                                        {% if task.status == 1 %}
+                                            <th style="text-align: center">
+                                                <span class="label label-info">待发布</span>
+                                            </th>
+                                        {% elif task.status == 2 %}
+                                            <th style="text-align: center">
+                                                <span class="label label-warning">发布中</span>
+                                            </th>
+                                        {% else %}
+                                            <th style="text-align: center">
+                                                <span class="label label-success">发布完成</span>
+                                            </th>
+                                        {% endif %}
+
+                                        <th style="text-align: center"><a
+                                                href="{% url 'deploy:deplot-task-details' %}?project_id={{ request.tracer.project.id }}&id={{ task.id }}"
+                                                class="btn btn-default"
+                                                style="font-size: 11px;color: black">
+                                            <i class="fa fa-eye"> 查看配置</i>
+                                        </a></th>
+                                        <th style="text-align: center">
+                                            <a href="{% url 'deploy:deplot-deploy' %}?project_id={{ request.tracer.project.id }}&programme_id={{ programme_object.id }}&taskid={{ task.id }}"
+                                               class="btn btn-default"
+                                               style="font-size: 11px;color: black">
+                                                <i class="fa fa-send"> 去发布</i>
+                                            </a>
+                                        </th>
+                                    </tr>
+                                {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+{% endblock %}

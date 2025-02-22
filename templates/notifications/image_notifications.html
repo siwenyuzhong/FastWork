@@ -1,0 +1,171 @@
+{% load static %}
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>FastWork - 已读消息</title>
+    <link rel="shortcut icon" href="{% static 'img/head_logo.png' %}" type="image/x-icon"/>
+    <link rel="stylesheet" href="{% static 'plugin/bootstrap/css/bootstrap.min.css' %}">
+    <link rel="stylesheet" href="{% static 'plugin/daterangepicker/daterangepicker.css' %}">
+    <link rel="stylesheet" href="/static/aliyun/css/global.css">
+    <link rel="stylesheet" href="/static/aliyun/css/common-header9.css">
+    <link rel="stylesheet" href="{% static 'plugin/font-awesome/css/font-awesome.min.css' %}">
+</head>
+<body>
+
+
+<div data-spm="2">
+    <div class="ali-common-header">
+        <div class="ali-common-header-inner common-header-clearfix">
+            <!-- 运营专区 -->
+            <div class="activity item pull-left" style="margin-right: 50px">
+                <ul class="menu item pull-left" id="J_common_header_menu" data-spm="201">
+                    <li class="" has-dropdown="true" menu-type="product" data-spm-click="">
+          <span class="menu-hd" style="margin-left: -50px;font-size: 20px">
+            <strong style="margin-left: -50px"><a href="{% url 'project:list' %}"
+                                                  style="color: white;text-decoration: none">FastWork</a></strong>
+          </span>
+                    </li>
+                </ul>
+            </div>
+            <!-- 导航菜单 -->
+            <ul class="menu item pull-left" id="J_common_header_menu" data-spm="201">
+
+                <li class="top-menu-item" style="margin-left: 80px;float: right">
+                    <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true"
+                       aria-expanded="false">
+                        <strong style="color: white;float: right;font-size: 15px;margin-right: -100px">
+                            <span style="color: white;font-size: 10px" class="glyphicon glyphicon-user"
+                                  aria-hidden="true"></span>
+                            <small>{{ request.tracer.user.username }}</small>
+                        </strong></a>
+                    <ul class="dropdown-menu">
+
+
+                        <li>
+                            <a href="">
+                                <i class="fa fa-bullhorn"></i> 未读消息 <span
+                                    class="label label-danger">{{ request.tracer.count }}</span>
+                            </a>
+                        </li>
+                        <li role="separator" class="divider"></li>
+
+                        {% for foo in request.tracer.sitemap %}
+                            {% if request.tracer.user.is_superuser == 1 %}
+                                <li>
+                                    <a href="{% url foo.link %}">
+                                        <i class="{{ foo.logo }}"></i> {{ foo.name }}
+                                    </a>
+                                </li>
+                                <li role="separator" class="divider"></li>
+                            {% else %}
+                                {% if foo.visible %}
+                                    <li>
+                                        <a href="{% url foo.link %}">
+                                            <i class="{{ foo.logo }}"></i> {{ foo.name }}
+                                        </a>
+                                    <li role="separator" class="divider"></li>
+                                {% endif %}
+                            {% endif %}
+                        {% endfor %}
+
+                        <li><a href="{% url 'user:logout' %}"><i class="fa fa-sign-out"></i> 注销登录</a></li>
+                    </ul>
+                </li>
+            </ul>
+        </div>
+    </div>
+</div>
+
+<div style="height:calc(100vh - 100px);overflow: scroll">
+    <div class="container-fluid" style="margin-top: 50px;">
+        <div class="row">
+            <div class="col-md-12">
+                <div class="panel panel-default">
+                    <div class="panel-heading">
+                        <a class="btn btn-default" href="{% url 'user:notifications' %}"
+                           style="color: black">
+                            <i class="fa fa-bullhorn" aria-hidden="true"></i> 未读消息 <span
+                                class="label label-danger">{{ request.tracer.count }}</span>
+                        </a>
+                        <a class="btn btn-default" href="{% url 'user:notifications_read' %}"
+                           style="color: black">
+                            <i class="fa fa-bullhorn" aria-hidden="true"></i> 已读消息 <span
+                                class="label label-success">{{ request.tracer.read_count }}</span>
+                        </a>
+                        <a class="btn btn-default" href="{% url 'user:notifications_read' %}"
+                           style="color: black">
+                            <i class="fa fa-camera-retro" aria-hidden="true"></i> 镜像备份消息
+                        </a>
+                        <a class="btn btn-default" href=""
+                           style="color: black">
+                            <i class="fa fa-refresh" aria-hidden="true"></i> 刷新
+                        </a>
+                        {#                        <a href="" class="btn btn-warning" role="button" style="color: white">#}
+                        {#                            <i class="fa fa-remove"> 清空所有通知</i>#}
+                        {#                        </a>#}
+                    </div>
+                    <div class="panel-body">
+                        <div class="col-sm-12" style="margin-top: 30px">
+                            <div class="container-fluid">
+                                <div class="panel-body" style="height:250px;overflow: scroll">
+                                    <div class="container">
+                                        <div class="row mt-4 ml-4">
+                                        </div>
+                                        <!-- 未读通知列表 -->
+                                        <div class="row mt-2 ml-4">
+                                            <ul class="list-group">
+                                                {% if image_objects_all %}
+                                                    {% for notice in image_objects_all %}
+                                                        <li class="list-group-item" id="notice_link"><span
+                                                                style="color: red">[镜像日志] </span>&nbsp;
+                                                            用户 <span
+                                                                    style="color: #5897fb"> {{ notice.nf_actor_name }}</span>
+                                                            在 <span style="color: #01a252;">
+                                                        {{ notice.nf_target_object }}
+                                                    </span>
+                                                            {{ notice.nf_verb }} <span
+                                                                    style="color: #5897fb;">({{ request.tracer.user.username }})</span>
+                                                            为 <span style="color: #5897fb;">处理人</span> 等级为
+                                                            {% if notice.nf_level == "error" %}
+                                                                <span class="label label-danger">高</span>
+                                                            {% elif notice.nf_level == "success" %}
+                                                                <span class="label label-success">成功</span>
+                                                            {% elif notice.nf_level == "info" %}
+                                                                <span class="label label-info">告知</span>
+                                                            {% elif notice.nf_level == "warning" %}
+                                                                <span class="label label-warning">警告</span>
+                                                            {% else %}
+                                                                <span class="label label-danger">未知</span>
+                                                            {% endif %}
+                                                            &nbsp;该问题属于项目:《{{ notice.nf_project }}》项目ID: {{ notice.nf_project_id }}
+                                                            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{{ notice.nf_timestamp|date:"Y/m/d H:i" }}
+                                                        </li>
+                                                    {% endfor %}
+                                                {% else %}
+                                                    暂无备份消息
+                                                {% endif %}
+                                            </ul>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+</div>
+
+<script type="text/javascript" src="/static/aliyun/js/base-all.js"></script>
+<script type="text/javascript" src="/static/aliyun/js/common-header.js"></script>
+<script src="{% static 'js/jquery-3.4.1.min.js' %}"></script>
+<script src="{% static 'plugin/bootstrap/js/bootstrap.min.js' %}"></script>
+
+</body>
+</html>
+
+

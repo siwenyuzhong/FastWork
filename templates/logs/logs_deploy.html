@@ -1,0 +1,93 @@
+{% extends 'base/site-base.html' %}
+{% block css %}
+    <style>
+        .content {
+            height: calc(100vh - 120px);
+            overflow: scroll;
+            margin-left: -1px;
+        }
+    </style>
+{% endblock %}
+
+{% block title %}
+    FastWork - 项目部署日志中心
+{% endblock %}
+
+{% block content %}
+    <div class="container-fluid content" style="margin-top: 20px">
+
+        <div class="col-sm-12">
+            <div class="panel-heading">
+                <ol class="breadcrumb">
+                    <li><a href="{% url 'project:list' %}" style="color: #337ab7">项目大厅</a></li>
+                    <li><a href="{% url 'journal:journal-logs_management' %}?project_id={{ request.tracer.project.id }}"
+                           style="color: #337ab7">日志中心</a></li>
+                    <li class="active">项目部署日志中心</li>
+                </ol>
+            </div>
+        </div>
+
+        <div class="col-sm-12" style="margin-top: -20px">
+            <div class="panel-body">
+                <table class="table table-hover">
+                    <thead>
+                    <tr>
+                        <th scope="col">序号</th>
+                        <th scope="col">所属项目</th>
+                        <th scope="col">所属工程</th>
+                        <th scope="col">工程代码地址</th>
+                        <th scope="col">工程部署路径</th>
+                        <th scope="col">部署任务名称</th>
+                        <th scope="col">部署任务建立日期</th>
+                        <th scope="col">部署任务发布节点名称</th>
+                        <th scope="col">部署任务发布节点状态</th>
+                        <th scope="col">部署任务发布节点至服务器</th>
+                        <th scope="col">部署任务发布节点执行结果</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {% for res in results %}
+                        <tr>
+                            <th scope="row">{{ forloop.counter }}</th>
+                            <th scope="row"><span class="label label-success">{{ res.project_name }}+</span>
+                            </th>
+                            <td>{{ res.programme_name }}</td>
+                            <td>{{ res.programme_repo }}</td>
+                            <td>{{ res.programme_path }}</td>
+                            <td>{{ res.deploy_task_name }}</td>
+                            <td>{{ res.deploy_task_date }}</td>
+                            <td>{{ res.deploy_task_node_text }}</td>
+                            {#                            <td>{{ res.deploy_task_node_status }}</td>#}
+                            {% if res.deploy_task_node_status == "green" %}
+                                <th scope="row"><span class="label label-success"
+                                                      style="background-color: #5cb85c;border: none">执行成功</span>
+                                </th>
+                            {% elif res.deploy_task_node_status == "red" %}
+                                <th scope="row"><span class="label label-danger"
+                                                      style="background-color: red;border: none">执行失败</span></th>
+                            {% elif res.deploy_task_node_status == "lightgray" %}
+                                <th scope="row"><span class="label label-info"
+                                                      style="background-color: lightgray;border: none">暂未发布</span>
+                                </th>
+                            {% endif %}
+                            {% if res.deploy_task_node_server %}
+                                <td>{{ res.deploy_task_node_server }}</td>
+                            {% else %}
+                                <td>未设置部署服务器</td>
+                            {% endif %}
+                            <td>{{ res.deploy_task_node_execute_records }}</td>
+
+                            {#                            <th scope="row"><span class="label label-success">{{ file_send_obj.project.name }}+</span>#}
+                            {#                            </th>#}
+
+                        </tr>
+                    {% endfor %}
+
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+{% endblock %}
+

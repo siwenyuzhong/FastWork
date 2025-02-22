@@ -1,0 +1,33 @@
+{% load static %}
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="shortcut icon" href="{% static 'img/head_logo.png' %}" type="image/x-icon"/>
+    <title>{% block title %}{% endblock %}</title>
+    {% block css %}
+    {% endblock %}
+
+</head>
+<body>
+
+
+<div class="container py-3">
+    <header>
+        {% block header %}
+        {% endblock %}
+    </header>
+
+    {% block content %}
+    {% endblock %}
+
+    {% block footer %}
+    {% endblock %}
+</div>
+
+{% block js %}
+
+{% endblock %}
+</body>
+</html>

@@ -1,0 +1,189 @@
+{% extends 'base/site-base.html' %}
+
+{% block title %}
+    FastWork - 服务器列表
+{% endblock %}
+{% block css %}
+    <style>
+        .content {
+            height: calc(100vh - 100px);
+            overflow: scroll;
+            border-left: 1px solid #dddddd;
+            border-right: 1px solid #dddddd;
+            margin-left: -1px;
+        }
+
+    </style>
+{% endblock %}
+{% block content %}
+    <div class="container-fluid" style="margin-top: 20px">
+        <div class="col-sm-12">
+            <div class="panel-heading">
+                <ol class="breadcrumb">
+                    <li><a href="{% url 'project:list' %}" style="color: #337ab7">项目大厅</a></li>
+                    <li>
+                        <a href="{% url 'tools_execution:tools-server-list' %}?project_id={{ request.tracer.project.id }}"
+                           style="color: #337ab7">服务器管理</a></li>
+                    <li class="active">服务器列表</li>
+                </ol>
+            </div>
+        </div>
+
+
+        <div class="col-sm-12" style="margin-top: -20px">
+            <div class="col-lg-6">
+                <div class="input-group">
+                    <a class="btn btn-default" data-toggle="modal" data-target="#addModal" style="margin-bottom: 5px">
+                        <i class="fa fa-plus" aria-hidden="true"></i> 添加服务器
+                    </a>
+                </div>
+            </div>
+
+        </div>
+
+        <div class="col-sm-12">
+            <div class="container-fluid">
+                <div class="panel panel-default">
+                    <div class="panel-body">
+                        <div>
+                            <table class="table table-bordered">
+                                <thead>
+                                <tr>
+                                    <th style="text-align: center"><strong>编号</strong></th>
+                                    <th style="text-align: center"><strong>主机地址</strong></th>
+                                    <th style="text-align: center"><strong>用户名</strong></th>
+                                    <th style="text-align: center"><strong>用户密码</strong></th>
+                                    <th style="text-align: center"><strong>端口</strong></th>
+                                    <th style="text-align: center"><strong>描述</strong></th>
+                                    <th style="text-align: center"><strong>操作</strong></th>
+                                </tr>
+                                </thead>
+                                <tbody style="text-align: center">
+                                {% for foo in accounts_obj %}
+                                    <tr>
+                                        <td style="width: 100px">
+                                            {{ forloop.counter }}
+                                        </td>
+                                        <td style="width: 100px">
+                                            {{ foo.hostname }}
+                                        </td>
+                                        <td style="width: 100px">
+                                            {{ foo.username }}
+                                        </td>
+                                        <td style="width: 5px">
+                                            <input type="password" style="border: none;text-align: center"
+                                                   value="{{ foo.password }}" disabled>
+                                        </td>
+                                        <td style="width: 100px">
+                                            {{ foo.port }}
+                                        </td>
+                                        <td style="width: 100px">
+                                            {{ foo.desc }}
+                                        </td>
+                                        <td style="width: 100px">
+                                            <a href="{% url 'tools_execution:tools-server-delete' %}?project_id={{ request.tracer.project.id }}&server_id={{ foo.id }}"
+                                               class="btn btn-danger btn-sm" style="color: white"><span
+                                                    class="glyphicon glyphicon-trash"
+                                                    aria-hidden="true"></span> 删除</a>
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="addModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
+                            aria-hidden="true">&times;</span></button>
+                    <h4 class="modal-title" id="myModalLabel">添加服务器</h4>
+                </div>
+                <div class="modal-body">
+                    <form id="addForm">
+                        <h3 style="color: rgba(0,0,0,0.65);margin-bottom: 5px">主机地址</h3>
+                        <input type="text" class="form-control" placeholder="请输入主机地址" id="ipaddress">
+                        <p style="margin-top: 20px"></p>
+
+                        <h3 style="color: rgba(0,0,0,0.65);margin-bottom: 5px">用户名</h3>
+                        <input type="text" class="form-control" value="root" id="username">
+                        <p style="margin-top: 20px"></p>
+
+                        <h3 style="color: rgba(0,0,0,0.65);margin-bottom: 5px">密码</h3>
+                        <input type="password" class="form-control" placeholder="请输入密码" id="password">
+                        <p style="margin-top: 20px"></p>
+
+                        <h3 style="color: rgba(0,0,0,0.65);margin-bottom: 5px">端口</h3>
+                        <input type="text" class="form-control" value="22" id="port">
+                        <p style="margin-top: 20px"></p>
+
+                        <h3 style="color: rgba(0,0,0,0.65);margin-bottom: 5px">描述</h3>
+                        <textarea class="form-control" placeholder="请输入主机描述" id="desc"
+                                  style="resize: none"></textarea>
+                        <p style="margin-top: 20px"></p>
+
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">取 消</button>
+                    <button id="btnSubmitAdd" type="button" class="btn btn-primary" style="background-color: #167be0">添
+                        加
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+{% endblock %}
+
+
+{% block js %}
+
+    <script>
+        $(function () {
+            $("#btnSubmitAdd").click(function () {
+                var ipaddress = $("#ipaddress").val();
+                var username = $("#username").val();
+                var password = $("#password").val();
+                var port = $("#port").val();
+                var desc = $("#desc").val();
+
+
+                if (ipaddress === "" || password === "") {
+                    alert("【主机地址】或【密码】不能为空！");
+                    return false;
+                }
+
+                $.ajax({
+                    url: "{% url 'tools_execution:tools-server-list' %}",
+                    type: "POST",
+                    dataType: 'json',
+                    data: {
+                        'ipaddress': ipaddress,
+                        'project_id': {{ request.tracer.project.id }},
+                        'username': username,
+                        'password': password,
+                        'port': port,
+                        'desc': desc,
+                        'csrfmiddlewaretoken': '{{ csrf_token }}'
+                    },
+                    success: function (data) {
+                        if (data.state == 0) {
+                            location.href = '{% url 'tools_execution:tools-server-list'  %}?project_id={{ request.tracer.project.id }}'
+                        } else {
+                            $("#tools_error").show().html(data.msg)
+                        }
+                    }
+                })
+
+            })
+        })
+    </script>
+
+{% endblock %}

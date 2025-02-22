@@ -1,0 +1,336 @@
+{% extends 'base/site-base.html' %}
+
+{% block title %}
+    FastWork - 定时任务
+{% endblock %}
+{% block css %}
+    <style>
+        .content {
+            height: calc(100vh - 100px);
+            overflow: scroll;
+            border-left: 1px solid #dddddd;
+            border-right: 1px solid #dddddd;
+            margin-left: -1px;
+        }
+
+    </style>
+{% endblock %}
+{% block content %}
+    <div class="container-fluid" style="margin-top: 20px">
+        <div class="col-sm-12">
+            <div class="panel-heading">
+                <ol class="breadcrumb">
+                    <li><a href="{% url 'project:list' %}" style="color: #337ab7">项目大厅</a></li>
+                    <li>
+                        <a href="{% url 'task_scheduler:task_scheduler-task-list' %}?project_id={{ request.tracer.project.id }}"
+                           style="color: #337ab7">定时任务</a></li>
+                    <li class="active">任务列表</li>
+                </ol>
+            </div>
+        </div>
+
+
+        <div class="col-sm-12" style="margin-top: -20px">
+            <div class="col-lg-6">
+                <div class="input-group">
+                    <a href="{% url 'task_scheduler:task_scheduler-task-add' %}?project_id={{ request.tracer.project.id }}"
+                       class="btn btn-default"
+                       style="color: #333;margin-bottom: 5px">
+                        <span class="glyphicon glyphicon-plus" aria-hidden="true"></span>
+                        新建定时任务</a>
+                    <a href="{% url 'task_scheduler:task_scheduler-task-show-log' %}?project_id={{ request.tracer.project.id }}"
+                       class="btn btn-default"
+                       style="color: #333;margin-bottom: 5px;margin-left: 1px">
+                        <i class="fa fa-history"></i>
+                        任务执行历史</a>
+                    <a href="{% url 'task_scheduler:task_scheduler-fast_task-list' %}?project_id={{ request.tracer.project.id }}"
+                       class="btn btn-default"
+                       style="color: #333;margin-bottom: 5px;margin-left: 1px">
+                        <i class="fa fa-paper-plane"></i>
+                        FastTasks</a>
+                </div>
+            </div>
+
+        </div>
+        <div class="col-sm-12">
+            <div class="container-fluid">
+                <div class="panel panel-default">
+                    <div class="panel-body">
+                        <div>
+                            {% if queryset %}
+                                <table class="table table-bordered">
+                                    <thead>
+                                    <tr>
+                                        <th style="text-align: center"><strong>任务ID</strong></th>
+                                        <th style="text-align: center"><strong>任务名称</strong></th>
+                                        <th style="text-align: center"><strong>执行操作</strong></th>
+                                        <th style="text-align: center"><strong>执行状态</strong></th>
+                                        <th style="text-align: center"><strong>下次执行时间(年-日-月 时:分:秒)</strong>
+                                        </th>
+                                        <th style="text-align: center"><strong>是否告警</strong></th>
+                                        <th style="text-align: center"><strong>操作</strong></th>
+                                    </tr>
+                                    </thead>
+                                    <tbody style="text-align: center">
+                                    {% for foo in issues_object_list %}
+                                        <tr>
+                                            <td>
+                                                <div style="width: 150px">
+                                                    <a href="{% url 'task_scheduler:task_scheduler-task-search' %}?project_id={{ request.tracer.project.id }}&keyword={{ foo.id }}"
+                                                       title="{{ foo.id }}">
+                                                        <strong>{{ foo.id|truncatechars:15 }}...</strong>
+                                                    </a>
+                                                </div>
+                                            </td>
+                                            <td>
+                                                <div style="width: 150px;height: 20px;overflow: scroll">
+                                                    <span>{{ foo.name|truncatechars:15 }}</span>
+                                                </div>
+                                            </td>
+                                            <td>
+                                                <div style="width: 400px;height: 20px;overflow: scroll">
+                                                    <span>{{ foo.cmd }}</span>
+                                                </div>
+                                            </td>
+
+                                            {% if foo.status == True %}
+                                                <td style="width: 100px">
+                                                    <a style="pointer-events: none"
+                                                       class="btn btn-success btn-sm">运行中</a>
+                                                </td>
+                                            {% else %}
+                                                <td style="width: 100px">
+                                                    <a style="pointer-events: none"
+                                                       class="btn btn-danger btn-sm">未运行</a>
+                                                </td>
+                                            {% endif %}
+                                            <td style="width: 200px">{{ foo.next_run_time }}</td>
+                                            <td style="width: 100px">
+
+                                                {% if foo.is_alarm == "无告警方式" %}
+                                                    <a class="nav-link btn btn-info btn-sm"
+                                                       style="color: white;pointer-events: none">无告警</a>
+                                                {% else %}
+                                                    <a class="nav-link btn btn-info btn-sm" href="#"
+                                                       data-toggle="modal" style="color: white" id="xxxxxxxxxx"
+                                                       onclick="get_alarm('{{ foo.id }}')"
+                                                       data-target="#IntervalModal">查看告警</a>
+                                                {% endif %}
+                                            </td>
+                                            <td style="width: 300px;">
+
+                                                <a class="btn btn-danger btn-sm" data-toggle="modal"
+                                                   data-target="#addModal" id="get_log"
+                                                   onclick="remove_job('{{ foo.id }}')">
+                                                    <span class="glyphicon glyphicon-trash"></span> 删除
+                                                </a>
+                                                <a class="btn btn-warning btn-sm" data-toggle="modal"
+                                                   data-target="#addModal" id="get_log"
+                                                   onclick="pause_job('{{ foo.id }}')">
+                                                    <span class="glyphicon glyphicon-stop"></span> 暂停
+                                                </a>
+                                                <a class="btn btn-success btn-sm" data-toggle="modal"
+                                                   data-target="#addModal" id="get_log"
+                                                   onclick="resume_job('{{ foo.id }}')">
+                                                    <span class="glyphicon glyphicon-play"></span>恢复
+                                                </a>
+                                            </td>
+                                        </tr>
+                                    {% endfor %}
+                                    </tbody>
+                                </table>
+                            {% else %}
+                                <table class="table table-bordered">
+                                    <thead>
+                                    <tr>
+                                        <th style="text-align: center"><strong>任务ID</strong></th>
+                                        <th style="text-align: center"><strong>任务名称</strong></th>
+                                        <th style="text-align: center"><strong>执行操作</strong></th>
+                                        <th style="text-align: center"><strong>执行状态</strong></th>
+                                        <th style="text-align: center"><strong>下次执行时间</strong></th>
+                                        <th style="text-align: center"><strong>操作</strong></th>
+                                    </tr>
+                                    </thead>
+                                    <tbody style="text-align: center">
+                                    <tr>
+                                        <td colspan="6">暂无任务</td>
+                                    </tr>
+                                    </tbody>
+                                </table>
+                            {% endif %}
+                        </div>
+                    </div>
+                    <nav aria-label="...">
+                        <ul class="pagination" style="margin-top: 0;">
+                            {{ page_html|safe }}
+                        </ul>
+                    </nav>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+
+    <div class="modal fade" id="IntervalModal" role="dialog">
+        <div class="temp-custom-modal-wrap">
+            <div class="modal-dialog" style="width: 1200px">
+                <!-- Modal content-->
+                <div class="modal-content temp-custom-modal-content">
+                    <div class="modal-body temp-custom-modal-body">
+                        <div class="temp-login-form-wrapper">
+                            <h2>告警条件</h2>
+                            <hr>
+                            <div class="row custom-row">
+                                <div class="col-md-4">
+                                    <div class="form-group"
+                                         style="margin-top: 15px">
+                                        <input type="text" id="alarm_cmd"
+                                               class="form-control"
+                                               value="" disabled>
+                                    </div>
+                                </div>
+                                <div class="col-md-1">
+                                    <button class="btn btn-success"
+                                            style="margin-top: 15px;margin-bottom: 30px;margin-left: -5px;pointer-events: none">
+                                        的结果
+                                    </button>
+                                </div>
+                                <div class="col-md-1">
+                                    <div class="form-group"
+                                         style="margin-top: 15px;margin-left: -10px">
+                                        <input type="text" id="operate_condition" style="width: 100px"
+                                               class="form-control"
+                                               value="" disabled>
+                                    </div>
+                                </div>
+                                <div class="col-md-1">
+                                    <button class="btn btn-success"
+                                            style="margin-top: 15px;margin-bottom: 30px;margin-left: 15px;pointer-events: none">
+                                        阈值
+                                    </button>
+                                </div>
+                                <div class="col-md-2">
+                                    <div class="form-group"
+                                         style="margin-top: 15px;margin-left: -10px">
+                                        <input type="text" id="alarm_threshold"
+                                               class="form-control"
+                                               value="" disabled>
+                                    </div>
+                                </div>
+                                <div class="col-md-1">
+                                    <button class="btn btn-success"
+                                            style="margin-top: 15px;margin-bottom: 30px;pointer-events: none;margin-left: 3px">
+                                        则进行
+                                    </button>
+                                </div>
+                                <div class="col-md-2">
+                                    <div class="form-group"
+                                         style="margin-top: 15px">
+                                        <input type="text" id="alarm_way"
+                                               class="form-control"
+                                               value="" disabled>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+{% endblock %}
+
+
+{% block js %}
+    <script>
+        function get_alarm(id) {
+            $.ajax({
+                url: "{% url 'task_scheduler:task_scheduler-task-list' %}",
+                type: "POST",
+                dataType: 'json',
+                data: {
+                    'task_id': id,
+                    'project_id': {{ request.tracer.project.id }},
+                    'csrfmiddlewaretoken': '{{ csrf_token }}'
+                },
+                success: function (data) {
+                    if (data.status == 200) {
+                        document.getElementById("alarm_cmd").value = data.cmd;
+                        document.getElementById("operate_condition").value = data.operate_condition;
+                        document.getElementById("alarm_threshold").value = data.alarm_threshold;
+                        document.getElementById("alarm_way").value = data.alarm_way;
+                    }
+                }
+            })
+        }
+    </script>
+
+    <script type="text/javascript">
+        // 暂停任务按钮绑定事件
+        function pause_job(id) {
+            $.ajax({
+                url: "{% url 'task_scheduler:task_scheduler-task-pause' %}",
+                type: "POST",
+                dataType: 'json',
+                data: {
+                    'task_id': id,
+                    'project_id': {{ request.tracer.project.id }},
+                    'csrfmiddlewaretoken': '{{ csrf_token }}'
+                },
+                success: function (data) {
+                    if (data.status == 200) {
+                        alert("暂停任务成功");
+                        location.href = "{% url 'task_scheduler:task_scheduler-task-list' %}?project_id={{ request.tracer.project.id }}"
+                    } else {
+                        alert("暂停任务失败")
+                    }
+                }
+            })
+        }
+
+        // 恢复任务按钮绑定事件
+        function resume_job(id) {
+            $.ajax({
+                url: "{% url 'task_scheduler:task_scheduler-task-resume' %}",
+                type: "POST",
+                dataType: 'json',
+                data: {
+                    'task_id': id,
+                    'project_id': {{request.tracer.project.id}},
+                    'csrfmiddlewaretoken': '{{ csrf_token }}'
+                },
+                success: function (data) {
+                    if (data.status == 200) {
+                        alert("恢复任务成功");
+                        location.href = "{% url 'task_scheduler:task_scheduler-task-list' %}?project_id={{ request.tracer.project.id }}"
+                    } else {
+                        alert("恢复任务失败")
+                    }
+                }
+            })
+        }
+
+        // 恢复任务按钮绑定事件
+        function remove_job(id) {
+            $.ajax({
+                url: "{% url 'task_scheduler:task_scheduler-task-remove' %}",
+                type: "POST",
+                dataType: 'json',
+                data: {
+                    'task_id': id,
+                    'project_id': {{request.tracer.project.id}},
+                    'csrfmiddlewaretoken': '{{ csrf_token }}'
+                },
+                success: function (data) {
+                    if (data.status == 200) {
+                        location.href = "{% url 'task_scheduler:task_scheduler-task-list' %}?project_id={{ request.tracer.project.id }}"
+                    } else {
+                        alert("删除任务失败")
+                    }
+                }
+            })
+        }
+    </script>
+{% endblock %}

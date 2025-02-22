@@ -1,0 +1,244 @@
+{% extends 'base/site-base.html' %}
+{% load static %}
+
+{% block title %}
+    FastWork - 知识库
+{% endblock %}
+
+{% block css %}
+    <link rel="stylesheet" href="{% static 'plugin/editor-md/css/editormd.preview.min.css' %}">
+    <link rel="stylesheet" href="{% static 'global_css/global.css' %}">
+    <style>
+        .damacontent {
+            filter: blur(3px);
+        }
+    </style>
+{% endblock %}
+
+
+{% block content %}
+    <div class="container-fluid" style="height:calc(100vh - 100px);overflow: scroll;margin-top: 20px">
+        <div class="panel panel-default">
+            <div class="panel-heading" style="height: 50px">
+                <ol class="breadcrumb">
+                    <li><a href="{% url 'project:list' %}" style="color: #337ab7">项目大厅</a></li>
+                    <li><a href="{% url 'wiki:wiki-list' %}?project_id={{ request.tracer.project.id }}">知识库文档</a>
+                    </li>
+                    <li class="active">知识库文档列表</li>
+                </ol>
+                <div class="function">
+                    {% if wiki_object %}
+                        <a type="button" class="btn btn-default btn-xs" style="color: #333;"
+                           href="{% url 'wiki:wiki-add' %}?project_id={{ request.tracer.project.id }}">
+                            <i class="fa fa-plus-circle" aria-hidden="true"></i> 新建
+                        </a>
+                        <a type="button" class="btn btn-default btn-xs" style="color: #333;"
+                           href="{% url 'wiki:wiki-auto-add' %}?project_id={{ request.tracer.project.id }}">
+                            <i class="fa fa-cloud-upload" aria-hidden="true"></i> 自动录入
+                        </a>
+                        <a type="button" class="btn btn-default btn-xs" style="color: #333"
+                           href="{% url 'wiki:wiki-edit' %}?project_id={{ request.tracer.project.id }}&wiki_id={{ wiki_object.id }}">
+                            <i class="fa fa-edit" aria-hidden="true"></i> 编辑
+                        </a>
+                        <a type="button" class="btn btn-default btn-xs" style="color: #333"
+                           href="{% url 'wiki:wiki-download' %}?project_id={{ request.tracer.project.id }}&wiki_id={{ wiki_object.id }}">
+                            <i class="fa fa-download" aria-hidden="true"></i> 导出文本.md
+                        </a>
+                        <a type="button" class="btn btn-default btn-xs" data-toggle="modal"
+                           data-target="#inviteModal"
+                           href="" style="color: #333">
+                            <i class="fa fa-share-square-o" aria-hidden="true"></i> 分享
+                        </a>
+                        <a type="button" class="btn btn-default btn-xs" id="delete_wiki_btn">
+                            <i class="fa fa-trash" aria-hidden="true"></i> 删除
+                        </a>
+                    {% endif %}
+                </div>
+            </div>
+            <div class="panel-body">
+                <div class="col-sm-2 title-list">
+                    <ul id="catalog">
+
+                    </ul>
+
+                </div>
+
+                <div class="col-sm-10 content">
+                    {% if wiki_object %}
+                        <h5><span class="glyphicon glyphicon-comment" aria-hidden="true"></span>
+                            【 {{ wiki_object.title }} 】内容</h5>
+                        <hr>
+                        <div id="previewMarkdown">
+                            <textarea>{{ wiki_object.content }}</textarea>
+                        </div>
+
+                    {% else %}
+                        <div style="text-align: center;margin-top: 200px">
+                            {% if request.tracer.project.isShow == "True" %}
+                                <h4 class="damacontent"> 《{{ request.tracer.project.name }}》知识文档库 </h4>
+                            {% else %}
+                                <h4> 《{{ request.tracer.project.name }}》知识文档库 </h4>
+                            {% endif %}
+                            <a class="btn btn-default btn-sm"
+                               style="color: #333;margin-top: 1px;"
+                               href="{% url 'wiki:wiki-add' %}?project_id={{ request.tracer.project.id }}"><span
+                                    class="glyphicon glyphicon-plus"
+                                    aria-hidden="true"></span> 新建知识</a> 或 <a class="btn btn-default btn-sm"
+                                                                                  style="color: #333;margin-top: 1px;"
+                                                                                  href="{% url 'wiki:wiki-auto-add' %}?project_id={{ request.tracer.project.id }}"><span
+                                class="glyphicon glyphicon-cloud-upload"
+                                aria-hidden="true"></span> 自动录入</a>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade in" id="inviteModal" role="dialog">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
+                            aria-hidden="true">&times;</span></button>
+                    <h5 class="modal-title" id="myModalLabel">《{{ wiki_object.title }}》文档分享页面</h5>
+                </div>
+                <div class="modal-body" style="padding-right: 40px;">
+                    <form id="inviteForm">
+                        {% csrf_token %}
+                        <button type="button" class="btn btn-primary" id="btnGenInviteCode"
+                                style="background-color: #167be0">生成文档分享链接
+                        </button>
+                    </form>
+                    <div id="inviteArea" class="hide">
+                        <hr/>
+                        <div class="form-group">
+                            <div class="input-group" style="margin-top: 20px">
+                                <div class="input-group-btn">
+                                    <input type="button" value="分享链接" class="btn btn-default">
+                                </div>
+                                <input type="text" class="form-control" id="inviteUrl">
+                                <div class="input-group-btn">
+                                    <input type="button" value="复制链接" class="btn btn-primary" id="btnCopyUrl"
+                                           style="background-color: #167be0">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+{% endblock %}
+
+{% block js %}
+    <script src="{% static 'plugin/editor-md/editormd.min.js' %}"></script>
+    <script src="{% static 'plugin/editor-md/lib/marked.min.js' %}"></script>
+    <script src="{% static 'plugin/editor-md/lib/prettify.min.js' %}"></script>
+    <script src="{% static 'plugin/editor-md/lib/raphael.min.js' %}"></script>
+    <script src="{% static 'plugin/editor-md/lib/underscore.min.js' %}"></script>
+    <script src="{% static 'plugin/editor-md/lib/sequence-diagram.min.js' %}"></script>
+    <script src="{% static 'plugin/editor-md/lib/flowchart.min.js' %}"></script>
+    <script src="{% static 'plugin/editor-md/lib/jquery.flowchart.min.js' %}"></script>
+    <script>
+
+        $(function () {
+            bindCopyUrl();
+        });
+
+
+        $('#btnGenInviteCode').click(function () {
+            $.ajax({
+                url: "{% url 'wiki:wiki-invite-url' %}?project_id={{ request.tracer.project.id }}&wiki_id={{ wiki_id }}",
+                type: "GET",
+                success: function (res) {
+                    if (res.status) {
+                        $('#inviteArea').removeClass('hide').find('#inviteUrl').val(res.data);
+                    } else {
+                        $.each(res.error, function (k, v) {
+                            $('#id_' + k).next('.error-msg').text(v[0]);
+                        })
+                    }
+                }
+            })
+
+        });
+
+        /*
+        点击拷贝邀请码
+        */
+        function bindCopyUrl() {
+            $('#btnCopyUrl').click(function () {
+                var textInput = $('#inviteUrl')[0]; // document.getElementById('inviteUrl')
+                textInput.select();
+
+                document.execCommand("Copy");
+                alert('复制成功');
+            })
+        }
+    </script>
+    <script>
+
+        // http://127.0.0.1:8002/manage/2/wiki/detail/
+        var WIKI_DETAIL_URL = "{% url 'wiki:wiki-list' %}?project_id={{ request.tracer.project.id }}";
+
+        $(function () {
+            initCatalog();
+            initPreivewMarkdown();
+        });
+
+        function initPreivewMarkdown() {
+            editormd.markdownToHTML("previewMarkdown", {
+                htmlDecode: "style,script,iframe",
+                emoji: true,
+                taskList: true,
+            });
+        }
+
+        function initCatalog() {
+            $.ajax({
+                url: "{% url 'wiki:wiki-catalog' %}?project_id={{ request.tracer.project.id }}",
+                type: "GET",
+                dataType: "JSON",
+                success: function (res) {
+                    if (res.status) {
+                        $.each(res.data, function (index, item) {
+                            var href = WIKI_DETAIL_URL + "&wiki_id=" + item.id;
+                            var li = $("<li>").attr('id', "id_" + item.id).append($('<a>').text(item.title).attr('href', href)).append($('<ul>'));
+
+                            if (!item.parent_id) {
+                                // 添加到catalog中
+                                $('#catalog').append(li);
+                            } else {
+                                $("#id_" + item.parent_id).children('ul').append(li);
+                            }
+                        })
+                    } else {
+                        alert("初始化目录失败");
+                    }
+                }
+            })
+        }
+    </script>
+    <script>
+        $("#delete_wiki_btn").click(function () {
+            var wiki_id = "";
+            if (wiki_id === ' ') {
+                wiki_id = 0
+            } else {
+                wiki_id =
+                {{ wiki_object.id }}
+            }
+            var url = "{% url 'wiki:wiki-delete' %}?project_id={{ request.tracer.project.id }}&wiki_id=" + wiki_id
+            $.get(url, function (ret) {
+                if (ret.status !== 200) {
+                    alert(ret.msg)
+                } else {
+                    location.href = "{% url 'wiki:wiki-list' %}?project_id={{ request.tracer.project.id }}"
+                }
+            })
+        })
+    </script>
+
+{% endblock %}

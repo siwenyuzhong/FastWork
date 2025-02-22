@@ -1,0 +1,170 @@
+{% extends 'base/site-base.html' %}
+{% load static %}
+
+{% block css %}
+    <style>
+        .content {
+            height: calc(100vh - 120px);
+            overflow: scroll;
+            margin-left: -1px;
+        }
+
+        th {
+            text-align: center;
+        }
+    </style>
+{% endblock %}
+{% block title %}
+    FastWork - 进程信息
+{% endblock %}
+{% block content %}
+    <div class="container-fluid content" style="margin-top: 20px">
+        <div class="col-sm-12">
+            <div class="panel-heading">
+                <ol class="breadcrumb">
+                    <li><a href="{% url 'project:list' %}" style="color: #337ab7">项目大厅</a></li>
+                    <li><a href="{% url 'cmdb:cmdb-assets' %}?project_id={{ request.tracer.project.id }}"
+                           style="color: #337ab7">资产管理</a></li>
+                    <li>
+                        <a href="{% url 'cmdb:cmdb-get-server-infos-intance-details' %}?project_id={{ request.tracer.project.id }}&q={{ macObj.mac }}"
+                           style="color: #337ab7">{{ macObj.name }}</a></li>
+                    <li class="active">进程信息</li>
+                </ol>
+            </div>
+        </div>
+
+        <div class="col-sm-12" style="margin-top: -20px">
+            <div class="container-fluid">
+                <div class="panel panel-default">
+                    <div class="panel-body">
+                        <div>
+                            {% if context.queryset %}
+                                <table class="table table-bordered">
+                                    <thead>
+                                    <tr>
+                                        <th>序号</th>
+                                        <th>进程名称</th>
+                                        <th>进程ID</th>
+                                        <th>CPU使用率(%)</th>
+                                        <th>进程用户名</th>
+                                        <th>状态</th>
+                                        <th>内存(MB)</th>
+                                        <th>最新上报时间</th>
+                                        <th>进程信息</th>
+                                    </tr>
+                                    </thead>
+                                    <tbody style="text-align: center">
+                                    {% for process in context.info_list %}
+                                        <tr>
+                                            <td>{{ forloop.counter }}</td>
+                                            <td>{{ process.name }}</td>
+                                            <td>{{ process.pid }}</td>
+                                            <td>{{ process.cpu_percent }}</td>
+                                            <td>{{ process.username }}</td>
+
+                                            {% if process.status == "running" %}
+                                                <td style="text-align: center"><span
+                                                        class="label label-success">{{ process.status }}</span></td>
+                                            {% else %}
+                                                <td style="text-align: center"><span
+                                                        class="label label-warning">{{ process.status }}</span></td>
+                                            {% endif %}
+
+                                            <td>{{ process.mem }}</td>
+                                            <td>{{ process.last_time }}</td>
+                                            <td style="text-align: center">
+
+                                                <a data-toggle="modal" class="btn btn-default btn-sm"
+                                                   data-target="#addModal"
+                                                   onclick="get_code({{ process.pk }})">
+                                                    <i class="fa fa-eye" aria-hidden="true"></i> 进程详情
+                                                </a>
+                                            </td>
+                                        </tr>
+                                    {% endfor %}
+                                    </tbody>
+                                </table>
+                            {% else %}
+                                <table class="table table-bordered">
+                                    <thead>
+                                    <tr>
+                                        <th>序号</th>
+                                        <th>进程ID</th>
+                                        <th>名称</th>
+                                        <th>CPU使用率(%)</th>
+                                        <th>进程用户名</th>
+                                        <th>状态</th>
+                                        <th>内存(MB)</th>
+                                        <th>最新上报时间</th>
+                                        <th>进程信息</th>
+                                    </tr>
+                                    </thead>
+                                    <tbody style="text-align: center">
+                                    <tr>
+                                        <td colspan="9">暂无进程</td>
+                                    </tr>
+                                    </tbody>
+                                </table>
+                            {% endif %}
+                        </div>
+                    </div>
+                    <nav aria-label="...">
+                        <ul class="pagination" style="margin-top: 0;">
+                            {{ context.page_html|safe }}
+                        </ul>
+                    </nav>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+
+    <div class="modal fade" id="addModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
+                            aria-hidden="true">&times;</span></button>
+                    <h4 class="modal-title">
+                        <input type="text" id="myModalLabel" style="border: none;" disabled>
+                    </h4>
+
+                </div>
+                <div class="modal-body">
+                    <span>cwd信息</span>
+                    <textarea id="cwdmessagecontainer" class="form-control" style="resize: none" disabled></textarea>
+                    <span>exe信息</span>
+                    <textarea id="exemessagecontainer" class="form-control" style="resize: none" disabled></textarea>
+
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+{% endblock %}
+
+{% block js %}
+    <script>
+        function get_code(process_id) {
+            $('#messagecontainer').empty();
+            $.ajax({
+                url: "{% url 'cmdb:cmdb-get-process-info' %}?project_id={{ request.tracer.project.id }}&process_id=" + process_id,
+                type: "get",
+                success: function (res) {
+                    if (res.status) {
+                        console.log(res.data.cwd)
+                        $("#myModalLabel").val("进程【" + res.data.pid + "】详细信息")
+                        $('#cwdmessagecontainer').val(res.data.cwd);
+                        $('#exemessagecontainer').val(res.data.exe);
+                    }
+                }
+            })
+        }
+    </script>
+{% endblock %}
+
+
+
+

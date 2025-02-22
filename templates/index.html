@@ -1,0 +1,232 @@
+{% load static %}
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="keywords" content=""/>
+    <meta name="viewport" content="initial-scale=1, maximum-scale=1, user-scalable=no">
+    <title>FastWork - 更好的帮助和管理你的项目进度</title>
+    <link rel="shortcut icon" href="{% static 'img/head_logo.png' %}" type="image/x-icon"/>
+    <meta name="description" content="FastWork"/>
+    <link href='/static/20220603-front/css/style.css' rel='stylesheet' type='text/css'>
+    <link href="/static/20220603-front/css/style2.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/static/20220603-front/css/bootstrap.min.css">
+    <link rel="stylesheet" href="/static/20220603-front/css/bootstrap-slider.min.css">
+    <link href="/static/20220603-front/css/landing-86bae757ff.css" rel="stylesheet"/>
+</head>
+
+<body class="main">
+
+<div class="wrapper">
+    <div id="v_main_slider" class="v_slider_block">
+        <header class="v_header landing_header">
+            <div class="container">
+                <a href="{% url 'index' %}" class="logo logo_white">
+                    <img src="/static/20220603-front/img/fastwork_white.png" class="logo_black" alt="Logo">
+                </a>
+                <a href="{% url 'index' %}" class="logo">
+                    <img src="/static/20220603-front/img/fastwork_red.png" class="logo_black" alt="Logo">
+                </a>
+
+                <nav class="v_menu">
+                    {% if  request.tracer.user %}
+                        <a href="{{ request.tracer.about_fastwork }}" class="v_menu_a" target="_blank">产品介绍</a>
+                        {#                        <a href="{% url 'web:rebuild_dashboard' project_id=38 %}" class="v_menu_a">快速体验</a>#}
+                        <a href="{% url 'project:list' %}" class="v_menu_a big_pink_btn"> 管理后台 </a>
+                        <a href="{% url 'user:logout' %}" class="v_menu_a big_pink_btn"> 注销登录 </a>
+                        <a class="v_menu_a"><i class="fa fa-user"></i>{{ request.tracer.user.username }}</a>
+                    {% else %}
+                        <a href="{{ request.tracer.about_fastwork }}" class="v_menu_a" target="_blank">产品介绍</a>
+                        <a href="{% url 'user:login' %}" class="v_menu_a big_pink_btn"> 登录 </a>
+                    {% endif %}
+                </nav>
+            </div>
+        </header>
+        <div class="container main_bg">
+            <div class="row">
+                <div>
+                    <h1 class="main_page_title">
+                        FastWork - 更好的帮助和管理你的项目进度
+                        <br> <span class="type-it"></span></h1>
+                    <ul class="list_1">
+                        <li><span style="font-size: 14px">日常项目实施过程中，最常遇到的问题就是项目的文档、内容、资料以及写过的工具变得多且杂乱。</span></li>
+                        <li><span style="font-size: 14px">随着时间推移，再整理归档起来往往难以下手等。</span></li>
+                        <li><span style="font-size: 14px">FastWork 就是以此背景为前提下诞生。</span></li>
+                        {% if request.tracer.user.username %}
+                            <li style="font-size: 14px">更多功能，请<a href="" style="font-size: 14px;color: white">前往体验</a>
+                            </li>
+                        {% else %}
+                            <li style="font-size: 14px">更多功能，请<a href="{% url 'user:login' %}" style="font-size: 14px;color: white">登录尝鲜</a></li>
+                        {% endif %}
+                    </ul>
+
+                    <div class="v_subscribe">
+                        <form id="firstReg" class="email_reg" action="" method="get">
+                            <div class="firstreg_border">
+                                <input type="email" class="email_reg_control autofocus" required name="email" disabled
+                                       placeholder="一键搜索"/>
+                                <input type="submit" class="pink_button_landing button_long" value="搜索" disabled>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+                <div class="div_main_bg" style="background-image: url(/static/20220603-front/img/robot.png)">
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="/static/20220603-front/js/cookie_consent.js"></script>
+
+{#底部footer#}
+<footer class="footer_features">
+    <div class="container">
+        <div class="row">
+            <div class="col-md-3">
+                <div class="title_5">关于</div>
+                <ul class="list">
+
+                    <li><a target="_blank" href="{{ request.tracer.about_fastwork }}">关于FastWork</a></li>
+                    <li><a target="_blank" href="{{ request.tracer.about_author }}">关于作者</a></li>
+
+                </ul>
+            </div>
+            <div class="col-md-3">
+                <div class="title_5">友链</div>
+                <ul class="list">
+
+                    <li><a href="{{ request.tracer.about_fastdoc }}" class="v_menu_a" target="_blank">FastDoc - 你的文档小帮手</a></li>
+
+                </ul>
+            </div>
+            <div class="col-md-3 pull-right">
+                <div class="title_5">鸣谢</div>
+                <ul class="list">
+
+                    <li><a href="https://www.bootcss.com/" class="v_menu_a" target="_blank">Bootstrap</a></li>
+                    <li><a href="https://fontawesome.dashgame.com/" class="v_menu_a" target="_blank">Font Awesome</a>
+                    </li>
+                    <li><a href="https://jquery.com/" class="v_menu_a" target="_blank">jQuery</a></li>
+
+                </ul>
+            </div>
+        </div>
+
+        <div class="logo_short_wrap">
+            <div class="logo_short"></div>
+        </div>
+
+        <div class="row footer_info">
+            <div class="col-md-3 text-jur-name">
+                <a href="#" style="color: gray"> FastWork - 更好的帮助和管理你的项目进度</a>
+            </div>
+            <div class="col-md-3 text-jur-name jur-data" style="padding-right: 0;">
+                <a href="{{ request.tracer.beian_url }}" target="_blank"
+                   style="color:gray;">{{ request.tracer.beian_name }}</a>
+            </div>
+            <div class="col-md-3 text-jur-name contact-data">
+                <p>
+                    <a disabled class="footer_menu_item"><i class="fa fa-envelope"></i>邮件: {{ request.tracer.email }}
+                    </a>
+                </p>
+            </div>
+        </div>
+
+    </div>
+</footer>
+<script src="/static/20220603-front/js/jquery.min.js"></script>
+<script src="/static/20220603-front/js/bootstrap.min.js"></script>
+<script src="/static/20220603-front/js/jquery.mobile.custom.min.js"></script>
+<script src="/static/20220603-front/js/bootstrap-slider.min.js"></script>
+<script src="/static/20220603-front/js/typeit.min.js"></script>
+<script src="/static/20220603-front/js/landing-global.js"></script>
+<script src="/static/20220603-front/js/landing.js"></script>
+<script type="text/javascript">
+    (function (d, w, c) {
+        (w[c] = w[c] || []).push(function () {
+            try {
+                w.yaCounter27103070 = new Ya.Metrika({
+                    id: 27103070,
+                    webvisor: true,
+                    clickmap: true,
+                    trackLinks: true,
+                    accurateTrackBounce: true
+                });
+            } catch (e) {
+            }
+        });
+
+        var n = d.getElementsByTagName("script")[0],
+            s = d.createElement("script"),
+            f = function () {
+                n.parentNode.insertBefore(s, n);
+            };
+        s.type = "text/javascript";
+        s.async = true;
+        s.src = (d.location.protocol == "https:" ? "https:" : "http:") + "//mc.yandex.ru/metrika/watch.js";
+
+        if (w.opera == "[object Opera]") {
+            d.addEventListener("DOMContentLoaded", f, false);
+        } else {
+            f();
+        }
+    })(document, window, "yandex_metrika_callbacks");
+
+    function metrikaReachGoal(goal) {
+        yaCounter27103070.reachGoal(goal);
+    }
+</script>
+<noscript>
+    <div><img src="" style="position:absolute; left:-9999px;" alt=""/></div>
+</noscript>
+<script>
+    function goal(type) {
+        if (typeof type === 'undefined') return;
+
+        try {
+            window.yaCounter27103070.reachGoal(type);
+        } catch (err) {
+        }
+    }
+</script>
+<script type="text/javascript">
+    window._retag = window._retag || [];
+    window._retag.push({code: "9ce8887695", level: 0});
+    (function () {
+        var id = "admitad-retag";
+        if (document.getElementById(id)) {
+            return;
+        }
+        var s = document.createElement("script");
+        s.async = true;
+        s.id = id;
+        var r = (new Date).getDate();
+        s.src = (document.location.protocol == "https:" ? "https:" : "http:") + "//cdn.lenmit.com/static/js/retag.min.js?r=" + r;
+        var a = document.getElementsByTagName("script")[0]
+        a.parentNode.insertBefore(s, a);
+    })()
+</script>
+<script type="text/javascript">
+    var translate = {
+        "tiTypeText1": "FastWork",
+        "tiTypeText2": "一站式工作工作场景",
+        "tiTypeText3": "更好的管理你的工作内容",
+        "tiTypeText4": "集成工具库、文件仓库、项目管理、文档管理、定时任务等功能模块",
+    };
+</script>
+<script type="text/javascript">window.NREUM || (NREUM = {});
+NREUM.info = {
+    "beacon": "bam.nr-data.net",
+    "licenseKey": "2b83ffef0e",
+    "applicationID": "79661562",
+    "transactionName": "b11UMURSChcCAUZaV1YXdwZCWgsKTApdXl0WUVgBU0s=",
+    "queueTime": 0,
+    "applicationTime": 78,
+    "atts": "QxpXRwxIGRk=",
+    "errorBeacon": "bam.nr-data.net",
+    "agent": ""
+}</script>
+</body>
+</html>

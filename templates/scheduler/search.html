@@ -1,0 +1,214 @@
+{% extends 'base/site-base.html' %}
+{% load static %}
+
+{% block title %}
+    FastWork - 任务历史搜索结果
+{% endblock %}
+
+
+{% block css %}
+    <style>
+        .test_box {
+            border: 1px solid #a0b3d6;
+            font-size: 14px;
+            height: 400px;
+            width: 870px;
+            overflow: auto;
+            font-family: "Bitstream Vera Sans Mono", Monaco, "Courier New", Courier, monospace;
+            background-color: #161616;
+            color: #12ec12;
+        }
+
+        {#style="pointer-events: none" 将输入框禁止操作#}
+    </style>
+{% endblock %}
+
+
+{% block content %}
+    <div class="container-fluid" style="margin-top: 20px">
+
+
+        <div class="col-sm-12">
+            <div class="panel-heading">
+                <ol class="breadcrumb">
+                    <li><a href="{% url 'project:list' %}" style="color: #337ab7">项目大厅</a></li>
+                    <li>
+                        <a href="{% url 'task_scheduler:task_scheduler-task-add' %}?project_id={{ request.tracer.project.id }}"
+                           style="color: #337ab7">定时任务</a></li>
+                    <li>
+                        <a href="{% url 'task_scheduler:task_scheduler-task-show-log' %}?project_id={{ request.tracer.project.id }}"
+                           style="color: #337ab7">任务执行历史</a></li>
+                    <li class="active">任务执行历史-搜索结果</li>
+                </ol>
+            </div>
+        </div>
+
+        <div class="col-sm-12" style="margin-top: -20px">
+            <div class="col-lg-3">
+                <form action="{% url 'task_scheduler:task_scheduler-task-search' %}?project_id={{ request.tracer.project.id }}"
+                      method="post">
+                    {% csrf_token %}
+                    <div class="input-group">
+                        <input type="text" class="form-control" placeholder="请输入 任务id 来查找" name="keyword">
+                        <span class="input-group-btn">
+                    <button class="btn btn-default" type="submit">
+                    <span class="glyphicon glyphicon-search"></span>
+                    搜索</button>
+                </span>
+                    </div>
+                </form>
+            </div>
+            <div class="col-lg-6" style="margin-left: -28px">
+                <div class="input-group">
+                    <a href="{% url 'task_scheduler:task_scheduler-task-add' %}?project_id={{ request.tracer.project.id }}"
+                       class="btn btn-default"
+                       style="color: #333;margin-bottom: 5px">
+                        <span class="glyphicon glyphicon-plus" aria-hidden="true"></span>
+                        创建定时任务</a>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-sm-12" style="margin-top: 20px">
+            <div style="margin-right: 0;margin-left: 15px;">
+                查询条件: <strong style="color:red;">【{{ keyword }}】</strong> 共搜索到<strong
+                    style="color: red">【{{ count }}】</strong>条记录，内容如下：
+            </div>
+        </div>
+
+        <div class="col-sm-12">
+            <div class="panel-body">
+                <div class="col-sm-12">
+                    <div>
+                        {% if queryset_obj %}
+                            <table class="table table-bordered">
+                                <thead>
+                                <tr>
+                                    <th style="text-align: center"><strong>ID</strong></th>
+                                    <th style="text-align: center"><strong>任务ID</strong></th>
+                                    <th style="text-align: center"><strong>执行任务</strong></th>
+                                    <th style="text-align: center"><strong>执行状态</strong></th>
+                                    <th style="text-align: center"><strong>执行时间</strong></th>
+                                    <th style="text-align: center"><strong>操作</strong></th>
+                                </tr>
+                                </thead>
+                                <tbody style="text-align: center">
+                                {% for foo in issues_object_list %}
+                                    <tr>
+                                        <td>{{ foo.id }}</td>
+                                        <td style="width: 200px">
+                                            {{ foo.task_id|truncatechars:20 }}...
+                                        </td>
+                                        <td style="width: 500px;">
+                                            {{ foo.cmd }}
+                                        </td>
+                                        {% if foo.status == 0 %}
+                                            <td>
+                                                <a style="pointer-events: none"
+                                                   class="btn btn-success btn-sm">执行成功</a>
+                                            </td>
+                                        {% else %}
+                                            <td>
+                                                <a style="pointer-events: none"
+                                                   class="btn btn-danger btn-sm">执行失败</a>
+                                            </td>
+                                        {% endif %}
+
+                                        <td>{{ foo.exe_time|date:"Y-m-d h:i:s" }}</td>
+                                        <td>
+                                            {% if foo.status == 0 %}
+                                                <a class="btn btn-info btn-sm" data-toggle="modal"
+                                                   data-target="#addModal" id="get_log"
+                                                   onclick="get_log({{ foo.id }})">
+                                                    <i class="fa fa-eye" aria-hidden="true"></i> 执行结果
+                                                </a>
+                                            {% else %}
+                                                <a class="btn btn-danger btn-sm" data-toggle="modal"
+                                                   data-target="#addModal" id="get_log"
+                                                   onclick="get_log({{ foo.id }})">
+                                                    <i class="fa fa-eye" aria-hidden="true"></i> 执行结果
+                                                </a>
+                                            {% endif %}
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                                </tbody>
+                            </table>
+                        {% else %}
+                            <table class="table table-bordered">
+                                <thead>
+                                <tr>
+                                    <th style="text-align: center"><strong>ID</strong></th>
+                                    <th style="text-align: center"><strong>任务ID</strong></th>
+                                    <th style="text-align: center"><strong>执行任务</strong></th>
+                                    <th style="text-align: center"><strong>执行状态</strong></th>
+                                    <th style="text-align: center"><strong>执行时间</strong></th>
+                                    <th style="text-align: center"><strong>操作</strong></th>
+                                </tr>
+                                </thead>
+                                <tbody style="text-align: center">
+                                <tr>
+                                    <td colspan="6">暂无搜索结果</td>
+                                </tr>
+                                </tbody>
+                            </table>
+                        {% endif %}
+                    </div>
+                </div>
+                <nav aria-label="">
+                    <ul class="pagination" style="margin-top: 0;">
+                        {{ page_html|safe }}
+                    </ul>
+                </nav>
+            </div>
+        </div>
+
+
+        <!-- Modal -->
+        <div class="modal fade" id="addModal" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel">
+            <div class="modal-dialog modal-lg" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
+                                aria-hidden="true">&times;</span></button>
+                        <h4 class="modal-title" id="myModalLabel">工具执行结果</h4>
+                    </div>
+                    <div class="modal-body">
+                        <div id="log_content" class="test_box">
+
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-default" data-dismiss="modal">取 消</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+{% endblock %}
+
+{% block js %}
+    <script>
+        function get_log(id) {
+            $.ajax({
+                url: "{% url 'task_scheduler:task_scheduler-task-show-log' %}",
+                type: "POST",
+                dataType: 'json',
+                data: {
+                    'id': id,
+                    'project_id': {{ request.tracer.project.id }},
+                    'csrfmiddlewaretoken': '{{ csrf_token }}'
+                },
+                success: function (data) {
+                    if (data.status == 200) {
+                        document.getElementById("log_content").innerText = data.data
+                    } else {
+                        $("#edit_err").show().html(data.msg)
+                    }
+                }
+            })
+        }
+    </script>
+{% endblock %}

@@ -1,0 +1,46 @@
+{% extends 'base/site-base.html' %}
+{% load static %}
+
+{% block css %}
+    <link rel="stylesheet" href="{% static 'plugin/editor-md/css/editormd.min.css' %}">
+    <link rel="stylesheet" href="{% static 'plugin/bootstrap-datepicker/css/bootstrap-datepicker.min.css' %}">
+    <link rel="stylesheet" href="{% static 'plugin/bootstrap-select/css/bootstrap-select.min.css' %}">
+    <link rel="stylesheet" href="{% static 'global_css/issues_details.css' %}">
+
+{% endblock %}
+
+{% block title %}
+    FastWork - {{ issues_object }}
+{% endblock %}
+
+{% block content %}
+    <div class="container-fluid clearfix content" style="padding: 20px 0;margin-top: 20px">
+        <div class="col-sm-12">
+            <div class="panel-heading">
+                <ol class="breadcrumb">
+                    <li><a href="{% url 'project:list' %}" style="color: #337ab7">项目大厅</a></li>
+                    <li><a href="{% url 'issue:issues' %}?project_id={{ request.tracer.project.id }}"
+                           style="color: #337ab7">问题管理</a></li>
+                    <li class="active">None</li>
+                </ol>
+            </div>
+            <div class="col-sm-12" style="margin-top: -20px">
+                <div class="panel panel-default">
+                    <div class="panel-heading edit-heading">
+                        <div>
+                            <i class="fa fa-edit" aria-hidden="true"></i> 更新问题
+                        </div>
+
+                    </div>
+                    <div class="panel-body">
+                        该问题不存在，或已被删除，issues id 为：{{ issues_id }} <a
+                            href="{% url 'user:notifications_read' %}">返回已读消息</a>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+
+{% endblock %}

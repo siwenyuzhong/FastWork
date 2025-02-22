@@ -1,0 +1,66 @@
+{% extends 'base/site-base.html' %}
+{% block css %}
+    <style>
+        .content {
+            height: calc(100vh - 120px);
+            overflow: scroll;
+            margin-left: -1px;
+        }
+    </style>
+{% endblock %}
+
+{% block title %}
+    FastWork - 文件分发日志中心
+{% endblock %}
+
+{% block content %}
+    <div class="container-fluid content" style="margin-top: 20px">
+
+        <div class="col-sm-12">
+            <div class="panel-heading">
+                <ol class="breadcrumb">
+                    <li><a href="{% url 'project:list' %}" style="color: #337ab7">项目大厅</a></li>
+                    <li><a href="{% url 'journal:journal-logs_management' %}?project_id={{ request.tracer.project.id }}"
+                           style="color: #337ab7">日志中心</a></li>
+                    <li class="active">文件分发日志</li>
+                </ol>
+            </div>
+        </div>
+
+        <div class="col-sm-12" style="margin-top: -20px">
+            <div class="panel-body">
+                <table class="table table-hover">
+                    <thead>
+                    <tr>
+                        <th scope="col">序号</th>
+                        <th scope="col">包裹单号</th>
+                        <th scope="col">分发时间</th>
+                        <th scope="col">文件名称</th>
+                        <th scope="col">操作人</th>
+                        <th scope="col">分发结果</th>
+                        <th scope="col">所属项目</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {% for file_send_obj in file_send_objs %}
+                        <tr>
+                            <th scope="row">{{ forloop.counter }}</th>
+                            <td>{{ file_send_obj.name }}</td>
+                            <td>{{ file_send_obj.create_datetime }}</td>
+                            <td>{{ file_send_obj.file.name }}</td>
+                            <td>{{ file_send_obj.creator.username }}</td>
+                            <td>{{ file_send_obj.records }}</td>
+                            <th scope="row"><span class="label label-success">{{ file_send_obj.project.name }}+</span>
+                            </th>
+
+                        </tr>
+                    {% endfor %}
+
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+{% endblock %}
+

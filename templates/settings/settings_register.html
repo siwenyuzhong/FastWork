@@ -1,0 +1,96 @@
+{% extends 'base/site-base.html' %}
+
+{% block title %}
+    FastWork - 邀请注册
+{% endblock %}
+
+{% block css %}
+    <style>
+        .choose {
+            border-left: 2px solid #f90 !important;
+        }
+    </style>
+{% endblock %}
+
+
+{% block content %}
+    <div class="container clearfix" style="margin-top: 20px;">
+        <div class="col-sm-3">
+            <div class="panel panel-default">
+                <div class="panel-heading" style="background-color:transparent;font-weight: bold;">
+                    个人中心
+                </div>
+                <div class="list-group" style="border-radius: 0">
+                    <div>
+
+                        <a href="{% url 'project:settings-invite-register' %}?project_id={{ request.tracer.project.id }}"
+                           class="list-group-item choose">邀请注册</a>
+
+                        <a href="{% url 'project:settings-change-password' %}?project_id={{ request.tracer.project.id }}"
+                           class="list-group-item">修改密码</a>
+
+                        <a href="{% url 'project:settings-backup' %}?project_id={{ request.tracer.project.id }}"
+                           class="list-group-item">打包项目</a>
+
+                        <a href="{% url 'project:settings-users-unbind' %}?project_id={{ request.tracer.project.id }}"
+                           class="list-group-item">项目设置</a>
+
+                        <a href="{% url 'project:settings-delete' %}?project_id={{ request.tracer.project.id }}"
+                           class="list-group-item">删除项目</a>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-sm-9">
+            <div class="panel panel-default">
+                <div class="panel-heading"><i class="fa fa-share" aria-hidden="true"></i> 邀请注册</div>
+                <div class="panel-body">
+
+                    <form class="form-horizontal" method="post">
+                        {% csrf_token %}
+                        <div class="form-group">
+                            <label class="col-sm-2 control-label" style="margin-top: -7px;margin-right: -10px">
+                                <input type="button" class="btn btn-default " value="一键复制"
+                                       id="btnCopyUrl">
+                            </label>
+                            <div class="col-sm-5">
+                                {% if request.tracer.user.tag == "体验账户" %}
+                                    <input type="text" class="form-control" value="体验账户 暂不支持邀请用户注册"
+                                           readonly>
+                                {% else %}
+                                    <input type="text" class="form-control" value="{{ url }}" id="inviteUrl" readonly>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </form>
+
+                </div>
+            </div>
+
+        </div>
+    </div>
+{% endblock %}
+
+{% block js %}
+    <script>
+
+        $(function () {
+            bindCopyUrl();
+        });
+
+        /*
+            点击拷贝邀请码
+            */
+        function bindCopyUrl() {
+            $('#btnCopyUrl').click(function () {
+                var textInput = $('#inviteUrl')[0]; // document.getElementById('inviteUrl')
+                textInput.select();
+
+                document.execCommand("Copy");
+                alert('复制成功');
+            })
+        }
+
+    </script>
+{% endblock %}

@@ -1,0 +1,211 @@
+{% extends 'base/site-base.html' %}
+{% load static %}
+{% block css %}
+    {#    <link rel=stylesheet href="/static/codemirror/doc/docs.css">#}
+    <link rel="stylesheet" href="/static/codemirror/lib/codemirror.css">
+    <link rel="stylesheet" href="/static/codemirror/monokai.css">
+    <link rel="stylesheet" href="/static/codemirror_latest/theme/darcula.css">
+{% endblock %}
+
+
+{% block title %}
+    FastWork - 新建工具
+{% endblock %}
+
+{% block content %}
+
+    <div class="container-fluid" style="height:calc(100vh - 100px);overflow: scroll;margin-top: 30px">
+        <div class="panel panel-default">
+            <div class="panel-heading" style="height: 50px">
+                <ol class="breadcrumb">
+                    <li><a href="{% url 'project:list' %}" style="color: #337ab7">项目大厅</a></li>
+                    <li><a href="{% url 'script:scripts-all' %}?project_id={{ request.tracer.project.id }}">工具库</a>
+                    </li>
+                    <li class="active">新建工具</li>
+                </ol>
+            </div>
+            <div class="panel-body">
+                <div class="col-sm-12 content">
+                    <div class="container-fluid project">
+                        <div class="panel panel-default">
+                            <div class="panel-body">
+                                <ul class="nav nav-tabs" id="myTab">
+                                    <li data-interest="java"><a href="#home"><strong>Java工具</strong></a></li>
+                                    <li data-interest="go"><a href="#home"><strong>Go工具</strong></a></li>
+                                    <li data-interest="shell"><a href="#home"><strong>Shell工具</strong></a></li>
+                                    <li data-interest="python" class="active"><a
+                                            href="#home"><strong>Python工具</strong></a></li>
+                                </ul>
+                                <div class="tab-content">
+                                    <div class="tab-pane active" id="home">
+                                        <div class="content-wrapper">
+                                            <section class="content container-fluid">
+
+                                                <div>
+                                                    <h3></h3><br><br>
+                                                    <form class="form-horizontal" method="post" novalidate>
+                                                        {% csrf_token %}
+                                                        <div class="form-group">
+                                                            <label for="" class="col-sm-2 control-label"><span
+                                                                    style="font-size: 16px;color: gray">工具名称:</span></label>
+                                                            <div class="col-sm-8">
+                                                                <input type="text" class="form-control"
+                                                                       id="tools_title"
+                                                                       placeholder="请输入 工具名称">
+                                                                <span style="color: red" id="tools_err"></span>
+                                                            </div>
+                                                        </div>
+
+                                                        <div class="form-group">
+                                                            <label for="" class="col-sm-2 control-label"><span
+                                                                    style="font-size: 16px;color: gray">脚本代码:</span></label>
+                                                            <div class="col-sm-8">
+                                    <textarea id="tools_code"
+                                              name="tools_code"></textarea>
+                                                            </div>
+                                                        </div>
+
+                                                        <div class="form-group">
+                                                            <label for="" class="col-sm-2 control-label"><span
+                                                                    style="font-size: 16px;color: gray">工具说明:</span></label>
+                                                            <div class="col-sm-8">
+                                    <textarea name="tools_desc" id="tools_desc" class="form-control" cols="10" rows="5"
+                                              style="resize: none"
+                                              placeholder="请说明 工具用途"></textarea>
+                                                            </div>
+                                                        </div>
+
+                                                        <div class="form-group" hidden>
+                                                            <label for="" class="col-sm-2 control-label"><span
+                                                                    style="font-size: 16px;color: gray">关联文档:</span></label>
+                                                            <div class="col-sm-8">
+
+                                                                <select class="form-control" id="selected_tools_wiki">
+                                                                    <option id="selected_wiki" style="color: gray">
+                                                                        ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+                                                                    </option>
+                                                                    {% for foo in wiki_object %}
+                                                                        <option id="selected_wiki">{{ foo.title }}</option>
+                                                                    {% endfor %}
+                                                                </select>
+
+                                                            </div>
+                                                        </div>
+
+                                                        <div class="form-group">
+                                                            <div class="col-sm-offset-2 col-sm-10">
+                                                                <input type="button" id="tools_btn" value="添 加"
+                                                                       style="background-color: #167be0"
+                                                                       data-loading-text="创建中"
+                                                                       class="btn btn-primary">
+                                                                <span style="color: red" id="tools_error"></span>
+                                                            </div>
+                                                        </div>
+                                                    </form>
+                                                </div>
+                                            </section>
+                                        </div>
+
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+{% endblock %}
+
+{% block js %}
+    <script src="/static/codemirror/lib/codemirror.js"></script>
+    <script src="/static/codemirror/addon/edit/matchbrackets.js"></script>
+    <script src="/static/codemirror/python.js"></script>
+
+    <script>
+        var editor = CodeMirror.fromTextArea(document.getElementById("tools_code"), {
+            mode: {
+                name: "python",
+                json: true,
+                singleLineStringErrors: false
+            },
+            theme: 'monokai',
+            {#lineNumbers: true,#}
+            indentUnit: 4,
+            matchBrackets: true,
+            smartIndent: true,
+        });
+        editor.setSize('auto', 500)
+
+        $(function () {
+            $("#tools_btn").click(function () {
+                //获取标题
+                var tools_title = $("#tools_title").val();
+
+                //获取说明
+                var tools_desc = $("#tools_desc").val();
+
+                //获取工具脚本
+                var content = editor.getValue();
+
+                if (tools_title === "" || content === "") {
+                    alert("【工具名】或【工具内容】不能为空！");
+                    return false;
+                }
+
+                $(this).button('loading').delay(1000).queue(function () {
+                    //获取关联文档
+                    var wiki_index = document.getElementById("selected_tools_wiki").selectedIndex;
+                    var wiki_result = ""
+                    if (wiki_index === 0) {
+                        wiki_result = "notwiki"
+                    } else {
+                        wiki_result = document.getElementById("selected_tools_wiki").options[wiki_index].text;
+                    }
+
+                    //获取工具类型
+                    var scripts_type = $("ul#myTab").find("li.active").data("interest")
+
+                    $.ajax({
+                        url: "{% url 'script:scripts-add' %}?project_id={{ request.tracer.project.id }}",
+                        type: "POST",
+                        dataType: 'json',
+                        data: {
+                            'tools_title': tools_title,
+                            'project_id': {{ request.tracer.project.id }},
+                            'tools_desc': tools_desc,
+                            'selected_wiki': wiki_result,
+                            'scripts_type': scripts_type,
+                            'content': content,
+                            'csrfmiddlewaretoken': '{{ csrf_token }}'
+                        },
+                        success: function (data) {
+                            if (data.state == 0) {
+                                location.href = '{% url 'script:scripts-all' %}?project_id={{ request.tracer.project.id }}'
+                            } else {
+                                $("#tools_error").show().html(data.msg)
+                            }
+                        }
+                    })
+
+
+                });
+
+            })
+        })
+
+    </script>
+
+    <script>
+        $(function () {
+            $('#myTab a:last').tab('show');//初始化显示哪个tab
+
+            $('#myTab a').click(function (e) {
+                e.preventDefault();//阻止a链接的跳转行为
+                $(this).tab('show');//显示当前选中的链接及关联的content
+            })
+        })
+    </script>
+{% endblock %}

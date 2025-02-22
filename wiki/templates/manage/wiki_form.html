@@ -1,0 +1,155 @@
+{% extends 'layout/manage.html' %}
+{% load static %}
+
+{% block title %}
+    FastWork - 知识库
+{% endblock %}
+
+{% block css %}
+    <link rel="stylesheet" href="{% static 'plugin/editor-md/css/editormd.min.css' %}">
+    <style>
+
+        a:hover {
+            text-decoration: none;
+        }
+
+        .panel-default {
+            margin-top: 10px;
+        }
+
+        .panel-default .panel-heading {
+            display: flex;
+            flex-direction: row;
+            justify-content: space-between;
+        }
+
+        .panel-body {
+            padding: 0;
+        }
+
+        .title-list ul {
+            padding-left: 15px;
+        }
+
+        .title-list ul a {
+            display: block;
+            padding: 5px 0;
+        }
+
+        .content {
+            border-left: 1px solid #dddddd;
+            min-height: 650px;
+            margin-left: -1px;
+        }
+
+        .editormd-fullscreen {
+            z-index: 1001;
+        }
+    </style>
+{% endblock %}
+
+{% block content %}
+    <div class="container-fluid" style="height: calc(100vh - 100px);overflow:scroll;">
+
+        <div class="panel panel-default">
+            <div class="panel-heading">
+                <div>
+                    <i class="fa fa-book" aria-hidden="true"></i> 知识库文档
+                </div>
+            </div>
+            <div class="panel-body">
+                {#                <div class="col-sm-3 title-list">#}
+                {#                    <ul id="catalog">#}
+                {##}
+                {#                    </ul>#}
+                {##}
+                {#                </div>#}
+                <div class="col-sm-12 content" style="margin-top: 10px">
+
+                    <form method="post">
+                        {% csrf_token %}
+                        {% for field in form %}
+                            {% if field.name == "content" %}
+                                <div class="form-group">
+                                    <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+                                    <div id="editor">
+                                        {{ field }}
+                                    </div>
+                                    <span class="error-msg">{{ field.errors.0 }}</span>
+                                </div>
+                            {% else %}
+                                <div class="form-group">
+                                    <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+                                    {{ field }}
+                                    <span class="error-msg">{{ field.errors.0 }}</span>
+                                </div>
+                            {% endif %}
+                        {% endfor %}
+
+                        <button type="submit" class="btn btn-primary" style="background-color: #167be0;margin-bottom: 10px">保  存</button>
+                    </form>
+
+                </div>
+                <div></div>
+            </div>
+        </div>
+
+    </div>
+{% endblock %}
+
+{% block js %}
+
+    <script src="{% static 'plugin/editor-md/editormd.amd.min.js' %}"></script>
+
+
+    <script>
+
+        // http://127.0.0.1:8002/manage/2/wiki/detail/
+        var WIKI_DETAIL_URL = "{% url 'web:wiki' project_id=request.tracer.project.id %}";
+        var WIKI_UPLOAD_URL = "{% url 'web:wiki_upload' project_id=request.tracer.project.id %}";
+
+        $(function () {
+
+            initCatalog();
+            initEditorMd();
+        });
+
+        //初始化编辑器
+        function initEditorMd() {
+            editormd('editor', {
+                placeholder: "请输入内容",
+                height: 500,
+                path: "{% static 'plugin/editor-md/lib/' %}",
+                imageUpload: true,
+                //previewTheme: "dark",//预览主题
+                imageFormats: ["jpg", "jpeg", "png", "gif"],
+                imageUploadURL: WIKI_UPLOAD_URL,
+            })
+        }
+
+        function initCatalog() {
+            $.ajax({
+                url: "{% url 'web:wiki_catalog' project_id=request.tracer.project.id %}",
+                type: "GET",
+                dataType: "JSON",
+                success: function (res) {
+                    if (res.status) {
+                        $.each(res.data, function (index, item) {
+                            var href = WIKI_DETAIL_URL + "?wiki_id=" + item.id;
+                            var li = $("<li>").attr('id', "id_" + item.id).append($('<a>').text(item.title).attr('href', href)).append($('<ul>'));
+
+                            if (!item.parent_id) {
+                                // 添加到catalog中
+                                $('#catalog').append(li);
+                            } else {
+                                $("#id_" + item.parent_id).children('ul').append(li);
+                            }
+                        })
+                    } else {
+                        alert("初始化目录失败");
+                    }
+                }
+            })
+        }
+    </script>
+{% endblock %}

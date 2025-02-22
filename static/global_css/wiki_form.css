@@ -1,0 +1,37 @@
+
+a:hover {
+    text-decoration: none;
+}
+
+.panel-default {
+    margin-top: 10px;
+}
+
+.panel-default .panel-heading {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+}
+
+.panel-body {
+    padding: 0;
+}
+
+.title-list ul {
+    padding-left: 15px;
+}
+
+.title-list ul a {
+    display: block;
+    padding: 5px 0;
+}
+
+.content {
+    border-left: 1px solid #dddddd;
+    min-height: 650px;
+    margin-left: -1px;
+}
+
+.editormd-fullscreen {
+    z-index: 1001;
+}

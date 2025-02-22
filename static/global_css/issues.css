@@ -1,0 +1,77 @@
+.issues-list .number {
+    width: 100px;
+    text-align: right;
+}
+
+.issues-list .number a {
+    font-weight: 500;
+    padding: 0 10px;
+}
+
+.issues-list .issue .tags {
+    padding: 10px 0;
+}
+
+.issues-list .issue .tags span {
+    margin-right: 20px;
+    display: inline-block;
+    font-size: 12px;
+}
+
+.issues-list .issue .tags .type {
+    color: white;
+    padding: 1px 5px;
+    border-radius: 5px;
+    background-color: sandybrown;
+}
+
+.issues-list .issue .tags .type1 {
+    color: white;
+    padding: 1px 5px;
+    border-radius: 5px;
+    background-color: lightseagreen;
+}
+
+.issues-list .issue .tags .type2 {
+    color: white;
+    padding: 1px 5px;
+    border-radius: 5px;
+    background-color: firebrick;
+}
+
+.editormd {
+    margin-bottom: 0;
+}
+
+.pd-0 {
+    padding: 0 !important;
+}
+
+/* 筛选 */
+.filter-area .item {
+    margin-bottom: 15px;
+}
+
+.filter-area .item .title {
+    padding: 5px 0;
+}
+
+.filter-area .item .check-list a {
+    text-decoration: none;
+    display: inline-block;
+    min-width: 65px;
+}
+
+.filter-area .item .check-list label {
+    font-weight: 200;
+    font-size: 13px;
+    margin-left: 3px;
+}
+
+.filter-area .item .check-list a:hover {
+    font-weight: 300;
+}
+
+.filter-area .item .check-list .cell {
+    margin-right: 10px;
+}

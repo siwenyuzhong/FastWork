@@ -1,0 +1,25 @@
+{% extends 'base/site-base.html' %}
+{% load static %}
+{% block title %}
+    FastWork - 工具告警配置文档
+{% endblock %}
+{% block content %}
+    <div style="margin-top: 20px;transform: scale(0.9);height: 500px;overflow: scroll">
+        <div class="col-sm-12">
+            <div class="panel-heading">
+                <div>
+                    <i class="fa fa-clock-o" aria-hidden="true" style="font-size: 15px"> 工具告警配置帮助文档</i>
+                </div>
+            </div>
+        </div>
+        <div class="col-sm-12">
+            <div class="panel-body">
+                <h3>第一步、配置需要设置定时任务的工具</h3>
+                <img style="width:100%" src="{% static 'help/tool_content.png' %}" alt="">
+                <h3>第二步、配置定时任务</h3>
+                <img style="width:100%" src="{% static 'help/help_tool.png' %}" alt="">
+                <img style="width:100%" src="{% static 'help/cron_task.png' %}" alt="">
+            </div>
+        </div>
+    </div>
+{% endblock %}

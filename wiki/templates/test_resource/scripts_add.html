@@ -1,0 +1,146 @@
+{% extends 'layout/manage.html' %}
+
+{% block css %}
+{% endblock %}
+
+{% block js %}
+    <script src="/static/ckeditor/wangEditor.min.js"></script>
+    <script type="text/javascript">
+        var E = window.wangEditor;
+        var editor = new E('#div1');
+        // 自定义菜单配置
+        editor.customConfig.menus = [
+            'code'
+        ];
+        editor.create();
+        document.getElementById("btn").addEventListener('click', function () {
+            $("#detail").val(document.getElementById("div1").innerText)
+        }, false)
+    </script>
+{% endblock %}
+
+{% block content %}
+    <div class="layui-fluid">
+        <div class="layui-row layui-col-space15">
+            <div class="layui-col-md12">
+                <div class="layui-card">
+
+                    <div class="wrapper">
+                        <!-- Content Wrapper. Contains page content -->
+                        <div class="content-wrapper">
+
+                            <section class="content container-fluid">
+
+                                <div>
+                                    <h3></h3><br><br>
+                                    <form class="form-horizontal" method="post" novalidate>
+                                        {% csrf_token %}
+                                        <div class="form-group">
+                                            <label for="hostname" class="col-sm-2 control-label"><span
+                                                    style="font-size: 16px;color: gray">脚本名称:</span></label>
+                                            <div class="col-sm-8">
+                                                {{ form.title }}
+                                                <span style="color: red">{{ form.title.errors.0 }}</span>
+                                            </div>
+                                        </div>
+
+                                        <div class="form-group">
+                                            <label for="hostname" class="col-sm-2 control-label"><span
+                                                    style="font-size: 16px;color: gray">脚本logo:</span></label>
+                                            <div class="col-sm-8">
+                                                {{ form.showImage }}
+                                                <span style="color: red">{{ form.showImage.errors.0 }}</span>
+                                            </div>
+                                        </div>
+
+
+                                        <div class="form-group">
+                                            <label for="hostname" class="col-sm-2 control-label"><span
+                                                    style="font-size: 16px;color: gray">脚本描述:</span></label>
+                                            <div class="col-sm-8">
+                                                {{ form.desc }}
+                                                <span style="color: red">{{ form.desc.errors.0 }}</span>
+                                            </div>
+                                        </div>
+
+                                        <div class="form-group">
+                                            <label for="hostname" class="col-sm-2 control-label"><span
+                                                    style="font-size: 16px;color: gray">分类字段:</span></label>
+                                            <div class="col-sm-8">
+                                                {{ form.kind }}
+                                                <span style="color: red">{{ form.kind.errors.0 }}</span>
+                                            </div>
+                                        </div>
+
+                                        <div class="form-group">
+                                            <label for="hostname" class="col-sm-2 control-label"><span
+                                                    style="font-size: 16px;color: gray">关 键 词 :</span></label>
+                                            <div class="col-sm-8">
+                                                {{ form.keywords }}
+                                                <span style="color: red;">{{ form.keywords.errors.0 }}</span>
+                                            </div>
+                                        </div>
+
+                                        <div class="form-group">
+                                            <label for="hostname" class="col-sm-2 control-label"><span
+                                                    style="font-size: 16px;color: gray">展示颜色 :</span></label>
+                                            <div class="col-sm-8">
+                                                <select class="form-control" id="selected_color" name="selected_color">
+                                                    <option id="selected_color">浅蓝</option>
+                                                    <option id="selected_color">橙色</option>
+                                                    <option id="selected_color">黄色</option>
+                                                    <option id="selected_color">青色</option>
+                                                    <option id="selected_color">紫色</option>
+                                                </select>
+                                            </div>
+                                        </div>
+
+                                        <div class="form-group" name="content">
+                                            <label for="hostname" class="col-sm-2 control-label"><span
+                                                    style="font-size: 16px;color: gray">脚本内容:</span></label>
+                                            <div class="col-sm-8">
+                                                {% autoescape off %}
+                                                    <input type="hidden" id="detail" name="detail" value="">
+                                                    <div id="div1" style="background-color: white">
+                                                {% endautoescape %}
+                                                </div>
+                                            </div>
+                                        </div>
+
+
+                                        <div class="form-group">
+                                            <label for="hostname" class="col-sm-2 control-label"><span
+                                                    style="font-size: 16px;color: gray">关联文档 :</span></label>
+                                            <div class="col-sm-8">
+                                                {{ form.wiki }}
+                                                <span style="color: red;">{{ form.wiki.errors.0 }}</span>
+                                            </div>
+                                        </div>
+
+                                        <div class="form-group">
+                                            <div class="col-sm-offset-2 col-sm-10">
+                                                <button id="btn" type="submit" class="btn btn-primary">
+                                                    创建
+                                                </button>
+                                            </div>
+                                        </div>
+
+                                    </form>
+                                </div>
+
+                            </section>
+
+                            <input id="handle_status" value="" hidden="hidden">
+                        </div>
+
+                        <div class="control-sidebar-bg"></div>
+
+                    </div>
+
+                    <hr>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+

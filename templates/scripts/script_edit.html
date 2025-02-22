@@ -1,0 +1,116 @@
+{% extends 'base/site-base.html' %}
+{% load static %}
+{% block css %}
+    <link rel="stylesheet" href="/static/codemirror_latest/lib/codemirror.css">
+    <link rel="stylesheet" href="/static/codemirror_latest/theme/monokai.css">
+    <link rel="stylesheet" href="/static/codemirror_latest/theme/darcula.css">
+    <link rel="stylesheet" href="/static/global_css/script_edit.css">
+
+{% endblock %}
+
+{% block title %}
+    FastWork - 正在编辑 - {{ comment.title }}
+{% endblock %}
+
+{% block content %}
+    <div class="container-fluid content" style="margin-top: 20px">
+        <div class="panel panel-default">
+            <div class="panel-heading" style="height: 150px;overflow:scroll;">
+                <div style="width: 600px">
+
+                    <div class="layui-btn-container" style="margin-top: 10px">
+                        <a href="{% url 'script:scripts-detail' %}?project_id={{ request.tracer.project.id }}&script_id={{ comment.id }}"
+                           class="btn btn-default" style="color: #333;background-color: white">
+                            <span class="glyphicon glyphicon-backward"></span>
+                            返回
+                        </a>
+                        <a type="button" id="btn_save" class="btn btn-default" data-loading-text="保存中"
+                           style="background-color: #2fc25b;color: white;border: none">
+                            <span class="glyphicon glyphicon-ok-circle" id="btn_save"></span>
+                            保存
+                        </a>
+                    </div>
+                    <hr>
+                    <div style="margin-top: 20px">
+                        <strong> 工具名称：</strong>
+                        <input type="text" value="{{ comment.title }}" class="form-control" id="script_title">
+                        <br>
+                        <strong>工具说明：</strong>
+                        <textarea class="form-control" id="script_desc"
+                                  style="resize: none">{{ comment.desc }}</textarea>
+                    </div>
+
+                    <span style="color: red" id="edit_err"></span>
+                </div>
+            </div>
+        </div>
+
+        <div class="panel-body">
+            <div class="col-sm-12 content">
+                <div>
+                    <article>
+                        <form><textarea id="code" name="code">{{ comment.content|safe }}</textarea></form>
+                    </article>
+                </div>
+            </div>
+            <div></div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block js %}
+    <script src="/static/codemirror_latest/lib/codemirror.js"></script>
+    <script src="/static/codemirror_latest/mode/javascript/javascript.js"></script>
+    <script src="/static/codemirror_latest/mode/shell/shell.js"></script>
+    <script src="/static/codemirror_latest/mode/python/python.js"></script>
+    <script src="/static/codemirror_latest/addon/selection/active-line.js"></script>
+    <script src="/static/codemirror_latest/addon/edit/matchbrackets.js"></script>
+    <script>
+        var editor = CodeMirror.fromTextArea(document.getElementById("code"), {
+            lineNumbers: true,
+            {#theme: 'darcula',#}
+            theme: 'monokai',
+            {#readOnly: true,#}
+            styleActiveLine: true,
+            matchBrackets: true,
+            smartIndent: true,
+            indentUnit: 4,
+            abSize: 4,
+        });
+        editor.setSize('auto', 'auto');
+
+        $(function () {
+            $("#btn_save").click(function () {
+                $(this).button('loading').delay(2000).queue(function () {
+                    var script_title = document.getElementById("script_title").value;
+                    var script_desc = document.getElementById("script_desc").value;
+                    var content = editor.getValue();
+                    $.ajax({
+                        url: "{% url 'script:scripts-edit' %}?project_id={{ request.tracer.project.id }}&script_id={{ comment.id }}",
+                        type: "POST",
+                        dataType: 'json',
+                        data: {
+                            'script_desc': script_desc,
+                            'script_id': {{ comment.id }},
+                            'project_id': {{ request.tracer.project.id }},
+                            'script_title': script_title,
+                            'content': content,
+                            'csrfmiddlewaretoken': '{{ csrf_token }}'
+                        },
+                        success: function (data) {
+                            if (data.state == 0) {
+                                location.href = '{% url 'script:scripts-detail'%}?project_id={{ request.tracer.project.id }}&script_id={{ comment.id }}'
+                            } else {
+                                $("#edit_err").show().html(data.msg)
+                            }
+                        }
+                    })
+                    {#$(this).button('reset');#}
+                    {#$(this).dequeue();#}
+                });
+            });
+        });
+
+    </script>
+
+{% endblock %}

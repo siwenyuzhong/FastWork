@@ -1,0 +1,314 @@
+{% extends 'base/site-base.html' %}
+{% load static %}
+{% block title %}
+    FastWork - 项目设置
+{% endblock %}
+
+{% block css %}
+    <link rel="stylesheet" href="{% static 'global_css/settings_project_users_unbind.css' %}">
+    <style>
+        .damacontent {
+            filter: blur(3px);
+        }
+
+        .choose {
+            border-left: 2px solid #f90 !important;
+        }
+    </style>
+{% endblock %}
+
+
+{% block content %}
+    <div class="container clearfix" style="margin-top: 20px;">
+        <div class="col-sm-3">
+            <div class="panel panel-default">
+                <div class="panel-heading" style="background-color:transparent;font-weight: bold;">
+                    个人中心
+                </div>
+                <div class="list-group" style="border-radius: 0">
+                    <div>
+
+                        <a href="{% url 'project:settings-invite-register' %}?project_id={{ request.tracer.project.id }}"
+                           class="list-group-item">邀请注册</a>
+
+                        <a href="{% url 'project:settings-change-password' %}?project_id={{ request.tracer.project.id }}"
+                           class="list-group-item">修改密码</a>
+
+                        <a href="{% url 'project:settings-backup' %}?project_id={{ request.tracer.project.id }}"
+                           class="list-group-item">打包项目</a>
+
+                        <a href="{% url 'project:settings-users-unbind' %}?project_id={{ request.tracer.project.id }}"
+                           class="list-group-item choose">项目设置</a>
+
+                        <a href="{% url 'project:settings-delete' %}?project_id={{ request.tracer.project.id }}"
+                           class="list-group-item">删除项目</a>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-sm-9">
+            <div class="panel panel-default">
+                <div class="panel-heading"><i class="fa fa-cog" aria-hidden="true"></i> 项目设置</div>
+                <div class="panel-body">
+                    <div class="col-md-6">
+                        <div class="panel panel-default">
+                            <div class="panel-heading">
+                                <i class="fa fa-user" aria-hidden="true"></i>
+                                项目成员
+                            </div>
+                            <div class="panel-body user-item">
+                                <div class="col-sm-12 title">创建者</div>
+                                <div class="clearfix" style="margin-bottom: 30px;">
+                                    <div class="col-sm-4">
+                                        <div class="avatar">{{ request.tracer.project.creator.username.0|upper }}</div>
+                                        <div class="text">{{ request.tracer.project.creator.username }}</div>
+                                    </div>
+                                </div>
+                                <div class="col-sm-12 title">参与者</div>
+                                <div>
+                                    {% for item in user_list %}
+                                        <div class="col-sm-4">
+                                            <div class="avatar">{{ item.user__username.0|upper }}</div>
+                                            <div class="text">{{ item.user__username }}</div>
+                                        </div>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-6">
+                        <div class="panel panel-default">
+                            <div class="panel-heading">
+                                <i class="fa fa-book" aria-hidden="true"></i>
+                                项目详情
+                            </div>
+                            <div class="panel-body user-item">
+                                <table class="table table-hover table-bordered">
+                                    <tbody>
+                                    <tr>
+                                        <td class="label-left">项目名称 ：</td>
+                                        {% if request.tracer.project.isShow == "True" %}
+                                            <td class="damacontent"><strong>{{ request.tracer.project.name }}</strong>
+                                            </td>
+                                        {% else %}
+                                            <td><strong>{{ request.tracer.project.name }}</strong></td>
+                                        {% endif %}
+                                    </tr>
+                                    <tr>
+                                        <td class="label-left">项目描述 ：</td>
+                                        {% if request.tracer.project.isShow == "True" %}
+                                            <td class="damacontent"><strong>{{ request.tracer.project.desc }}</strong>
+                                            </td>
+                                        {% else %}
+                                            <td><strong>{{ request.tracer.project.desc }}</strong></td>
+                                        {% endif %}
+                                    </tr>
+                                    <tr>
+                                        <td class="label-left">创建时间 ：</td>
+                                        <td><strong>{{ request.tracer.project.create_datetime }}</strong></td>
+                                    </tr>
+                                    <tr>
+                                        <td class="label-left">创&nbsp;&nbsp;建&nbsp;&nbsp;人：</td>
+                                        <td><strong>{{ request.tracer.project.creator.username }}</strong></td>
+                                    </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+            <button type="button" class="btn btn-danger" data-toggle="modal" data-target="#exampleModal111"
+                    data-whatever="@mdo" style="border: none">
+                <span class="glyphicon glyphicon-remove-circle" aria-hidden="true"></span> 解绑成员
+            </button>
+            <div class="modal fade" id="exampleModal111" tabindex="-1" role="dialog"
+                 aria-labelledby="exampleModalLabel">
+                <div class="modal-dialog" role="document">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">&times;</span></button>
+                            <h4 class="modal-title" id="exampleModalLabel">解绑项目参与用户</h4>
+                        </div>
+                        <div class="modal-body">
+                            <label for="" class="control-label">选择解绑用户:</label>
+                            <select id="userSelect" class="form-control" aria-label="" multiple>
+                                {% for user in user_list %}
+                                    <option value="{{ user.user__username }}">{{ user.user__username }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-default" data-dismiss="modal">取消
+                            </button>
+                            <button type="button" class="btn btn-primary" id="unbind_button"
+                                    style="background-color: #167be0">确定解绑
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <button type="button" class="btn btn-danger" data-toggle="modal" data-target="#exampleModal"
+                    data-whatever="@mdo" style="border: none;float: right">
+                <span class="glyphicon glyphicon-edit" aria-hidden="true"></span> 修改项目
+            </button>
+            <div class="modal fade" id="exampleModal" tabindex="-1" role="dialog"
+                 aria-labelledby="exampleModalLabel">
+                <div class="modal-dialog" role="document">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">&times;</span></button>
+                            <h4 class="modal-title" id="exampleModalLabel">修改项目信息</h4>
+                        </div>
+                        <div class="modal-body">
+                            <form>
+                                <div class="form-group">
+                                    <label for="recipient-name" class="control-label">项目名称:</label>
+                                    {% if request.tracer.project.isShow == "True" %}
+                                        <input type="text" class="form-control damacontent" id="recipient-name"
+                                               value="{{ request.tracer.project.name }}" disabled>
+                                    {% else %}
+                                        <input type="text" class="form-control" id="recipient-name"
+                                               value="{{ request.tracer.project.name }}">
+                                    {% endif %}
+
+                                </div>
+                                <div class="form-group">
+                                    <label for="message-text" class="control-label">项目描述:</label>
+                                    {% if request.tracer.project.isShow == "True" %}
+                                        <textarea class="form-control damacontent" style="height: 200px;resize: none;"
+                                                  disabled
+                                                  id="message-text">{{ request.tracer.project.desc }}</textarea>
+                                    {% else %}
+                                        <textarea class="form-control" style="height: 200px;resize: none;"
+                                                  id="message-text">{{ request.tracer.project.desc }}</textarea>
+                                    {% endif %}
+
+                                </div>
+                                <div class="form-group">
+                                    <label for="message-text" class="control-label">项目logo:
+                                        (将需要上传的logo先上传至文件仓库，并获取到logo的网络地址，把地址填入下方输入框即可)</label>
+                                    <input type="text" class="form-control" id="project_logo"
+                                           placeholder="如果未设置logo,则按照创建项目时选择的颜色显示样式"
+                                           value="{{ request.tracer.project.logo }}">
+                                </div>
+                                <div class="form-group">
+                                    <label for="message-text" class="control-label">项目封面颜色:
+                                        (封面颜色和项目logo二者设置其一即可)</label>
+                                    <label for="message-text" class="control-label" style="color: gray">卡片颜色: 1、蓝色
+                                        2、橙色
+                                        3、黄色 4、青色 5、绿色 6、紫色 7、深绿色</label>
+                                    <input type="text" class="form-control" id="project_color"
+                                           value="{{ request.tracer.project.color }}">
+                                </div>
+                                <div class="form-group">
+                                    <label for="message-text"
+                                           class="control-label">项目是否隐藏(隐藏：将模糊项目logo等标识｜显示：正常显示！)</label>
+                                    {#                                    <input type="text" class="form-control" id="selectedIsShow"#}
+                                    {#                                           value="{{ request.tracer.project.isShow }}">#}
+                                    <select class="form-control" id="project_status">
+                                        {% if request.tracer.project.isShow == "True" %}
+                                            <option id="project_status">当前状态：隐藏</option>
+                                            <option id="project_status">显示</option>
+                                        {% endif %}
+                                        {% if request.tracer.project.isShow == "False" %}
+                                            <option id="project_status">当前状态：显示</option>
+                                            <option id="project_status">隐藏</option>
+                                        {% endif %}
+
+                                    </select>
+                                </div>
+                            </form>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-default" data-dismiss="modal">取消
+                            </button>
+                            <button type="button" class="btn btn-primary" id="ensure_modify_button"
+                                    style="background-color: #167be0">确定修改
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block js %}
+    <script>
+        //取消用户参与
+        $("#unbind_button").click(function (data) {
+            var selectObj = document.getElementById("userSelect");
+            var users = getMultiple(selectObj);
+
+            if (users == '') {
+                alert("请先选择需要解绑的用户")
+                return false;
+            }
+
+            $.ajax({
+                url: "{% url 'project:settings-users-unbind' %}?project_id={{ request.tracer.project.id }}",
+                type: "POST",
+                dataType: "json",
+                data: {
+                    "users": JSON.stringify(users),
+                    "project_id": {{ request.tracer.project.id }},
+                    'csrfmiddlewaretoken': '{{ csrf_token }}'
+                },
+                success: function (data) {
+                    if (data.status == 200) {
+                        window.location.href = "{% url 'project:settings-users-unbind' %}?project_id={{ request.tracer.project.id }}"
+                    }
+                }
+            })
+        })
+
+        function getMultiple(obj) {
+            var arr = [];
+            var options = obj.options;
+            while (obj.selectedIndex != -1) {
+                arr.push(options[obj.selectedIndex].value);
+                options[obj.selectedIndex].selected = false;
+            }
+            return arr;
+        };
+
+
+        //修改项目
+        $("#ensure_modify_button").click(function (data) {
+
+            var project_name = $("#recipient-name").val();
+            var project_desc = $("#message-text").val();
+            var project_logo = $("#project_logo").val();
+            var project_color = $("#project_color").val();
+
+            //告警方式
+            var project_status_index = document.getElementById("project_status").selectedIndex;
+            var project_status_value = document.getElementById("project_status").options[project_status_index].text;
+
+            $.ajax({
+                url: "{% url 'project:settings-modify' %}?project_id={{ request.tracer.project.id }}",
+                type: "POST",
+                dataType: "json",
+                data: {
+                    "project_name": project_name,
+                    "project_id": {{ request.tracer.project.id }},
+                    "project_desc": project_desc,
+                    "project_logo": project_logo,
+                    "project_color": project_color,
+                    "selectedIsShow": project_status_value,
+                    'csrfmiddlewaretoken': '{{ csrf_token }}'
+                },
+                success: function (data) {
+                    window.location.href = "{% url 'project:settings-users-unbind' %}?project_id={{ request.tracer.project.id }}"
+                }
+            })
+        })
+    </script>
+{% endblock %}

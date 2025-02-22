@@ -1,0 +1,172 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>{{ wiki_object.title }}</title>
+    <link rel="shortcut icon" href="{% static 'img/head_logo.png' %}" type="image/x-icon"/>
+    <link rel="stylesheet" href="{% static 'plugin/bootstrap/css/bootstrap.min.css' %}">
+    <link rel="stylesheet" href="{% static 'plugin/font-awesome/css/font-awesome.min.css' %}">
+    <link rel="stylesheet" href="{% static 'css/manage.css' %}">
+    <link rel="stylesheet" href="{% static 'plugin/editor-md/css/editormd.preview.min.css' %}">
+    <style>
+
+        a:hover {
+            text-decoration: none;
+        }
+
+        .panel-default {
+            margin-top: 10px;
+        }
+
+        .panel-default .panel-heading {
+            display: flex;
+            flex-direction: row;
+            justify-content: space-between;
+        }
+
+        .panel-body {
+            padding: 0;
+        }
+
+
+        .title-list ul {
+            padding-left: 15px;
+        }
+
+        .title-list ul a {
+            display: block;
+            padding: 5px 0;
+        }
+
+        .content {
+            border-left: 1px solid #dddddd;
+            margin-left: -1px;
+        }
+
+        .panel-body {
+            padding: 0;
+            display: flex;
+            flex-direction: row;
+            justify-content: left;
+            align-items: flex-start;
+            flex-wrap: wrap;
+        }
+
+        .panel-body > .item {
+            border-radius: 6px;
+            width: 210px;
+            border: 1px solid #dddddd;
+            margin: 20px 10px;
+
+        }
+
+        .panel-body > .item:hover {
+            border: 1px solid #f0ad4e;
+        }
+
+        .panel-body > .item > .title {
+            height: 104px;
+            color: white;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            border-top-left-radius: 6px;
+            border-top-right-radius: 6px;
+            font-size: 15px;
+            text-decoration: none;
+        }
+
+        .panel-body > .item > .info {
+            padding: 10px 10px;
+
+            display: flex;
+            justify-content: space-between;
+
+            border-bottom-left-radius: 6px;
+            border-bottom-right-radius: 6px;
+            color: #8c8c8c;
+
+        }
+
+        .panel-body > .item > .info a {
+            text-decoration: none;
+        }
+
+        .panel-body > .item > .info .fa-star {
+            font-size: 18px;
+        }
+
+        .color-radio label {
+            margin-left: 0;
+            padding-left: 0;
+        }
+
+        .color-radio input[type="radio"] {
+            display: none;
+        }
+
+        .color-radio input[type="radio"] + .cycle {
+            display: inline-block;
+            height: 25px;
+            width: 25px;
+            border-radius: 50%;
+            border: 2px solid #dddddd;
+        }
+
+        .color-radio input[type="radio"]:checked + .cycle {
+            border: 2px solid black;
+        }
+
+    </style>
+</head>
+<body>
+
+<div class="container-fluid" style="">
+    <div class="panel panel-default">
+        <div class="panel-heading">
+            <div>
+                <i class="fa fa-share" aria-hidden="true"></i> 【 {{ wiki_object.title }} 】内容分享
+            </div>
+            <div class="function">
+                <a type="button" class="btn btn-success btn-xs"
+                   href="{% url 'web:wiki_invite_join_download' code=code %}">
+                    <i class="fa fa-download" aria-hidden="true"></i> 导出文本.md
+                </a>
+            </div>
+        </div>
+
+        <div class="panel-body">
+            <div class="col-sm-12 content">
+                <div id="previewMarkdown">
+                    <textarea>{{ wiki_object.content }}</textarea>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script src="{% static 'js/jquery-3.4.1.min.js' %}"></script>
+<script src="{% static 'plugin/bootstrap/js/bootstrap.min.js' %}"></script>
+<script src="{% static 'plugin/editor-md/editormd.min.js' %}"></script>
+<script src="{% static 'plugin/editor-md/lib/marked.min.js' %}"></script>
+<script src="{% static 'plugin/editor-md/lib/prettify.min.js' %}"></script>
+<script src="{% static 'plugin/editor-md/lib/raphael.min.js' %}"></script>
+<script src="{% static 'plugin/editor-md/lib/underscore.min.js' %}"></script>
+<script src="{% static 'plugin/editor-md/lib/sequence-diagram.min.js' %}"></script>
+<script src="{% static 'plugin/editor-md/lib/flowchart.min.js' %}"></script>
+<script src="{% static 'plugin/editor-md/lib/jquery.flowchart.min.js' %}"></script>
+<script>
+    $(function () {
+        initPreivewMarkdown();
+    });
+
+    function initPreivewMarkdown() {
+        editormd.markdownToHTML("previewMarkdown", {
+            htmlDecode: "style,script,iframe",
+            emoji: true,
+            taskList: true,
+        });
+    }
+</script>
+</body>
+</html>

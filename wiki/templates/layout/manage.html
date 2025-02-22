@@ -1,0 +1,78 @@
+{% load static %}
+{% load project %}
+<!DOCTYPE html>
+{#禁止浏览器复制#}
+{#<html lang="en" onselectstart="return false">#}
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>{% block title %}{% endblock %}</title>
+    <link rel="shortcut icon" href="{% static 'img/head_logo.png' %}" type="image/x-icon"/>
+    <link rel="stylesheet" href="{% static 'plugin/bootstrap/css/bootstrap.min.css' %}">
+    <link rel="stylesheet" href="{% static 'plugin/font-awesome/css/font-awesome.min.css' %}">
+    <link rel="stylesheet" href="{% static 'css/manage.css' %}">
+    <style>
+        .error-msg {
+            color: red;
+            position: absolute;
+            font-size: 13px;
+        }
+    </style>
+    {% block css %}{% endblock %}
+
+</head>
+<body>
+
+<nav class="navbar navbar-av">
+    <div class="container-fluid">
+        <div class="navbar-header">
+            <button type="button" class="navbar-toggle collapsed" data-toggle="collapse"
+                    data-target="#bs-example-navbar-collapse-1" aria-expanded="false">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a class="navbar-brand" href="{% url 'web:project_list' %}"><strong>FastWork</strong></a>
+        </div>
+
+        <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+            <ul class="nav navbar-nav">
+
+                {% all_project_list request %}
+
+                {% if request.tracer.project %}
+                    {% manage_menu_list request %}
+                {% endif %}
+            </ul>
+
+            <ul class="nav navbar-nav navbar-right">
+                {#                <li><a href="#">工作台</a></li>#}
+                {#                <li><a href="#">日历</a></li>#}
+
+                {% block menu %}
+                {% endblock %}
+
+                <li class="dropdown">
+                    <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true"
+                       aria-expanded="false"><strong>{{ request.tracer.user.username }}</strong><span
+                            class="caret"></span></a>
+                    <ul class="dropdown-menu">
+                        <li><a href="{% url 'web:index' %}">FastWork官网</a></li>
+                        {% if request.tracer.user %}
+                            <li role="separator" class="divider"></li>
+                            <li><a href="{% url 'web:logout' %}">注销登录</a></li>
+                        {% endif %}
+                    </ul>
+                </li>
+            </ul>
+        </div>
+    </div>
+</nav>
+
+{% block content %}{% endblock %}
+<script src="{% static 'js/jquery-3.4.1.min.js' %}"></script>
+<script src="{% static 'plugin/bootstrap/js/bootstrap.min.js' %}"></script>
+{% block js %}{% endblock %}
+</body>
+</html>

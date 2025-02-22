@@ -1,0 +1,393 @@
+{% extends 'base/site-base.html' %}
+{% load static %}
+
+{% block css %}
+    <style>
+        .juzhong {
+            text-align: center;
+        }
+
+        .content {
+            height: calc(100vh - 120px);
+            overflow: scroll;
+            margin-left: -1px;
+        }
+    </style>
+{% endblock %}
+
+{% block title %}
+    FastWork - 部署管理
+{% endblock %}
+{% block content %}
+    <div class="container-fluid content" style="margin-top: 20px">
+        <div class="col-sm-12">
+            <div class="panel-heading">
+                <ol class="breadcrumb">
+                    <li><a href="{% url 'project:list' %}" style="color: #337ab7">项目大厅</a></li>
+                    <li><a href="{% url 'deploy:deplot-programme-list' %}?project_id={{ request.tracer.project.id }}"
+                           style="color: #337ab7">持续部署</a></li>
+                    <li class="active">部署大厅</li>
+                </ol>
+            </div>
+        </div>
+
+        <div class="col-sm-12" style="margin-top: -20px">
+            <div class="col-lg-6">
+                <div class="input-group">
+                    <a class="btn btn-default" data-toggle="modal" data-target="#addModal" style="margin-bottom: 5px">
+                        <i class="fa fa-plus" aria-hidden="true"></i> 添加部署工程
+                    </a>
+                </div>
+            </div>
+
+        </div>
+
+        <div class="col-sm-12">
+            <div class="container-fluid">
+                <div class="panel panel-default">
+                    <div class="panel-body">
+                        <div>
+                            <table class="table table-bordered">
+                                <thead>
+                                <tr>
+                                    <th style="text-align: center"><strong>ID</strong></th>
+                                    <th style="text-align: center"><strong>项目名称</strong></th>
+                                    <th style="text-align: center"><strong>项目地址</strong></th>
+                                    <th style="text-align: center"><strong>项目环境</strong></th>
+                                    <th style="text-align: center"><strong>线上项目地址</strong></th>
+                                    <th style="text-align: center"><strong>部署服务器</strong></th>
+                                    <th style="text-align: center"><strong>发布任务</strong></th>
+                                    <th style="text-align: center"><strong>操作</strong></th>
+                                </tr>
+                                </thead>
+                                <tbody style="text-align: center">
+                                {% for project in projects %}
+                                    <tr>
+                                        <th class="juzhong">{{ project.id }}</th>
+                                        <th class="juzhong">{{ project.title }}</th>
+                                        <th class="juzhong">{{ project.repo }}</th>
+                                        {#choice里面的选择可以显示中文#}
+                                        <th class="juzhong">{{ project.get_env_display }}</th>
+                                        <th class="juzhong">{{ project.path }}</th>
+                                        <th class="juzhong"
+                                            style="text-overflow: ellipsis; white-space: nowrap; overflow: hidden;">
+                                            {# 下面的server是models外键关联的名称#}
+                                            {% for item in project.server.all %}
+                                                <span class="label label-info">{{ item.hostname }}</span>
+                                            {% endfor %}
+                                        </th>
+                                        <th class="juzhong">
+                                            <a class="btn btn-success"
+                                               style="margin-bottom: 5px;color: white;font-size: 11px"
+                                               href="{% url 'deploy:deplot-task-list' %}?project_id={{ request.tracer.project.id }}&programme_id={{ project.id }}">
+                                                <i class="fa fa-share-square-o" aria-hidden="true"></i> 发布任务
+                                            </a>
+                                        </th>
+                                        <th class="juzhong">
+                                            <a class="btn btn-warning" data-toggle="modal" data-target="#editModal"
+                                               style="margin-bottom: 5px;font-size: 11px"
+                                               onclick="get_code({{ project.id }})">
+                                                <i class="fa fa-edit" aria-hidden="true"></i> 编辑
+                                            </a>
+
+                                            <a class="btn btn-danger" onclick="deleteProj({{ project.id }})"
+                                               style="margin-bottom: 5px;font-size: 11px">
+                                                <i class="fa fa-remove" aria-hidden="true"></i> 删除
+                                            </a>
+                                        </th>
+                                    </tr>
+                                {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="addModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+
+                {% if accounts_obj %}
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
+                                aria-hidden="true">&times;</span></button>
+                        <h4 class="modal-title">添加部署工程</h4>
+                    </div>
+                    <div class="modal-body">
+                        <form id="addForm">
+                            <h3 style="color: rgba(0,0,0,0.65);margin-bottom: 5px">工程名称</h3>
+                            <input type="text" class="form-control" id="proj_name" placeholder="请输入工程名称">
+                            <p style="margin-top: 20px"></p>
+
+                            <h3 style="color: rgba(0,0,0,0.65);margin-bottom: 5px">线上工程地址(在线代码仓库地址)</h3>
+                            <input type="text" class="form-control" id="proj_address_online"
+                                   placeholder="请输入在线代码仓库地址">
+                            <p style="margin-top: 20px"></p>
+
+                            <h3 style="color: rgba(0,0,0,0.65);margin-bottom: 5px">工程环境</h3>
+                            <select class="form-control" id="proj_env">
+                                <option>请选择部署环境</option>
+                                <option>正式环境</option>
+                                <option>测试环境</option>
+                            </select>
+                            <p style="margin-top: 20px"></p>
+
+                            <h3 style="color: rgba(0,0,0,0.65);margin-bottom: 5px">
+                                部署目标目录(部署到服务器的哪个目录下)</h3>
+                            <input type="text" class="form-control" placeholder="请输入部署目标目录" id="proj_data_dir">
+                            <p style="margin-top: 20px"></p>
+
+                            <h3 style="color: rgba(0,0,0,0.65);margin-bottom: 5px">部署服务器</h3>
+
+                            <select class="form-control" id="proj_server_list" multiple>
+                                {% for foo in accounts_obj %}
+                                    <option>{{ foo.hostname }}</option>
+                                {% endfor %}
+                            </select>
+
+                            <p style="margin-top: 20px"></p>
+
+                        </form>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-default" data-dismiss="modal">取 消</button>
+                        <button id="btnAddEdit" type="button" class="btn btn-default"
+                                style="background-color: #167be0;color: white">添 加
+                        </button>
+                    </div>
+                {% else %}
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
+                                aria-hidden="true">&times;</span></button>
+                        <h4 class="modal-title">添加部署工程</h4>
+                    </div>
+                    <div class="modal-body">
+                        <form id="addForm">
+                            <h3 style="color: rgba(0,0,0,0.65);margin-bottom: 5px">工程名称</h3>
+                            <input type="text" class="form-control" id="proj_name" placeholder="请输入工程名称"
+                                   disabled>
+                            <p style="margin-top: 20px"></p>
+
+                            <h3 style="color: rgba(0,0,0,0.65);margin-bottom: 5px">线上工程地址(在线代码仓库地址)</h3>
+                            <input type="text" class="form-control" id="proj_address_online"
+                                   placeholder="请输入在线代码仓库地址"
+                                   disabled>
+                            <p style="margin-top: 20px"></p>
+
+                            <h3 style="color: rgba(0,0,0,0.65);margin-bottom: 5px">工程环境</h3>
+                            <select class="form-control" id="proj_env" disabled>
+                                <option>请选择部署环境</option>
+                                <option>正式环境</option>
+                                <option>测试环境</option>
+                            </select>
+                            <p style="margin-top: 20px"></p>
+
+                            <h3 style="color: rgba(0,0,0,0.65);margin-bottom: 5px">
+                                部署目标目录(部署到服务器的哪个目录下)</h3>
+                            <input type="text" class="form-control" placeholder="请输入部署目标目录" id="proj_data_dir"
+                                   disabled>
+                            <p style="margin-top: 20px"></p>
+
+                            <h3 style="color: rgba(0,0,0,0.65);margin-bottom: 5px">部署服务器</h3>
+
+                            <a class="btn btn-primary" style="margin-bottom: 5px;color: white;background-color: #167be0"
+                               href="{% url 'tools_execution:tools-server-list' %}?project_id={{ request.tracer.project.id }}">
+                                <i class="fa fa-server" aria-hidden="true"></i> 前往添加服务器</a>
+
+                            <p style="margin-top: 20px"></p>
+
+                        </form>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-default" data-dismiss="modal">取 消</button>
+                        <button type="button" class="btn btn-default" disabled
+                                style="background-color: gray;color: white">添 加
+                        </button>
+                    </div>
+                {% endif %}
+
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="editModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
+                            aria-hidden="true">&times;</span></button>
+                    <h4 class="modal-title" id="xxxxxxx">正在编辑</h4>
+                </div>
+                <div class="modal-body">
+                    <form id="addForm">
+                        <h3 style="color: rgba(0,0,0,0.65);margin-bottom: 5px">项目ID</h3>
+                        <input type="text" class="form-control" placeholder="项目ID" id="project_id" disabled>
+                        <p style="margin-top: 20px"></p>
+
+                        <h3 style="color: rgba(0,0,0,0.65);margin-bottom: 5px">项目名称</h3>
+                        <input type="text" class="form-control" value="root" id="project_name" placeholder="项目名称">
+                        <p style="margin-top: 20px"></p>
+
+                        <h3 style="color: rgba(0,0,0,0.65);margin-bottom: 5px">项目地址</h3>
+                        <input type="text" class="form-control" id="project_address" disabled placeholder="项目地址">
+                        <p style="margin-top: 20px"></p>
+
+                        <h3 style="color: rgba(0,0,0,0.65);margin-bottom: 5px">项目环境</h3>
+                        <input type="text" class="form-control" id="project_env" placeholder="项目环境" disabled>
+                        <p style="margin-top: 20px"></p>
+
+                        <h3 style="color: rgba(0,0,0,0.65);margin-bottom: 5px">线上项目地址</h3>
+                        <input type="text" class="form-control" placeholder="线上项目地址" id="project_address_online">
+                        <p style="margin-top: 20px"></p>
+
+                        <h3 style="color: rgba(0,0,0,0.65);margin-bottom: 5px">部署服务器</h3>
+                        <textarea class="form-control" placeholder="部署服务器" id="project_server" disabled
+                                  style="resize: none"></textarea>
+                        <p style="margin-top: 20px"></p>
+
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">取 消</button>
+                    <button id="btnSubmitEdit" type="button" class="btn btn-default"
+                            style="background-color: #167be0;color: white">修 改
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+{% endblock %}
+
+{% block js %}
+    <script>
+        function get_code(programm_id) {
+            $.ajax({
+                {#url: "{% url 'web:programme_edit_data'  project_id=request.tracer.project.id%}",#}
+                {#url: "/web/manage/" + {{ request.tracer.project.id }} +"/rebuild/programme/edit/data/" + programm_id + "/",#}
+                url: "{% url 'deploy:deplot-programme-edit' %}?project_id={{ request.tracer.project.id }}&programme_id=" + programm_id,
+                type: "get",
+                success: function (res) {
+                    if (res.status) {
+                        $("#project_id").val(res.data.project_id);
+                        $("#project_name").val(res.data.project_name);
+                        $("#project_address").val(res.data.project_address);
+                        $("#project_env").val(res.data.project_env);
+                        $("#project_address_online").val(res.data.project_address_online);
+                        $("#project_server").val(res.data.project_server);
+                    }
+                }
+            })
+        }
+    </script>
+
+    <script>
+        $(function () {
+            $("#btnSubmitEdit").click(function () {
+                var project_name = $("#project_name").val();
+                var project_address_online = $("#project_address_online").val();
+
+                if (project_name === "" || project_address_online === "") {
+                    alert("【项目名称】或【线上项目地址】不能为空！");
+                    return false;
+                }
+
+                $.ajax({
+                    url: "{% url 'deploy:deplot-programme-list' %}",
+                    type: "POST",
+                    dataType: 'json',
+                    data: {
+                        'operation_type': "edit",
+                        'project_name': project_name,
+                        'project_id': {{request.tracer.project.id}},
+                        'project_address_online': project_address_online,
+                        'csrfmiddlewaretoken': '{{ csrf_token }}'
+                    },
+                    success: function (data) {
+                        if (data.state == 0) {
+                            location.href = '{% url 'deploy:deplot-programme-list' %}?project_id={{ request.tracer.project.id }}';
+                            return true;
+                        } else {
+                            alert(data.data)
+                            return false;
+                        }
+                    }
+                })
+
+
+            })
+        })
+    </script>
+
+    <script>
+        $(function () {
+            $("#btnAddEdit").click(function () {
+                var proj_name = $("#proj_name").val();
+                var proj_address_online = $("#proj_address_online").val();
+                var proj_data_dir = $("#proj_data_dir").val();
+                var proj_env_index = document.getElementById("proj_env").selectedIndex;
+                var proj_env = document.getElementById("proj_env").options[proj_env_index].text;
+
+                //获取多个值
+                var proj_server_list = document.getElementById("proj_server_list")
+                var selected_value = ""
+                for (var i = 0; i < proj_server_list.length; i++) {
+                    if (proj_server_list[i].selected == true) {
+                        selected_value += proj_server_list[i].text + ","
+                    }
+                }
+                if (proj_name == "" || proj_address_online == "" || proj_data_dir == "" || proj_env == "请选择部署环境" || selected_value === "") {
+                    alert("部署工程选项未按要求填写")
+                    return false;
+                }
+
+                $.ajax({
+                    url: "{% url 'deploy:deplot-programme-list' %}",
+                    type: "POST",
+                    dataType: 'json',
+                    data: {
+                        'operation_type': "add",
+                        'proj_name': proj_name,
+                        'proj_address_online': proj_address_online,
+                        'proj_data_dir': proj_data_dir,
+                        'project_id': {{request.tracer.project.id}},
+                        'proj_env': proj_env,
+                        'proj_server_list': selected_value,
+                        'csrfmiddlewaretoken': '{{ csrf_token }}'
+                    },
+                    success: function (data) {
+                        if (data.state == 0) {
+                            location.href = '{% url 'deploy:deplot-programme-list' %}?project_id={{ request.tracer.project.id }}';
+                            return true;
+                        } else {
+                            alert(data.data)
+                            return false;
+                        }
+                    }
+                })
+
+            })
+        })
+    </script>
+
+    <script>
+        function deleteProj(program_id) {
+            var result = confirm("确定要删除该工程吗？");
+            if (result) {
+                $.ajax({
+                    url: "{% url 'deploy:deplot-programme-remove' %}?project_id={{ request.tracer.project.id }}&programme_id=" + program_id,
+                    type: "get",
+                    dataType: "JSON",
+                    success: function (res) {
+                        if (res.status) {
+                            location.href = '{% url 'deploy:deplot-programme-list' %}?project_id={{ request.tracer.project.id }}';
+                        }
+                    }
+                });
+            }
+        }
+    </script>
+{% endblock %}

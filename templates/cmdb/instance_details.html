@@ -1,0 +1,410 @@
+{% extends 'base/site-base.html' %}
+{% load static %}
+
+{% block css %}
+    <link rel="stylesheet" type="text/css" href="{% static 'sweetalert-1.0.1/dist/sweetalert.css' %}"/>
+    <link rel="stylesheet" type="text/css"
+          href="{% static 'DataTables-1.10.15/media/css/dataTables.bootstrap.min.css' %}"/>
+    <style>
+        .content {
+            height: calc(100vh - 120px);
+            overflow: scroll;
+            margin-left: -1px;
+        }
+    </style>
+{% endblock %}
+{% block title %}
+    FastWork - 资产信息
+{% endblock %}
+{% block content %}
+    <div class="container-fluid content" style="margin-top: 20px">
+
+        <div class="col-sm-12">
+            <div class="panel-heading">
+                <ol class="breadcrumb">
+                    <li><a href="{% url 'project:list' %}" style="color: #337ab7">项目大厅</a></li>
+                    <li><a href="{% url 'cmdb:cmdb-assets' %}?project_id={{ request.tracer.project.id }}" style="color: #337ab7">资产管理</a></li>
+                    <li class="active">资产列表</li>
+                    <li class="active">{{ asset.name }}</li>
+                </ol>
+            </div>
+        </div>
+
+        <div class="col-sm-12" style="margin-top: -30px">
+            <div class="panel-body">
+                <table id="table_user" class="table table-striped table-bordered table-hover table-condensed">
+                    <thead>
+                    <tr>
+                        <th>序号</th>
+                        <th>主机名</th>
+                        <th>IP</th>
+                        <th>MAC</th>
+                        <th>操作系统</th>
+                        <th>系统架构</th>
+                        <th>内存(MB)</th>
+                        <th>CPU(核)</th>
+                        <th>序列号</th>
+                        <th>状态</th>
+                        <th>订购时间</th>
+                        <th>过保时间</th>
+                        <th>创建时间</th>
+                        <th>最新上报时间</th>
+                        {#                        <th style="text-align: center">磁盘信息(GB)</th>#}
+                        <th>负责人</th>
+                        <th style="text-align: center">操作</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr>
+                        <td>1</td>
+                        <td>{{ asset.name }}</td>
+                        <td>{{ asset.ip }}</td>
+                        <td>
+                            <a href="{% url 'cmdb:cmdb-get-server-infos-by-mac' %}?project_id={{ request.tracer.project.id }}&q={{ asset.mac }}">{{ asset.mac }}</a>
+                        </td>
+                        <td>{{ asset.os }} </td>
+                        <td>{{ asset.arch }} </td>
+                        <td>{{ asset.mem }}</td>
+                        <td>{{ asset.cpu }}</td>
+                        <td>{{ asset.sn }} </td>
+                        <td>
+                            {% if asset.remark == 1 %}
+                                <span class="label label-success">运营中</span>
+                            {% else %}
+                                <span class="label label-danger">不可用</span>
+                            {% endif %}
+                        </td>
+                        <td>{{ asset.purchase_time }} </td>
+                        <td>{{ asset.over_insurance_time }} </td>
+                        <td>{{ asset.created_time }} </td>
+                        <td>{{ asset.last_time }} </td>
+
+
+                        <td>{{ asset.user }} </td>
+                        <td style="width: 120px">
+                            <a class="btn btn-info btn-xs btn-resource-asset" href="javascript:void(0)"
+                               style="color: white;background-color:#5cb85c ;border: none"
+                               data-id="{{ asset.id }}">监控</a>
+
+                            <a class="btn btn-success btn-xs" data-target="#EditModal" data-toggle="modal"
+                               onclick="get_server_info({{ asset.id }})"
+                               style="color: white;background-color: orange;border: none">编辑</a>
+
+                            <a class="btn btn-danger btn-xs"
+                               onclick="remove({{ asset.id }})"
+                               style="color: white;background-color: red;border: none">删除</a>
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+    </div>
+
+    {#    资源监控#}
+    <div class="modal fade dialog-resource" tabindex="-1" role="dialog"
+         aria-labelledby="myLargeModalLabel">
+        <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
+                            aria-hidden="true">&times;</span></button>
+                    <h4 class="modal-title" id="myModalLabel">资源监控</h4>
+                </div>
+                <div class="modal-body">
+                    <div id="chart-resource" style="width: 850px;height:400px;"></div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {#用户编辑#}
+    <div class="modal fade" id="EditModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
+                            aria-hidden="true">&times;</span></button>
+                    <h4 class="modal-title" id="myModalLabel">资产编辑</h4>
+                </div>
+                <div class="modal-body">
+                    <form class="form-horizontal form-edit-user">
+                        {% csrf_token %}
+
+                        <input type="text" id="server_id" value="" hidden/>
+
+                        <div class="form-group">
+                            <label class="control-label col-md-3">资产序列号(sn)：</label>
+                            <div class="col-md-9">
+                                <input type="text" class="form-control" id="sn" value=""/>
+                            </div>
+                        </div>
+
+
+                        <div class="form-group">
+                            <label class="control-label col-md-3">负责人：</label>
+                            <div class="col-md-9">
+                                <input type="text" class="form-control" id="user" value=""/>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="control-label col-md-3">状态：</label>
+                            <div class="col-md-9">
+                                <input type="text" class="form-control" id="remark" value=""
+                                       placeholder="(1:运营中，2:不可用)"/>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="control-label col-md-3">订购时间：</label>
+                            <div class="col-md-9">
+                                <input type="datetime-local" class="form-control" id="purchase_time" value=""/>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="control-label col-md-3">过保时间：</label>
+                            <div class="col-md-9">
+                                <input type="datetime-local" class="form-control" id="over_insurance_time" value=""/>
+                            </div>
+                        </div>
+
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+                    <button type="button" class="btn btn-success" id="btnSubmitEdit"
+                            style="background-color: #167be0;border: none">更新
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+{% endblock %}
+
+{% block js %}
+    <script type="text/javascript" src="{% static 'sweetalert-1.0.1/dist/sweetalert.min.js' %}"></script>
+    <script type="text/javascript" src="{% static 'DataTables-1.10.15/media/js/jquery.dataTables.min.js' %}"></script>
+    <script type="text/javascript"
+            src="{% static 'DataTables-1.10.15/media/js/dataTables.bootstrap.min.js' %}"></script>
+    <script type="text/javascript" src="{% static 'echarts/echarts.min.js' %}"></script>
+    <script type="text/javascript">
+        jQuery(document).ready(function () {
+            jQuery('#table_user').DataTable({
+                "language": {
+                    "processing": "处理中...",
+                    "lengthMenu": "显示 _MENU_ 项结果",
+                    "zeroRecords": "没有匹配结果",
+                    "info": "显示第 _START_ 至 _END_ 项结果，共 _TOTAL_ 项",
+                    "infoEmpty": "显示第 0 至 0 项结果，共 0 项",
+                    "infoFiltered": "(由 _MAX_ 项结果过滤)",
+                    "infoPostFix": "",
+                    "search": "搜索:",
+                    "searchPlaceholder": "搜索...",
+                    "url": "",
+                    "emptyTable": "表中数据为空",
+                    "loadingRecords": "载入中...",
+                    "infoThousands": ",",
+                    "paginate": {
+                        "first": "首页",
+                        "previous": "上页",
+                        "next": "下页",
+                        "last": "末页"
+                    },
+                    "aria": {
+                        paginate: {
+                            first: '首页',
+                            previous: '上页',
+                            next: '下页',
+                            last: '末页'
+                        },
+                        "sortAscending": ": 以升序排列此列",
+                        "sortDescending": ": 以降序排列此列"
+                    },
+                    "decimal": "-",
+                    "thousands": "."
+                }
+            });
+
+            //监控
+            var chart_resource = echarts.init(document.getElementById('chart-resource'));
+            var chart_resource_option = option = {
+                title: {
+                    text: 'CPU内存使用率'
+                },
+                tooltip: {
+                    trigger: 'axis'
+                },
+                legend: {
+                    data: ['CPU', '内存']
+                },
+                grid: {
+                    left: '3%',
+                    right: '4%',
+                    bottom: '3%',
+                    containLabel: true
+                },
+                toolbox: {
+                    feature: {
+                        saveAsImage: {}
+                    }
+                },
+                xAxis: {
+                    type: 'category',
+                    boundaryGap: false,
+                    data: [],
+                },
+                yAxis: {
+                    type: 'value'
+                },
+                series: [
+                    {
+                        name: 'CPU',
+                        type: 'line',
+                        stack: 'CPU',
+                        data: [],
+                    },
+                    {
+                        name: '内存',
+                        type: 'line',
+                        stack: '内存',
+                        data: [],
+                    },
+                ]
+            };
+
+            //定时器
+            var th = null;
+
+            function reload_resource_chart(id) {
+                jQuery.get('{% url 'cmdb:cmdb-echart-data' %}?project_id={{ request.tracer.project.id }}', {
+                    'id': id,
+                    '_': (new Date()).getTime()
+                }, function (result) {
+                    if (result['code'] == 200) {
+                        chart_resource_option['xAxis']['data'] = result['result']['xAxis']
+                        chart_resource_option['series'][0]['data'] = result['result']['CPU_datas']
+                        chart_resource_option['series'][1]['data'] = result['result']['MEM_datas']
+
+                        chart_resource.setOption(chart_resource_option);
+                    }
+                }, 'json');
+            }
+
+            jQuery('#table_user').on('click', '.btn-resource-asset', function () {
+
+                //获取id：jQuery(this).attr('data-id);
+                var id = jQuery(this).data('id')
+                reload_resource_chart(id);
+                if (th === null) {
+                    th = setInterval(function () {
+                        reload_resource_chart(id);
+                    }, 30 * 1000);
+                }
+                ;
+
+
+                jQuery('.dialog-resource').modal({
+                    show: true,
+                    backdrop: 'static',
+                    keyboard: false
+                });
+            });
+
+            //魔态框关闭的时候
+            jQuery('.dialog-resource').on('hidden.bs.modal', function (e) {
+                console.log("close", th)
+                if (th !== null) {
+                    console.log("close", th)
+                    clearInterval(th);
+                    th = null;
+                }
+            });
+
+        });
+    </script>
+    <script>
+        function remove(server_id) {
+            if (window.confirm('确定要删除该实例吗？')) {
+                $.ajax({
+                    url: "{% url 'cmdb:cmdb-get-server-infos' %}?server_id=" + server_id,
+                    type: "GET",
+                    success: function (data) {
+                        if (data.state == 0) {
+                            alert(data.data)
+                            location.href = '{% url 'cmdb:cmdb-assets' %}?project_id={{ request.tracer.project.id }}'
+                        } else {
+                            alert(data.data)
+                        }
+                    }
+                })
+                return true;
+            } else {
+                return false;
+            }
+        }
+    </script>
+    <script>
+        function get_server_info(server_id) {
+            $.ajax({
+                url: "{% url 'cmdb:cmdb-get-server-infos' %}?server_id=" + server_id,
+                type: "GET",
+                success: function (res) {
+                    if (res.status) {
+                        $("#sn").val(res.data.sn);
+                        $("#server_id").val(res.data.id);
+                        $("#user").val(res.data.user);
+                        $("#remark").val(res.data.remark);
+                        $("#purchase_time").val(res.data.purchase_time);
+                        $("#over_insurance_time").val(res.data.over_insurance_time);
+                    }
+                }
+            })
+        }
+    </script>
+
+
+    <script>
+        $("#btnSubmitEdit").click(function () {
+            var server_id = $("#server_id").val();
+            var sn = $("#sn").val();
+            var user = $("#user").val();
+            var remark = $("#remark").val();
+            var purchase_time = $("#purchase_time").val();
+            var over_insurance_time = $("#over_insurance_time").val();
+
+            $.ajax({
+                url: "{% url 'cmdb:cmdb-get-server-infos' %}",
+                type: "POST",
+                dataType: 'json',
+                data: {
+                    'server_id': server_id,
+                    'project_id': {{ request.tracer.project.id }},
+                    'sn': sn,
+                    'user': user,
+                    'remark': remark,
+                    'purchase_time': purchase_time,
+                    'over_insurance_time': over_insurance_time,
+                    'csrfmiddlewaretoken': '{{ csrf_token }}'
+                },
+                success: function (data) {
+                    if (data.state == 0) {
+                        alert(data.data)
+                        location.href = '{% url 'cmdb:cmdb-assets' %}?project_id={{ request.tracer.project.id }}'
+                    } else {
+                        alert(data.data)
+                    }
+                }
+            })
+
+
+        })
+    </script>
+{% endblock %}
+

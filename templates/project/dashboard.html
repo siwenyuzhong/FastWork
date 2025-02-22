@@ -1,0 +1,291 @@
+{% extends 'base/site-base.html' %}
+{% load static %}
+{% load dashboard %}
+{% load issues %}
+
+{% block title %}
+    FastWork - 项目管理
+{% endblock %}
+
+{% block css %}
+    <style>
+        .table-right > tbody > tr > td.label-left {
+            width: 90px;
+        }
+
+        .table-right > tbody > tr > td {
+            border: 0;
+        }
+
+        .status-count {
+            text-align: center;
+            margin-top: 10px;
+            font-size: 14px;
+        }
+
+        .status-count .count {
+            font-size: 25px;
+        }
+
+        .status-count a {
+            text-decoration: none;
+        }
+
+        .user-item .title {
+            margin-bottom: 20px;
+        }
+
+        .user-item .avatar, .top-10 .avatar {
+            float: left;
+            margin-right: 10px;
+            display: inline-block;
+            width: 30px;
+            height: 30px;
+            background-color: #304659;
+            color: white;
+            text-align: center;
+            line-height: 30px;
+            border-radius: 50%;
+        }
+
+        .user-item .text {
+            line-height: 30px;
+        }
+
+        .top-10 .avatar {
+            margin-right: 0;
+        }
+
+        .top-10 td {
+            padding: 5px 10px;
+        }
+
+        .top-10 .table > tbody > tr > td {
+            border-top: 0;
+            border-bottom: 1px solid #ddd;
+        }
+
+        .damacontent {
+            filter: blur(3px);
+        }
+
+        .content {
+            height: calc(100vh - 120px);
+            overflow: scroll;
+            margin-left: -1px;
+        }
+    </style>
+{% endblock %}
+
+
+{% block content %}
+    <div class="container-fluid content" style="margin-top: 20px">
+        <div class="row">
+            <div class="col-md-8">
+                <div class="panel panel-default">
+                    <div class="panel-heading">
+                        <i class="fa fa-bar-chart" aria-hidden="true"></i>
+                        新增问题趋势
+                    </div>
+                    <div class="panel-body">
+                        <div id="chart" style="width:100%;min-height:200px"></div>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="panel panel-default">
+                            <div class="panel-heading">
+                                <i class="fa fa-quora" aria-hidden="true"></i>
+                                问题
+                            </div>
+                            <div class="panel-body">
+                                {% for key,item in status_dict.items %}
+                                    <div class="col-sm-4 status-count">
+                                        <a href="{% url 'issue:issues' %}?project_id={{ request.tracer.project.id }}&status={{ key }}">
+                                            <div style="font-size: 17px;">{{ item.count }}</div>
+                                            <div style="font-size: 13px;">{{ item.text }}</div>
+                                        </a>
+                                    </div>
+                                {% endfor %}
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="panel panel-default">
+                            <div class="panel-heading">
+                                <i class="fa fa-user" aria-hidden="true"></i>
+                                项目成员
+                            </div>
+                            <div class="panel-body user-item">
+                                <div class="col-sm-12 title">创建者</div>
+                                <div class="clearfix" style="margin-bottom: 30px;">
+                                    <div class="col-sm-4">
+                                        <div class="avatar">{{ request.tracer.project.creator.username.0|upper }}</div>
+                                        <div class="text">{{ request.tracer.project.creator.username }}</div>
+                                    </div>
+                                </div>
+                                <div class="col-sm-12 title">参与者</div>
+                                <div>
+                                    {% for item in user_list %}
+                                        <div class="col-sm-4">
+                                            <div class="avatar">{{ item.user__username.0|upper }}</div>
+                                            <div class="text">{{ item.user__username }}</div>
+                                        </div>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+            <div class="col-md-4">
+                <div class="panel panel-default">
+                    <div class="panel-heading">
+                        <i class="fa fa-cog title-icon"></i>
+                        详细
+                    </div>
+                    <div class="panel-body">
+                        <table class="table table-right">
+                            <tbody>
+                            <tr>
+                                <td class="label-left">项目名称 ：</td>
+                                {% if request.tracer.project.isShow == "True" %}
+                                    <td class="damacontent"><strong>{{ request.tracer.project.name }}</strong></td>
+                                {% else %}
+                                    <td><strong>{{ request.tracer.project.name }}</strong></td>
+                                {% endif %}
+                            </tr>
+                            <tr>
+                                <td class="label-left">项目描述 ：</td>
+                                {% if request.tracer.project.isShow == "True" %}
+                                    <td class="damacontent"><strong>{{ request.tracer.project.desc }}</strong></td>
+                                {% else %}
+                                    <td><strong>{{ request.tracer.project.desc }}</strong></td>
+                                {% endif %}
+                            </tr>
+                            <tr>
+                                <td class="label-left">创建时间 ：</td>
+                                <td><strong>{{ request.tracer.project.create_datetime }}</strong></td>
+                            </tr>
+                            <tr>
+                                <td class="label-left">创&nbsp;&nbsp;建&nbsp;&nbsp;人：</td>
+                                <td><strong>{{ request.tracer.project.creator.username }}</strong></td>
+                            </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div class="panel panel-default">
+                    <div class="panel-heading">
+                        <i class="fa fa-list-ul" aria-hidden="true"></i>
+                        动态
+                    </div>
+                    <div class="panel-body top-10" style="height:calc(80vh - 120px);overflow: scroll">
+                        <table class="table">
+                            <tbody>
+                            <tbody>
+                            {% for item in top_ten %}
+                                <tr>
+                                    <td style="width: 46px;">
+                                        <div class="avatar">{{ item.creator.username.0|upper }}</div>
+                                    </td>
+                                    <td>
+                                        <div>{{ item.creator.username }}</div>
+                                        <div>指派
+                                            <a href="">{% string_just item.id %}</a>
+                                            给 {{ item.assign.username }}
+                                        </div>
+                                    </td>
+                                    <td style="width: 156px;">
+                                        {{ item.create_datetime }}
+                                    </td>
+                                </tr>
+
+                            {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block js %}
+    <script src="{% static 'plugin/highcharts/highcharts.js' %}"></script>
+    <script>
+        var INIT_CHART = "{% url 'project:dashboard-chart' %}?project_id={{ request.tracer.project.id }}"
+        Highcharts.setOptions({
+            global: {
+                useUTC: false
+            }
+        });
+
+        $(function () {
+            initChart();
+        });
+
+        function initChart() {
+            // chart
+            var config = {
+                title: {
+                    text: null   // 不显示标题
+                },
+                legend: {
+                    enabled: false // 关闭图例提示
+                },
+                credits: {
+                    enabled: false // 关闭版权信息
+                },
+                yAxis: {
+                    title: {
+                        text: '问题数量' // Y周文本提示
+                    }
+                },
+                xAxis: {
+                    type: 'datetime',
+                    tickInterval: 60 * 60 * 24 * 1000,
+                    labels: {
+                        formatter: function () {
+                            return Highcharts.dateFormat('%m-%d', this.value);
+                        },
+                        rotation: -30
+                    }
+                },
+                tooltip: {
+                    headerFormat: '<b>{point.key}</b><br>',
+                    pointFormat: '<span style="color:{series.color}">\u25CF</span> 数量: {point.y} ',
+                    xDateFormat: '%Y-%m-%d',
+                },
+                plotOptions: {
+                    area: {
+                        stacking: 'normal',
+                        lineColor: '#666666',
+                        lineWidth: 1,
+                        marker: {
+                            lineWidth: 1,
+                            lineColor: '#666666'
+                        }
+                    }
+                },
+                series: [{
+                    data: []
+                }]
+            };
+            $.ajax({
+                url: INIT_CHART,
+                type: "GET",
+                dataType: "JSON",
+                success: function (res) {
+                    config.series[0].data = res.data;
+                    var chart = Highcharts.chart('chart', config);
+                }
+            });
+        }
+    </script>
+{% endblock %}
+

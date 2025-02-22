@@ -1,0 +1,426 @@
+{% load static %}
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>{% block title %}{% endblock %}</title>
+    <link rel="shortcut icon" href="{% static 'img/head_logo.png' %}" type="image/x-icon"/>
+    <link rel="stylesheet" href="{% static 'plugin/bootstrap/css/bootstrap.min.css' %}">
+    <link rel="stylesheet" href="/static/aliyun/css/global.css">
+    <link rel="stylesheet" href="/static/aliyun/css/common-header9.css">
+    <link rel="stylesheet" href="{% static 'plugin/font-awesome/css/font-awesome.min.css' %}">
+    <style>
+        .damacontent {
+            filter: blur(6px);
+        }
+    </style>
+    {% block css %}
+    {% endblock %}
+</head>
+<body>
+<!-- 开发者中心数据拼接-->
+<!-- 培训与频道拼接-->
+<!-- 互联网+拼接-->
+<div data-spm="2">
+    <div class="ali-common-header">
+        <div class="ali-common-header-inner common-header-clearfix">
+            <!-- 运营专区 -->
+            <div class="activity item pull-left" style="margin-right: 50px">
+                <ul class="menu item pull-left" id="J_common_header_menu" data-spm="201">
+                    <li class="" has-dropdown="true" menu-type="product" data-spm-click="">
+          <span class="menu-hd" style="margin-left: -50px;font-size: 20px">
+            <strong style="margin-left: -50px"><a href="{% url 'project:list' %}" title="点我返回项目列表"
+                                                  style="color: white;text-decoration: none">FastWork</a></strong>
+          </span>
+                    </li>
+                </ul>
+            </div>
+            <!-- 导航菜单 -->
+            <ul class="menu item pull-left" id="J_common_header_menu" data-spm="201">
+
+                <li class="top-menu-item" has-dropdown="true" menu-type="training" data-spm-click="">
+                    <a class="menu-hd" target="_self">
+                        <strong style="font-size: 14px">资产管理</strong>
+                    </a>
+                    <div class="menu-dropdown solutions training-bg">
+                        <div class="menu-dropdown-inner module-padding common-header-clearfix">
+
+                            <div class="module-wrap " style="width:200px">
+                                <div class="module-hd">
+                                    <span class="glyphicon glyphicon-th-large" aria-hidden="true"></span>
+                                    资产管理
+                                </div>
+                                <div class="module-bd">
+                                    <a href="{% url 'cmdb:cmdb-assets' %}?project_id={{ request.tracer.project.id }}"
+                                       target="_self">
+                                        <span class="glyphicon glyphicon-th" aria-hidden="true"></span>
+                                        资产列表
+                                    </a>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+                </li>
+
+                <li class="top-menu-item" has-dropdown="true" menu-type="training" data-spm-click="">
+                    <a class="menu-hd" target="_self">
+                        <strong style="font-size: 14px">项目管理</strong>
+                    </a>
+                    <div class="menu-dropdown solutions training-bg">
+                        <div class="menu-dropdown-inner module-padding common-header-clearfix">
+
+                            <div class="module-wrap " style="width:200px">
+                                <div class="module-hd">
+                                    <span class="glyphicon glyphicon-tasks" aria-hidden="true"></span>
+                                    项目管理
+                                </div>
+                                <div class="module-bd">
+                                    <a href="{% url 'project:dashboard' %}?project_id={{ request.tracer.project.id }}"
+                                       target="_self">
+                                        <span class="glyphicon glyphicon-list-alt" aria-hidden="true"></span>
+                                        项目看板
+                                    </a>
+                                </div>
+
+                                <div class="module-bd">
+                                    <a href="{% url 'issue:issues' %}?project_id={{ request.tracer.project.id }}"
+                                       target="_self">
+                                        <span class="glyphicon glyphicon-question-sign" aria-hidden="true"></span>
+                                        问题管理
+                                    </a>
+                                </div>
+                            </div>
+                            <div class="module-wrap " style="width:200px">
+                                <div class="module-hd">
+                                    <span class="glyphicon glyphicon-list" aria-hidden="true"></span>
+                                    内容管理
+                                </div>
+
+
+                                <div class="module-bd">
+                                    <a href="{% url 'wiki:wiki-list' %}?project_id={{ request.tracer.project.id }}"
+                                       target="_self">
+                                        <span class="glyphicon glyphicon-book" aria-hidden="true"></span>
+                                        知识库
+                                    </a>
+                                </div>
+
+                                <div class="module-bd">
+                                    <a href="{% url 'file_depository:file_depository-files' %}?project_id={{ request.tracer.project.id }}"
+                                       target="_self">
+                                        <span class="glyphicon glyphicon-folder-open" aria-hidden="true"></span>
+                                        文件仓库
+                                    </a>
+                                </div>
+                            </div>
+                            <div class="module-wrap " style="width:200px">
+                                <div class="module-hd">
+                                    <span class="glyphicon glyphicon-scale" aria-hidden="true"></span>
+                                    数据统计
+                                </div>
+                                <div class="module-bd">
+                                    <a href="{% url 'project:statistics' %}?project_id={{ request.tracer.project.id }}"
+                                       target="_self">
+                                        <span class="glyphicon glyphicon-signal" aria-hidden="true"></span>
+                                        数据统计
+                                    </a>
+                                </div>
+                            </div>
+
+
+                        </div>
+                    </div>
+                </li>
+
+                <li class="top-menu-item" has-dropdown="true" menu-type="training" data-spm-click="">
+                    <a class="menu-hd" target="_self">
+                        <strong style="font-size: 14px">自动化运维</strong>
+                    </a>
+                    <div class="menu-dropdown solutions training-bg">
+                        <div class="menu-dropdown-inner module-padding common-header-clearfix">
+
+                            <div class="module-wrap " style="width:200px">
+                                <div class="module-hd">
+                                    <span class="glyphicon glyphicon-briefcase" aria-hidden="true"></span>
+                                    工具管理
+                                </div>
+                                <div class="module-bd">
+                                    <a href="{% url 'script:scripts-all' %}?project_id={{ request.tracer.project.id }}"
+                                       target="_self">
+                                        <span class="glyphicon glyphicon-cog" aria-hidden="true"></span> 工具库
+                                    </a>
+                                </div>
+
+
+                                <div class="module-bd">
+                                    <a href="{% url 'tools_execution:tools-webssh-server' %}?project_id={{ request.tracer.project.id }}"
+                                       target="_self">
+                                        <span class="glyphicon glyphicon-globe" aria-hidden="true"></span> WebSSH
+                                    </a>
+                                </div>
+
+                                <div class="module-bd">
+                                    <a href="{% url 'cmdb:cmdb-code-segment' %}?project_id={{ request.tracer.project.id }}"
+                                       target="_self">
+                                        <span class="glyphicon glyphicon-bookmark" aria-hidden="true"></span> 代码段管理
+                                    </a>
+                                </div>
+
+
+                            </div>
+
+                            <div class="module-wrap " style="width:200px">
+                                <div class="module-hd">
+                                    <span class="glyphicon glyphicon-blackboard" aria-hidden="true"></span>
+                                    运维场景
+                                </div>
+                                <div class="module-bd">
+                                    <a href="{% url 'task_scheduler:task_scheduler-task-list' %}?project_id={{ request.tracer.project.id }}"
+                                       target="_self">
+                                        <span class="glyphicon glyphicon-time" aria-hidden="true"></span>
+                                        定时任务
+                                    </a>
+                                </div>
+
+                                <div class="module-bd">
+                                    <a href="{% url 'batch_tasks:batch_tasks-batch_index' %}?project_id={{ request.tracer.project.id }}"
+                                       target="_self">
+                                        <span class="glyphicon glyphicon-menu-hamburger" aria-hidden="true"></span>
+                                        批量操作
+                                        {#                                        <span class="badge" style="color: white;background-color: red">新</span>#}
+                                    </a>
+                                </div>
+
+                                <div class="module-bd">
+                                    <a href="{% url 'file_depository:file_depository-files-difference' %}?project_id={{ request.tracer.project.id }}"
+                                       target="_self">
+                                        <span class="glyphicon glyphicon-duplicate" aria-hidden="true"></span>
+                                        文件对比
+                                    </a>
+                                </div>
+
+                                <div class="module-bd">
+                                    <a href="{% url 'file_depository:file_depository-files' %}?project_id={{ request.tracer.project.id }}"
+                                       target="_self">
+                                        <span class="glyphicon glyphicon-send" aria-hidden="true"></span>
+                                        文件分发
+                                    </a>
+                                </div>
+                            </div>
+
+                            <div class="module-wrap " style="width:200px">
+                                <div class="module-hd">
+                                    <span class="glyphicon glyphicon-list-alt" aria-hidden="true"></span>
+                                    日志管理
+                                </div>
+
+                                <div class="module-bd">
+                                    <a href="{% url 'journal:journal-logs_management' %}?project_id={{ request.tracer.project.id }}"
+                                       target="_self">
+                                        <span class="glyphicon glyphicon-compressed" aria-hidden="true"></span>
+                                        日志中心
+                                    </a>
+                                </div>
+
+
+                            </div>
+
+                        </div>
+                    </div>
+                </li>
+
+                <li class="top-menu-item" has-dropdown="true" menu-type="training" data-spm-click="">
+                    <a class="menu-hd" target="_self">
+                        <strong style="font-size: 14px">持续交付</strong>
+                    </a>
+                    <div class="menu-dropdown solutions training-bg">
+                        <div class="menu-dropdown-inner module-padding common-header-clearfix">
+
+                            <div class="module-wrap " style="width:200px">
+                                <div class="module-hd">
+                                    <span class="glyphicon glyphicon-calendar" aria-hidden="true"></span>
+                                    持续部署
+                                </div>
+                                <div class="module-bd">
+                                    <a href="{% url 'deploy:deplot-programme-list' %}?project_id={{ request.tracer.project.id }}"
+                                       target="_self">
+                                        <span class="glyphicon glyphicon-send" aria-hidden="true"></span>
+                                        项目部署
+                                    </a>
+                                </div>
+
+
+                            </div>
+
+                            <div class="module-wrap " style="width:200px">
+                                <div class="module-hd">
+                                    <span class="glyphicon glyphicon-th-list" aria-hidden="true"></span>
+                                    主机管理
+                                </div>
+                                <div class="module-bd">
+                                    <a href="{% url 'tools_execution:tools-server-list' %}?project_id={{ request.tracer.project.id }}"
+                                       target="_self">
+                                        <span class="glyphicon glyphicon-plus-sign" aria-hidden="true"></span>
+                                        Agent管理
+                                    </a>
+                                </div>
+
+                            </div>
+                        </div>
+                    </div>
+                </li>
+
+                <li class="top-menu-item" has-dropdown="true" menu-type="training" data-spm-click="">
+                    <a class="menu-hd" target="">
+                        <strong style="font-size: 14px" class="">功能模块化</strong>
+                    </a>
+
+                    <div class="menu-dropdown solutions training-bg">
+                        <div class="menu-dropdown-inner module-padding common-header-clearfix">
+                            <div class="module-wrap " style="width:150px">
+                                <div class="module-hd">
+                                    <span class="glyphicon glyphicon-export" aria-hidden="true"></span>
+                                    模块化组件
+                                </div>
+                                <div class="module-bd">
+                                    <a href=""
+                                       target="_self">
+                                        <span class="glyphicon glyphicon-credit-card" aria-hidden="true"></span>
+                                        自建模块
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </li>
+
+                <li class="top-menu-item" has-dropdown="true" menu-type="training" data-spm-click="">
+                    <a class="menu-hd" target="">
+                        {% if request.tracer.project.isShow == "True" %}
+                            <strong style="font-size: 14px"
+                                    class="damacontent">{{ request.tracer.project.name }}+</strong>
+                        {% else %}
+                            <strong style="font-size: 14px"
+                                    class="">{{ request.tracer.project.name }}+</strong>
+                        {% endif %}
+                    </a>
+
+                    <div class="menu-dropdown solutions training-bg">
+                        <div class="menu-dropdown-inner module-padding common-header-clearfix">
+                            <div class="module-wrap " style="width:150px">
+                                <div class="module-hd">
+                                    <span class="glyphicon glyphicon-user" aria-hidden="true"></span>
+                                    用户设置
+                                </div>
+                                <div class="module-bd">
+                                    <a href="{% url 'project:settings-invite-register' %}?project_id={{ request.tracer.project.id }}"
+                                       target="_self">
+                                        <span class="glyphicon glyphicon-share" aria-hidden="true"></span>
+                                        邀请注册
+                                    </a>
+
+                                    <a href="{% url 'project:settings-change-password' %}?project_id={{ request.tracer.project.id }}"
+                                       target="_self">
+                                        <span class="glyphicon glyphicon-edit" aria-hidden="true"></span>
+                                        修改密码
+                                    </a>
+
+                                </div>
+                            </div>
+                            <div class="module-wrap " style="width:150px">
+                                <div class="module-hd">
+                                    <span class="glyphicon glyphicon-cog" aria-hidden="true"></span>
+                                    项目设置
+                                </div>
+                                <div class="module-bd">
+                                    <a href="{% url 'project:settings-users-unbind' %}?project_id={{ request.tracer.project.id }}"
+                                       target="_self">
+                                        <span class="glyphicon glyphicon-edit" aria-hidden="true"></span>
+                                        项目设置
+                                    </a>
+
+                                    <a href="{% url 'project:settings-backup' %}?project_id={{ request.tracer.project.id }}"
+                                       target="_self">
+                                        <span class="glyphicon glyphicon-briefcase" aria-hidden="true"></span>
+                                        打包项目
+                                    </a>
+                                </div>
+                            </div>
+                            <div class="module-wrap " style="width:150px">
+                                <div class="module-hd">
+                                    <span class="glyphicon glyphicon-remove" aria-hidden="true"></span>
+                                    删除项目
+                                </div>
+                                <div class="module-bd">
+                                    <a href="{% url 'project:settings-delete' %}?project_id={{ request.tracer.project.id }}"
+                                       target="_self">
+                                        <span class="glyphicon glyphicon-trash" aria-hidden="true"></span>
+                                        删除项目
+                                    </a>
+
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </li>
+
+                <li class="top-menu-item" style="margin-left: 80px;float: right">
+                    <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true"
+                       aria-expanded="false">
+                        <strong style="color: white;float: right;font-size: 15px;margin-right: -100px">
+                            <span style="color: white;font-size: 10px" class="glyphicon glyphicon-user"
+                                  aria-hidden="true"></span>
+                            <small>{{ request.tracer.user.username }}</small>
+                        </strong></a>
+                    <ul class="dropdown-menu">
+
+                        <li>
+                            <a href="{% url 'user:notifications' %}">
+                                <i class="fa fa-bullhorn"></i> 未读消息 <span
+                                    class="label label-danger">{{ request.tracer.count }}</span>
+                            </a>
+                        </li>
+                        <li role="separator" class="divider"></li>
+
+
+                        {% for foo in request.tracer.sitemap %}
+                            {% if request.tracer.user.is_superuser == 1 %}
+                                <li>
+                                    <a href="{% url foo.link %}">
+                                        <i class="{{ foo.logo }}"></i> {{ foo.name }}
+                                    </a>
+                                </li>
+                                <li role="separator" class="divider"></li>
+                            {% else %}
+                                {% if foo.visible %}
+                                    <li>
+                                        <a href="{% url foo.link %}">
+                                            <i class="{{ foo.logo }}"></i> {{ foo.name }}
+                                        </a>
+                                    <li role="separator" class="divider"></li>
+                                {% endif %}
+                            {% endif %}
+                        {% endfor %}
+
+
+                        <li><a href="{% url 'user:logout' %}">
+                            <i class="fa fa-sign-out"></i> 注销登录</a></li>
+                    </ul>
+                </li>
+            </ul>
+        </div>
+    </div>
+</div>
+{% block content %}
+{% endblock %}
+
+<script type="text/javascript" src="/static/aliyun/js/base-all.js"></script>
+<script type="text/javascript" src="/static/aliyun/js/common-header.js"></script>
+<script src="{% static 'js/jquery-3.4.1.min.js' %}"></script>
+<script src="{% static 'plugin/bootstrap/js/bootstrap.min.js' %}"></script>
+
+{% block js %}
+{% endblock %}
+</body>
+</html>

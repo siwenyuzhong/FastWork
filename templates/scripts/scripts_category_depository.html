@@ -1,0 +1,212 @@
+{% extends 'base/site-base.html' %}
+{% load static %}
+
+
+{% block title %}
+    FastWork - 工具库
+{% endblock %}
+
+{% block css %}
+    <link rel="stylesheet" href="/static/global_css/scripts_list.css">
+    <style>
+        .content {
+            height: calc(100vh - 120px);
+            overflow: scroll;
+            margin-left: -1px;
+        }
+    </style>
+{% endblock %}
+
+{% block content %}
+    <div class="container-fluid content" style="margin-top: 20px">
+
+        <div class="col-sm-12">
+            <div class="panel-heading">
+                <ol class="breadcrumb">
+                    <li><a href="{% url 'project:list' %}" style="color: #337ab7">项目大厅</a></li>
+                    <li><a href="{% url 'script:scripts-all' %}?project_id={{ request.tracer.project.id }}"
+                           style="color: #337ab7">工具库</a></li>
+                    <li class="active">工具分类列表</li>
+                </ol>
+            </div>
+        </div>
+
+        <div class="col-sm-12" style="margin-top: -20px">
+            <div style="margin-right: 0;margin-left: auto">
+                <form method="post"
+                      action="{% url 'script:scripts-search' %}?project_id={{ request.tracer.project.id }}"
+                      style="transform: scale(1.0)">
+                    {% csrf_token %}
+                    <div class="col-lg-6">
+                        <div class="input-group">
+                            <input type="text" class="form-control" placeholder="输入工具名来模糊查找" name="q"
+                                   style="width: 200px">
+                            <input type="submit" value="工具查找" class="btn btn-default" style="margin-left: -5px">
+
+
+                            <a href="{% url 'script:scripts-add' %}?project_id={{ request.tracer.project.id }}"
+                               class="btn btn-default"
+                               style="margin-left: 2px;color: #333">
+                                <span class="glyphicon glyphicon-plus" aria-hidden="true"></span>
+                                新建工具</a>
+
+
+                            <a href="{% url 'script:scripts-auto-add' %}?project_id={{ request.tracer.project.id }}"
+                               class="btn btn-default" style="margin-left: 2px;color: #333">
+                                <span class="glyphicon glyphicon-cloud-upload" aria-hidden="true"></span>
+                                工具录入</a>
+
+                            {% if scripts_obj %}
+
+                                <a href="{% url 'script:scripts-export-output' %}?project_id={{ request.tracer.project.id }}"
+                                   class="btn btn-default" style="margin-left: 2px;color: #333">
+                                    <span class="glyphicon glyphicon-share" aria-hidden="true"></span>
+                                    导出</a>
+
+                            {% endif %}
+
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <div class="col-sm-12">
+            <div class="panel-heading">
+                <div class="panel-body">
+                    {% if categroy_count %}
+                        {% for category in categroy_count %}
+                            <a class="btn btn-default btn-sm"
+                               style="font-size: 15px;margin-left: 5px;color: black;margin-top: 10px"
+                               href="{% url 'script:scripts-category-search' %}?project_id={{ request.tracer.project.id }}&category_id={{ category.category.id }}">
+                                {{ category.category.name }} <span class="badge"
+                                                                   style="background-color: #337ab7">{{ category.count }}</span>
+                            </a>
+                        {% endfor %}
+                    {% endif %}
+
+                    {% if categroy_count %}
+                        <a class="btn btn-default btn-sm"
+                           style="font-size: 15px;margin-left: 5px;color: black;margin-top: 10px"
+                           data-toggle="modal"
+                           data-target="#AddGroupModel"
+                           onclick="">
+                            <span class="glyphicon glyphicon-plus"></span>
+                        </a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <div class="col-sm-12">
+            {% if tool_category_count %}
+                <div>
+                    <div class="panel-body">
+
+                        {% for foo in tool_category_count %}
+                            <div class="item" style="margin-left: 30px">
+
+                                <div style="height: 30px;text-align: center;padding: 10px 10px;color: #8c8c8c;background-color: #f5f5f5;overflow: scroll">
+                                    <span title="{{ foo.title }}">{{ foo.title }}</span>
+                                </div>
+
+                                <a href="{% url 'script:scripts-detail' %}?project_id={{ request.tracer.project.id }}&script_id={{ foo.id }}"
+                                   class="title">
+                                    <img src="{{ foo.showImage }}" alt="">
+                                </a>
+
+                                <hr>
+
+                                <div style="height: 30px;padding: 10px 10px;color: #8c8c8c;overflow: scroll">
+                                    {% if foo.desc %}
+                                        <span title="{{ foo.desc }}"><small>说明：{{ foo.desc }}</small></span>
+                                    {% else %}
+                                        <span title="{{ foo.desc }}"><small>说明：暂无说明</small></span>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        {% endfor %}
+
+                    </div>
+                </div>
+            {% else %}
+                <div style="height:calc(100vh - 100px)">
+                    <div style="text-align: center;margin-top: 200px">
+                            <span style="text-align: center;font-size: 15px">暂无工具，请点击
+                            <a class="btn btn-default btn-sm" style="color: #333"
+                               href="{% url 'script:scripts-add' %}?project_id={{ request.tracer.project.id }}"><span
+                                    class="glyphicon glyphicon-plus"
+                                    aria-hidden="true"></span> 新建工具</a>
+                                创建
+                            </span>
+                    </div>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+
+    {#    增加分类#}
+    <div class="modal fade" id="AddGroupModel" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
+                            aria-hidden="true">&times;</span></button>
+                    <h2 class="modal-title" id="myModalLabel">添加分组</h2>
+                </div>
+                <div class="modal-body">
+                    <form id="editForm">
+                        <div>
+                            <div class="form-group">
+                                <input type="text" hidden value="" id="file_id">
+                                <h3>分组名称:</h3>
+                                <input type="text" class="form-control" id="category_name" style="margin-top: 3px"
+                                       value="">
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">取 消</button>
+                    <button id="AddGroupBTN" type="button" class="btn btn-primary">添 加</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+{% endblock %}
+
+{% block js %}
+    <script>
+        $(function () {
+            $("#AddGroupBTN").click(function () {
+                var category_name = $("#category_name").val();
+
+                if (category_name === "") {
+                    alert("【分类名称】不能为空！");
+                    return false;
+                }
+
+                $.ajax({
+                    url: "{% url 'script:scripts-category-add' %}",
+                    type: "POST",
+                    dataType: 'json',
+                    data: {
+                        'category_name': category_name,
+                        'project_id': {{ request.tracer.project.id }},
+                        'csrfmiddlewaretoken': '{{ csrf_token }}'
+                    },
+                    success: function (data) {
+                        if (data.status) {
+                            alert(data.data)
+                            location.href = '{% url 'script:scripts-all' %}?project_id={{ request.tracer.project.id }}'
+                        } else {
+                            alert(data.data)
+                        }
+                    }
+                })
+            })
+        })
+    </script>
+{% endblock %}
+

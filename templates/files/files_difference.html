@@ -1,0 +1,102 @@
+{% extends 'base/site-base.html' %}
+{% load static %}
+{% block title %}
+    FastWork - 文件差异性对比
+{% endblock %}
+
+{% block css %}
+    <style>
+        .content {
+            height: calc(100vh - 120px);
+            overflow: scroll;
+            margin-left: -1px;
+        }
+    </style>
+{% endblock %}
+
+{% block content %}
+
+    <div class="container-fluid content" style="margin-top: 20px">
+
+        <div class="col-sm-12">
+            <div class="panel-heading">
+                <ol class="breadcrumb">
+                    <li><a href="{% url 'project:list' %}" style="color: #337ab7">项目大厅</a></li>
+                    <li>
+                        <a href="{% url 'file_depository:file_depository-files-difference' %}?project_id={{ request.tracer.project.id }}"
+                           style="color: #337ab7">文件内容差异性对比</a></li>
+                    <li class="active">差异性对比</li>
+                </ol>
+            </div>
+        </div>
+
+        <div class="col-sm-12" style="margin-top: -20px">
+            <div class="container-fluid">
+                <div class="panel panel-default">
+                    <div class="panel-body">
+
+                        <div class="row">
+                            <div class="col-md-6">
+                                <textarea class="form-control" style="height: 450px;resize: none" id="file_left"
+                                          placeholder="请输入需要对比的文件内容A"></textarea>
+                            </div>
+                            <div class="col-md-6">
+                                <textarea class="form-control" style="height: 450px;resize: none" id="file_right"
+                                          placeholder="请输入需要对比的文件内容B"></textarea>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-1" style="margin-top: 5px">
+                                <button class="btn btn-success form-control" id="compare_content"
+                                        style="background-color: #167be0;border: none">对比差异
+                                </button>
+                            </div>
+                            <div class="col-md-1" style="margin-left: -15px;margin-top: 5px">
+                                <a class="btn btn-warning form-control" href="" style="color: white">刷新内容</a>
+                            </div>
+                            <div class="col-md-10" style="margin-top: 15px">
+                                <a href="" id="results" target="_blank" style="font-size: 15px"></a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block js %}
+    <script>
+        $("#compare_content").click(function (data) {
+
+            var file_left = $("#file_left").val();
+            var file_right = $("#file_right").val();
+
+            if (file_left == '' || file_right == "") {
+                alert("文件对比内容不能为空！")
+                return false;
+            }
+            $.ajax({
+                url: "{% url 'file_depository:file_depository-files-difference' %}",
+                type: "POST",
+                dataType: "json",
+                data: {
+                    "project_id": {{request.tracer.project.id}},
+                    "file_left": file_left,
+                    "file_right": file_right,
+                    'csrfmiddlewaretoken': '{{ csrf_token }}'
+                },
+                success: function (data) {
+                    if (data.code == 200) {
+                        alert(data.msg)
+                        document.getElementById("results").innerText = "此处查看结果报告";
+                        document.getElementById("results").href = data.data;
+                    } else {
+                        alert(data.msg)
+                        return false;
+                    }
+                }
+            })
+        })
+    </script>
+{% endblock %}

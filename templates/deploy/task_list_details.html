@@ -1,0 +1,88 @@
+{% extends 'base/site-base.html' %}
+{% load static %}
+
+{% block css %}
+{% endblock %}
+{% block title %}
+    FastWork - 部署管理
+{% endblock %}
+{% block content %}
+    <div class="container-fluid" style="margin-top: 20px">
+
+        <div class="col-sm-12">
+            <div class="panel-heading">
+                <ol class="breadcrumb">
+                    <li><a href="{% url 'project:list' %}" style="color: #337ab7">项目大厅</a></li>
+                    <li>
+                        <a href="{% url 'deploy:deplot-task-list' %}?project_id={{ request.tracer.project.id }}&programme_id={{ task.programme_id }}"
+                           style="color: #337ab7">发布历史</a></li>
+                    <li class="active">{{ task.uid }} / 部署配置记录</li>
+                </ol>
+            </div>
+        </div>
+
+        <div class="col-sm-12">
+            <div class="container-fluid">
+                <div class="panel panel-default">
+                    <div class="panel-body">
+
+
+                        <table class="table">
+                            <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>项目</th>
+                                <th>版本</th>
+                                <th>发布情况</th>
+                                <th>下载前脚本内容</th>
+                                <th>下载后脚本内容</th>
+                                <th>发布前脚本内容</th>
+                                <th>发布后脚本内容</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            <tr class="info">
+                                {% for foo in task_obj %}
+                                    <td>{{ foo.pk }}</td>
+                                    <td>{{ foo.programme.title }}</td>
+                                    <td>{{ foo.tag }}</td>
+                                    <td>{{ foo.get_status_display }}</td>
+                                    {% if foo.before_download_script %}
+                                        <td>{{ foo.before_download_script }}</td>
+                                    {% else %}
+                                        <td>无定义</td>
+                                    {% endif %}
+
+                                    {% if foo.after_download_script %}
+                                        <td>{{ foo.after_download_script }}</td>
+                                    {% else %}
+                                        <td>无定义</td>
+                                    {% endif %}
+
+
+                                    {% if foo.before_deploy_script %}
+                                        <td>{{ foo.before_deploy_script }}</td>
+                                    {% else %}
+                                        <td>无定义</td>
+                                    {% endif %}
+
+
+                                    {% if foo.after_deploy_script %}
+                                        <td>{{ foo.after_deploy_script }}</td>
+                                    {% else %}
+                                        <td>无定义</td>
+                                    {% endif %}
+
+                                {% endfor %}
+                            </tr>
+                            </tbody>
+                        </table>
+
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+{% endblock %}

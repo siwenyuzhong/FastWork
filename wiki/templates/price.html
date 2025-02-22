@@ -1,0 +1,59 @@
+{% extends 'layout/basic.html' %}
+{% load static %}
+
+{% block title %} 套餐 {% endblock %}
+
+{% block css %}
+    <style>
+        .slogan {
+            font-size: 36px;
+            text-align: center;
+            margin: 50px 0;
+        }
+
+    </style>
+{% endblock %}
+
+{% block content %}
+    <div class="container">
+        <div class="slogan">多种方案，使用多种场景</div>
+        <div class="row">
+            {% for item in policy_list %}
+                <div class="col-md-4">
+                    <div class="panel panel-default">
+                        <div class="panel-heading" style="text-align: center;">{{ item.title }}</div>
+                        <div class="panel-body">
+
+                            <p style="text-align: center;font-size: 25px;">
+                                ¥ {{ item.price }} / 年
+                            </p>
+
+                        </div>
+                        <ul class="list-group">
+                            <li class="list-group-item">
+                                <form class="form-inline" method="get"
+                                      action="{% url 'web:payment' policy_id=item.id %}">
+                                    <div class="form-group">
+                                        <div class="input-group">
+                                            <div class="input-group-addon">数量</div>
+                                            <input type="number" name="number" value="1" class="form-control"
+                                                   placeholder="购买数量">
+                                            <div class="input-group-btn">
+                                                <input type="submit" value="立即购买" class="btn btn-primary">
+                                            </div>
+                                        </div>
+                                    </div>
+                                </form>
+                            </li>
+                            <li class="list-group-item">最大项目数量：{{ item.project_num }}</li>
+                            <li class="list-group-item">最大项目空间：{{ item.project_space }}G</li>
+                            <li class="list-group-item">最大文件支持：{{ item.per_file_size }}M</li>
+                            <li class="list-group-item">项目成员：{{ item.project_member }}</li>
+                        </ul>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+
+{% endblock %}

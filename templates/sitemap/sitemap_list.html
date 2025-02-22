@@ -1,0 +1,379 @@
+{% extends 'base/without_project_base.html' %}
+{% load static %}
+{% block title %}
+    功能配置
+{% endblock %}
+
+{% block css %}
+
+{% endblock %}
+
+
+{% block content %}
+    <div class="container-fluid content" style="margin-top: 20px">
+
+        <div class="col-sm-12">
+            <div class="panel-heading">
+                <ol class="breadcrumb">
+                    <li><a href="{% url 'project:list' %}"
+                           style="color: #337ab7">项目大厅</a></li>
+                    <li class="active">功能地图配置</li>
+                </ol>
+            </div>
+        </div>
+
+        <div class="col-sm-12" style="margin-top: -20px">
+            <div class="col-lg-3">
+                <div class="input-group">
+                    <a data-toggle="modal"
+                       data-target="#addModal"
+                       class="btn btn-default"
+                       style="color: #333;margin-bottom: 5px">
+                        <span class="glyphicon glyphicon-plus" aria-hidden="true"></span>
+                        新建站点</a>
+                </div>
+{#                <form action="" method="get">#}
+{#                    <div class="input-group">#}
+{#                        <input type="text" class="form-control" placeholder="请输入 功能名称 来查找" name="keyword">#}
+{#                        <span class="input-group-btn">#}
+{#                    <button class="btn btn-default" type="submit">#}
+{#                    <span class="glyphicon glyphicon-search"></span>#}
+{#                    搜索</button>#}
+{#                </span>#}
+{#                    </div>#}
+{#                </form>#}
+            </div>
+            <div class="col-lg-4" style="margin-left: -28px">
+
+            </div>
+        </div>
+
+        <div class="col-sm-12" style="">
+            <div class="container-fluid">
+                <div class="panel panel-default">
+                    <div class="panel-body">
+                        <div class="alert alert-warning alert-dismissible" role="alert">
+                            <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span
+                                    aria-hidden="true">&times;</span></button>
+                            <strong>说明!</strong> 功能地图配置页：是全平台的功能菜单配置管理界面，可在此界面配置，功能菜单的基本信息。
+                        </div>
+                        <div class="wrapper wrapper-content animated fadeInRight">
+                            <div class="wrapper wrapper-content">
+                                <div class="row">
+                                    <div class="col-sm-12">
+                                        <table class="table table-bordered">
+                                            <thead>
+                                            <tr>
+
+                                                <th style="text-align: center"><strong>ID</strong></th>
+                                                <th style="text-align: center"><strong>功能名称</strong>
+                                                </th>
+                                                <th style="text-align: center"><strong>所属模块</strong>
+                                                </th>
+                                                <th style="text-align: center"><strong>功能分类</strong>
+                                                </th>
+                                                <th style="text-align: center"><strong>功能URL</strong>
+                                                </th>
+                                                <th style="text-align: center"><strong>是否可见(对普通用户)</strong>
+                                                </th>
+                                                <th style="text-align: center"><strong>功能LOGO</strong>
+                                                </th>
+                                                <th style="text-align: center"><strong>操作</strong>
+                                                </th>
+                                            </tr>
+                                            </thead>
+                                            <tbody style="text-align: center">
+                                            {% for foo in issues_object_list %}
+                                                <tr>
+                                                    <td>{{ forloop.counter }}</td>
+                                                    <td>{{ foo.name }}</td>
+                                                    <td>{{ foo.module }}</td>
+                                                    <td>{{ foo.category }}</td>
+                                                    <td>{{ foo.link }}</td>
+                                                    <td>{{ foo.visible }}</td>
+                                                    <td>{{ foo.logo }}</td>
+                                                    <td>
+                                                        <a class="btn btn-primary btn-sm"
+                                                           data-toggle="modal" style="background-color: #167be0"
+                                                           data-target="#editModal" id="get_log"
+                                                           onclick="edit_sitemap({{ foo.id }})">
+                                                            <i class="fa fa-edit"
+                                                               aria-hidden="true"></i> 编辑
+                                                        </a>
+                                                        <a href="{% url 'sitemap:sitemaps-delete' %}?id={{ foo.id }}"
+                                                           class="btn btn-danger btn-sm" style="color: white">
+                                                            <i class="fa fa-remove"
+                                                               aria-hidden="true"></i> 删除
+                                                        </a>
+                                                    </td>
+                                                </tr>
+                                            {% endfor %}
+                                            </tbody>
+                                        </table>
+                                        <nav aria-label="...">
+                                            <ul class="pagination" style="margin-top: 0;">
+                                                {{ context.page_html|safe }}
+                                            </ul>
+                                        </nav>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="addModal" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel">
+        <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
+                            aria-hidden="true">&times;</span></button>
+                    <h4 class="modal-title" id="myModalLabel">新建功能点</h4>
+                </div>
+                <div class="modal-body">
+                    <div id="log_content" class="test_box">
+                        <form>
+                            <div class="form-group">
+                                <label for="name">功能名称</label>
+                                <input type="text" class="form-control" id="name" placeholder="功能名称">
+                            </div>
+                            <div class="form-group">
+                                <label for="module">所属模块</label>
+                                <select class="form-control" id="module">
+                                    <option id="module">用户侧边栏</option>
+                                    <option id="module">隐藏</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="category">功能点分类</label>
+                                <select class="form-control" id="category">
+                                    <option id="category">用户侧边栏导航</option>
+                                    <option id="category">隐藏</option>
+                                </select>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="link">功能点跳转地址</label>
+                                <input type="text" class="form-control" id="link"
+                                       placeholder="功能点跳转地址">
+                            </div>
+
+                            <div class="form-group">
+                                <label for="visible">是否可见</label>
+                                <select class="form-control" id="visible_condition">
+                                    <option id="visible_condition">可见</option>
+                                    <option id="visible_condition">隐藏</option>
+                                </select>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="logo">LOGO</label>
+                                <input type="text" class="form-control" id="logo"
+                                       placeholder="LOGO">
+                            </div>
+                        </form>
+
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" id="add_sitemaps" class="btn btn-primary" data-dismiss="modal"
+                            style="background-color: #167be0">新 建
+                    </button>
+                    <button type="button" class="btn btn-default" data-dismiss="modal">取 消</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="modal fade" id="editModal" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel">
+        <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
+                            aria-hidden="true">&times;</span></button>
+                    <h4 class="modal-title">编辑界面</h4>
+                </div>
+                <div class="modal-body">
+                    <div id="log_content" class="test_box">
+                        <form>
+                            <input type="text" id="edit_id" hidden>
+
+                            <div class="form-group">
+                                <label for="edit_name">功能名称</label>
+                                <input type="text" class="form-control" id="edit_name" placeholder="功能名称">
+                            </div>
+                            <div class="form-group">
+                                <label for="edit_module">所属模块</label>
+                                <select class="form-control" id="edit_module">
+                                    <option id="edit_module">1</option>
+                                    <option id="edit_module">用户侧边栏</option>
+                                    <option id="edit_module">隐藏</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="edit_category">功能点分类</label>
+                                <select class="form-control" id="edit_category">
+                                    <option id="edit_category">1</option>
+                                    <option id="edit_category">用户侧边栏导航</option>
+                                    <option id="edit_category">隐藏</option>
+                                </select>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="edit_link">功能点跳转地址</label>
+                                <input type="text" class="form-control" id="edit_link"
+                                       placeholder="功能点跳转地址">
+                            </div>
+
+                            <div class="form-group">
+                                <label for="edit_visible">是否可见(对普通用户)</label>
+                                <select class="form-control" id="edit_visible">
+                                    <option id="edit_visible">true</option>
+                                    <option id="edit_visible">false</option>
+                                </select>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="edit_logo">LOGO</label>
+                                <input type="text" class="form-control" id="edit_logo"
+                                       placeholder="LOGO">
+                            </div>
+                        </form>
+
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" id="edit_sitemaps" class="btn btn-primary" data-dismiss="modal"
+                            style="background-color: #167be0">修 改
+                    </button>
+                    <button type="button" class="btn btn-default" data-dismiss="modal">取 消</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+{% endblock %}
+
+{% block js %}
+    <script>
+        $("#add_sitemaps").click(function () {
+            //公用参数
+            var name = $("#name").val();
+            var link = $("#link").val();
+            var logo = $("#logo").val();
+            var visible_condition_index = document.getElementById("visible_condition").selectedIndex;
+            var visible = document.getElementById("visible_condition").options[visible_condition_index].text;
+
+            var module_index = document.getElementById("module").selectedIndex;
+            var module = document.getElementById("module").options[module_index].text;
+
+            var category_index = document.getElementById("category").selectedIndex;
+            var category = document.getElementById("category").options[category_index].text;
+
+
+            if (name === "" || link === "" || logo === "" || category === "") {
+                alert("必填项不能为空");
+                return false;
+            } else {
+                $.ajax({
+                    url: "{% url 'sitemap:sitemaps-add' %}",
+                    type: "POST",
+                    dataType: 'json',
+                    data: {
+                        'name': name,
+                        'category': category,
+                        'module': module,
+                        'link': link,
+                        'logo': logo,
+                        'visible': visible,
+                        'csrfmiddlewaretoken': '{{ csrf_token }}'
+                    },
+                    success: function (data) {
+                        if (data.status === 200) {
+                            alert(data.msg);
+                            location.href = "{% url 'sitemap:sitemaps-list' %}"
+                        } else {
+                            alert(data.msg)
+                        }
+                    }
+                })
+            }
+
+        })
+    </script>
+    <script>
+        function edit_sitemap(site_id) {
+            $.ajax({
+                url: "{% url 'sitemap:sitemaps-detail' %}?site_id=" + site_id,
+                type: "GET",
+                dataType: "json",
+                success: function (data) {
+                    if (data.code === 200) {
+                        document.getElementById("edit_name").value = data.data.name;
+                        document.getElementById("edit_id").value = data.data.id;
+                        document.getElementById("edit_module").value = data.data.module;
+                        document.getElementById("edit_category").value = data.data.category;
+                        document.getElementById("edit_link").value = data.data.link;
+                        document.getElementById("edit_visible").value = data.data.visible;
+                        document.getElementById("edit_logo").value = data.data.logo;
+                    } else {
+                        alert(data.msg)
+                        return false;
+                    }
+                }
+            })
+
+        }
+    </script>
+    <script>
+        $("#edit_sitemaps").click(function () {
+            //公用参数
+            var edit_id = $("#edit_id").val();
+            var edit_name = $("#edit_name").val();
+            var edit_link = $("#edit_link").val();
+            var edit_logo = $("#edit_logo").val();
+            var edit_module_index = document.getElementById("edit_module").selectedIndex;
+            var edit_module = document.getElementById("edit_module").options[edit_module_index].text;
+
+            var edit_category_index = document.getElementById("edit_category").selectedIndex;
+            var edit_category = document.getElementById("edit_category").options[edit_category_index].text;
+
+            var edit_visible_index = document.getElementById("edit_visible").selectedIndex;
+            var edit_visible = document.getElementById("edit_visible").options[edit_visible_index].text;
+
+
+            if (edit_name === "" || link === "" || logo === "" || category === "") {
+                alert("必填项不能为空");
+                return false;
+            } else {
+                $.ajax({
+                    url: "{% url 'sitemap:sitemaps-detail' %}",
+                    type: "POST",
+                    dataType: 'json',
+                    data: {
+                        'edit_id': edit_id,
+                        'name': edit_name,
+                        'category': edit_category,
+                        'module': edit_module,
+                        'link': edit_link,
+                        'logo': edit_logo,
+                        'visible': edit_visible,
+                        'csrfmiddlewaretoken': '{{ csrf_token }}'
+                    },
+                    success: function (data) {
+                        if (data.status === 200) {
+                            alert(data.msg)
+                            location.href = "{% url 'sitemap:sitemaps-list' %}"
+                        } else {
+                            alert(data.msg)
+                        }
+                    }
+                })
+            }
+
+        })
+    </script>
+{% endblock %}

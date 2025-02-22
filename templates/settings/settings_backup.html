@@ -1,0 +1,211 @@
+{% extends 'base/site-base.html' %}
+{% load static %}
+{% block title %}
+    FastWork - 项目打包
+{% endblock %}
+
+{% block css %}
+    <link rel="stylesheet" href="{% static 'global_css/settings_project_users_unbind.css' %}">
+    <style>
+        .damacontent {
+            filter: blur(3px);
+        }
+
+        .choose {
+            border-left: 2px solid #f90 !important;
+        }
+    </style>
+{% endblock %}
+
+
+{% block content %}
+    <div class="container clearfix" style="margin-top: 20px;">
+        <div class="col-sm-3">
+            <div class="panel panel-default">
+                <div class="panel-heading" style="background-color:transparent;font-weight: bold;">
+                    个人中心
+                </div>
+                <div class="list-group" style="border-radius: 0">
+                    <div>
+
+                        <a href="{% url 'project:settings-invite-register' %}?project_id={{ request.tracer.project.id }}"
+                           class="list-group-item">邀请注册</a>
+
+                        <a href="{% url 'project:settings-change-password' %}?project_id={{ request.tracer.project.id }}"
+                           class="list-group-item">修改密码</a>
+
+                        <a href="{% url 'project:settings-backup' %}?project_id={{ request.tracer.project.id }}"
+                           class="list-group-item choose">打包项目</a>
+
+                        <a href="{% url 'project:settings-users-unbind' %}?project_id={{ request.tracer.project.id }}"
+                           class="list-group-item">项目设置</a>
+
+                        <a href="{% url 'project:settings-delete' %}?project_id={{ request.tracer.project.id }}"
+                           class="list-group-item">删除项目</a>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-sm-9">
+            <div class="panel panel-default">
+                <div class="panel-heading"><span class="glyphicon glyphicon-print"></span> 项目打包</div>
+                <div class="panel-body">
+
+                    <div class="col-md-6">
+                        <div class="panel panel-default">
+                            <div class="panel-heading">
+                                <i class="fa fa-book" aria-hidden="true"></i>
+                                项目情况
+                            </div>
+                            <div class="panel-body user-item">
+                                <table class="table table-hover table-bordered">
+                                    <tbody>
+                                    <tr>
+                                        <td class="label-left">项目名称 ：</td>
+                                        {% if request.tracer.project.isShow == "True" %}
+                                            <td class="damacontent"><strong>{{ request.tracer.project.name }}</strong>
+                                            </td>
+                                        {% else %}
+                                            <td><strong>{{ request.tracer.project.name }}</strong></td>
+                                        {% endif %}
+                                    </tr>
+                                    <tr>
+                                        <td class="label-left">项目描述 ：</td>
+                                        {% if  request.tracer.project.isShow == "True" %}
+                                            <td class="damacontent"><strong>{{ request.tracer.project.desc }}</strong>
+                                            </td>
+                                        {% else %}
+                                            <td><strong>{{ request.tracer.project.desc }}</strong></td>
+                                        {% endif %}
+
+                                    </tr>
+                                    <tr>
+                                        <td class="label-left">创建时间 ：</td>
+                                        <td><strong>{{ request.tracer.project.create_datetime }}</strong></td>
+                                    </tr>
+                                    <tr>
+                                        <td class="label-left">创&nbsp;&nbsp;建&nbsp;&nbsp;人：</td>
+                                        <td><strong>{{ request.tracer.project.creator.username }}</strong></td>
+                                    </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-6">
+                        <div class="panel panel-default">
+                            <div class="panel-heading">
+                                <span class="glyphicon glyphicon-book"></span> 知识文档统计
+                            </div>
+                            <div class="panel-body user-item">
+                                <table class="table table-hover table-bordered">
+                                    <tbody>
+                                    <tr>
+                                        <td class="tableW">知识库数量：</td>
+                                        <td>{{ wiki_count }}</td>
+                                    </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-6">
+                        <div class="panel panel-default">
+                            <div class="panel-heading">
+                                <span class="glyphicon glyphicon-cog"></span> 工具库统计
+                            </div>
+                            <div class="panel-body user-item">
+                                <table class="table table-hover table-bordered">
+                                    <tbody>
+                                    <tr>
+                                        <td class="tableW">工具库数量：</td>
+                                        <td>{{ scripts_count }}</td>
+                                    </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-6">
+                        <div class="panel panel-default">
+                            <div class="panel-heading">
+                                <span class="glyphicon glyphicon-file"></span> 文件仓库统计
+                            </div>
+                            <div class="panel-body user-item">
+                                <table class="table table-hover table-bordered">
+                                    <tbody>
+                                    <tr>
+                                        <td class="tableW">文件仓库数量：</td>
+                                        <td>{{ files_count }}</td>
+                                    </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-6">
+                        <div class="panel panel-default">
+                            <div class="panel-heading">
+                                <span class="glyphicon glyphicon-time"></span> 定时任务统计
+                            </div>
+                            <div class="panel-body user-item">
+                                <table class="table table-hover table-bordered">
+                                    <tbody>
+                                    <tr>
+                                        <td class="tableW">定时任务数量：</td>
+                                        <td>{{ task_count }}</td>
+                                    </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="btn-group">
+                <button type="button" class="btn btn-danger" id="back_up_btn">
+                    <span class="glyphicon glyphicon-download-alt" aria-hidden="true"></span>
+                    一键打包
+                </button>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block js %}
+    <script>
+        $("#back_up_btn").click(function () {
+
+            if (window.confirm('确定要打包整个项目吗？')) {
+                $.ajax({
+                    url: "{% url 'project:settings-backup' %}?project_id={{ request.tracer.project.id }}",
+                    type: "POST",
+                    dataType: "json",
+                    data: {
+                        'csrfmiddlewaretoken': '{{ csrf_token }}',
+                        'project_id': '{{ request.tracer.project.id }}'
+                    },
+                    success: function (data) {
+                        download(data.url)
+                    }
+                })
+                return true;
+            } else {
+                return false;
+            }
+
+            // 直接下载，用户体验好
+            function download(url) {
+                var $form = $('<form method="GET"></form>');
+                $form.attr('action', url);
+                $form.appendTo($('body'));
+                $form.submit();
+            }
+        })
+    </script>
+{% endblock %}

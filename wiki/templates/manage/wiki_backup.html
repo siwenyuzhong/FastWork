@@ -1,0 +1,252 @@
+{% extends 'layout/manage.html' %}
+{% load static %}
+{% block css %}
+    <link rel="stylesheet" href="/static/hello/static/hello/css/code.css" type="text/css">
+    <style>
+
+        a:hover {
+            text-decoration: none;
+        }
+
+
+        .panel-default {
+            margin-top: 10px;
+        }
+
+        .panel-default .panel-heading {
+            display: flex;
+            flex-direction: row;
+            justify-content: space-between;
+        }
+
+        .panel-body {
+            padding: 0;
+        }
+
+        .title-list {
+            border-right: 1px solid #dddddd;
+            min-height: 500px;
+        }
+
+        .title-list ul {
+            padding-left: 15px;
+        }
+
+        .title-list ul a {
+            display: block;
+            padding: 5px 0;
+        }
+
+        .content {
+            border-left: 1px solid #dddddd;
+            min-height: 600px;
+            margin-left: -1px;
+        }
+
+        .panel-body {
+            padding: 0;
+            display: flex;
+            flex-direction: row;
+            justify-content: left;
+            align-items: flex-start;
+            flex-wrap: wrap;
+        }
+
+        .panel-body > .item {
+            border-radius: 6px;
+            width: 210px;
+            border: 1px solid #dddddd;
+            margin: 20px 10px;
+
+        }
+
+        .panel-body > .item:hover {
+            border: 1px solid #f0ad4e;
+        }
+
+        .panel-body > .item > .title {
+            height: 104px;
+            color: white;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            border-top-left-radius: 6px;
+            border-top-right-radius: 6px;
+            font-size: 15px;
+            text-decoration: none;
+        }
+
+        .panel-body > .item > .info {
+            padding: 10px 10px;
+
+            display: flex;
+            justify-content: space-between;
+
+            border-bottom-left-radius: 6px;
+            border-bottom-right-radius: 6px;
+            color: #8c8c8c;
+
+        }
+
+        .panel-body > .item > .info a {
+            text-decoration: none;
+        }
+
+        .panel-body > .item > .info .fa-star {
+            font-size: 18px;
+        }
+
+        .color-radio label {
+            margin-left: 0;
+            padding-left: 0;
+        }
+
+        .color-radio input[type="radio"] {
+            display: none;
+        }
+
+        .color-radio input[type="radio"] + .cycle {
+            display: inline-block;
+            height: 25px;
+            width: 25px;
+            border-radius: 50%;
+            border: 2px solid #dddddd;
+        }
+
+        .color-radio input[type="radio"]:checked + .cycle {
+            border: 2px solid black;
+        }
+
+    </style>
+{% endblock %}
+
+{% block menu %}
+    <li class="dropdown">
+        <a href="#" class="fa fa-bell-o dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true"
+           aria-expanded="false"><span
+                class="caret"></span></a>
+        <ul class="dropdown-menu">
+            <li><a href="{% url 'web:get_all_crons' project_id=request.tracer.project.id %}" style="text-align: center">模型管理</a>
+            </li>
+            <li role="separator" class="divider"></li>
+            <li><a href="{% url 'web:get_all_crons' project_id=request.tracer.project.id %}" style="text-align: center">定时任务</a>
+            </li>
+            <li role="separator" class="divider"></li>
+            <li><a href="{% url 'web:get_all_crons' project_id=request.tracer.project.id %}" style="text-align: center">钉钉通知</a>
+            </li>
+        </ul>
+    </li>
+    <li><a href="#"><i class="fa fa-bookmark" aria-hidden="true"></i></a></li>
+{% endblock %}
+
+{% block content %}
+    <div class="container-fluid">
+
+        <div class="panel panel-default">
+            <div class="panel-heading">
+                <div>
+                    <i class="fa fa-book" aria-hidden="true"></i> 知识库文档
+                </div>
+                <div class="function">
+                    <a type="button" class="btn btn-primary btn-xs" style="background-color: #167be0"
+                       href="{% url 'web:wiki_add' project_id=request.tracer.project.id %}">
+                        <i class="fa fa-plus-circle" aria-hidden="true"></i> 新建文档
+                    </a>
+                    {% if wiki_object %}
+                        <a type="button" class="btn btn-warning btn-xs"
+                           href="{% url 'web:wiki_edit' project_id=request.tracer.project.id  wiki_id=wiki_object.id %}">
+                            <i class="fa fa-edit" aria-hidden="true"></i> 编辑
+                        </a>
+                        <a type="button" class="btn btn-success btn-xs"
+                           href="{% url 'wiki:wiki_download'  project_id=request.tracer.project.id wiki_id=wiki_object.id %}">
+                            <i class="fa fa-share-square-o" aria-hidden="true"></i> 导出markdown文本
+                        </a>
+                        <a type="button" class="btn btn-danger btn-xs"
+                           href="{% url 'web:wiki_delete' project_id=request.tracer.project.id wiki_id=wiki_object.id %} ">
+                            <i class="fa fa-trash" aria-hidden="true"></i> 删除
+                        </a>
+                    {% endif %}
+                </div>
+            </div>
+
+
+            <div class="panel-body">
+                <div class="col-sm-2 title-list" style="height: 600px;overflow:scroll;">
+                    <ul id="catalog">
+
+                    </ul>
+
+                </div>
+
+                <div class="col-sm-10 content">
+                    {% if wiki_object %}
+                        {#                        <h5><span class="glyphicon glyphicon-folder-open" aria-hidden="true"></span>#}
+                        {#                            【 {{ wiki_object.title }} 】内容</h5>#}
+                        {#                        <hr>#}
+
+
+                        <div style="">
+                            <h1>{{ wiki_object.title }}</h1>
+                            <br>
+                            <div class="author">
+                                <span class="wordage">作者： {{ request.tracer.user.username }}</span>
+                                <span class="publish-time">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;发布时间：{{ wiki_object.create_datetime }}</span>
+                            </div>
+                            <hr>
+
+                            {{ content | safe }}
+
+                        </div>
+
+
+                    {% else %}
+                        <div style="text-align: center;margin-top: 200px;">
+                            <h4> 《{{ request.tracer.project.name }}》知识文档库 </h4>
+                            <a class="btn btn-primary btn-sm" style="background-color: #167be0"
+                               href="{% url 'wiki:wiki_add' project_id=request.tracer.project.id %}"><span
+                                    class="glyphicon glyphicon-plus"
+                                    aria-hidden="true"></span> 新建知识文档</a>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block js %}
+    <script>
+        // http://127.0.0.1:8002/manage/2/wiki/detail/
+        var WIKI_DETAIL_URL = "{% url 'web:wiki' project_id=request.tracer.project.id %}";
+
+        $(function () {
+            initCatalog();
+        });
+
+        function initCatalog() {
+            $.ajax({
+                url: "{% url 'web:wiki_catalog' project_id=request.tracer.project.id %}",
+                type: "GET",
+                dataType: "JSON",
+                success: function (res) {
+                    if (res.status) {
+                        $.each(res.data, function (index, item) {
+                            var href = WIKI_DETAIL_URL + "?wiki_id=" + item.id;
+                            var li = $("<li>").attr('id', "id_" + item.id).append($('<a>').text(item.title).attr('href', href)).append($('<ul>'));
+
+                            if (!item.parent_id) {
+                                // 添加到catalog中
+                                $('#catalog').append(li);
+                            } else {
+                                $("#id_" + item.parent_id).children('ul').append(li);
+                            }
+                        })
+                    } else {
+                        alert("初始化目录失败");
+                    }
+                }
+            })
+        }
+    </script>
+
+{% endblock %}

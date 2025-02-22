@@ -1,0 +1,180 @@
+{% extends 'base/site-base.html' %}
+{% block title %}
+    FastWork - 正在远程 -【{{ accObj.hostname }}】服务器
+{% endblock %}
+{% block css %}
+    <link href="/static/webssh/css/xterm.min.css" rel="stylesheet" type="text/css"/>
+    <style>
+        .content {
+            height: 100%;
+            overflow: scroll;
+            border-left: 1px solid #dddddd;
+            border-right: 1px solid #dddddd;
+            margin-left: -1px;
+        }
+
+        body {
+            padding-bottom: 30px;
+        }
+
+        .reverse-video {
+            color: #000;
+            background: #f0f0f0;
+        }
+    </style>
+{% endblock %}
+
+{% block content %}
+
+    <div class="container-fluid" style="margin-top: 20px">
+        <div class="col-sm-12">
+            <div class="panel-heading">
+                <div>
+                    <i class="fa fa-tasks" aria-hidden="true" style="font-size: 15px"> 正在操作服务器:【{{ accObj.desc }}】<span
+                            style="color: red">（提示：如若连接服务器无反应，则表示服务器账户信息可能有误！）</span>
+                    </i>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-sm-12 content">
+            <div class="container-fluid">
+                <div class="panel panel-default">
+                    <div class="panel-body">
+                        <div>
+                            <div class="form-group">
+
+                                <div class="row">
+                                    <div class="col-lg-6">
+                                        <div class="input-group">
+                                          <span class="input-group-btn">
+                                            <button class="btn btn-default" type="button">用户名</button>
+                                          </span>
+                                            <input type="text" class="form-control" id="username"
+                                                   value={{ accObj.username }} disabled>
+                                        </div>
+                                    </div>
+
+                                    <div class="col-lg-6" style="margin-top: 1px">
+                                        <div class="input-group">
+                                          <span class="input-group-btn">
+                                            <button class="btn btn-default" type="button">认证密码</button>
+                                          </span>
+                                            <input type="password" class="form-control" id="password" disabled
+                                                   value="{{ accObj.password }}">
+                                        </div>
+                                    </div>
+
+                                    <div class="col-lg-6">
+                                        <div class="input-group">
+                                          <span class="input-group-btn">
+                                            <button class="btn btn-default" type="button">远程地址</button>
+                                          </span>
+                                            <input type="text" class="form-control" id="address"
+                                                   value="{{ accObj.hostname }}"
+                                                   disabled>
+                                        </div>
+                                    </div>
+
+                                    <div class="col-lg-6" style="margin-top: 1px">
+                                        <div class="input-group">
+                                          <span class="input-group-btn">
+                                            <button class="btn btn-default" type="button">端口</button>
+                                          </span>
+                                            <input type="text" class="form-control" id="port" value="{{ accObj.port }}"
+                                                   disabled>
+                                        </div>
+                                    </div>
+                                </div>
+                                <button type="button" class="btn btn-success" id="backup_all"
+                                        style="margin-top: 5px;background-color: rebeccapurple;border: none">
+                                    <span class="glyphicon glyphicon-share">登录服务器</span>
+                                </button>
+
+                                <button type="button" style="margin-top: 5px;border: none" class="btn btn-danger"
+                                        name="close" value="关闭当前页面" onclick="window.close();">
+                                    <span class="glyphicon glyphicon-remove">关闭当前页面</span>
+                                </button>
+                            </div>
+
+                        </div>
+                    </div>
+
+                    <div style="overflow:scroll;height:100%" id="terminal_content"></div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+
+{% endblock %}
+
+{% block js %}
+    <script src="/static/webssh/js/jquery.min.js"></script>
+    <script src="/static/webssh/js/xterm.min.js"></script>
+    <script>
+
+        {#  登录  #}
+        $('#backup_all').click(function () {
+
+            if (window.confirm('确定要远程登录该服务器吗？')) {
+                //动态获取用户输入的账户信息
+                var username = document.getElementById("username").value;
+                var password = document.getElementById("password").value;
+                var address = document.getElementById("address").value;
+                var port = document.getElementById("port").value;
+                //发送账户信息，给后端
+                UserInfos = {
+                    "username": username,
+                    "password": password,
+                    "address": address,
+                    "port": port,
+                }
+                //ws socket连接地址
+                var host = window.location.host;
+                //生产环境
+                {#var url = "wss://" + host + "/wss/";#}
+
+                //测试环境
+                var url = "ws://" + host.split(":")[0] + ":8223/ws/1";
+
+                var socket = new WebSocket(url);
+
+                //初始化一个终端
+                var term = new Terminal();
+
+                socket.onopen = function () {
+                    //发送用户登录信息给后端
+                    socket.send(JSON.stringify(UserInfos))
+
+                    //term终端配置信息
+                    term.open(document.getElementById('terminal_content'));
+
+                    term.on('data', function (data) {
+                        console.log(111, data);
+                        socket.send(data);
+                    })
+                }
+
+                socket.onmessage = function (msg) {
+                    console.log(222, msg.data);
+                    term.write(msg.data);
+                };
+
+                socket.onerror = function (e) {
+                    console.log(333, e);
+                };
+
+                socket.onclose = function (e) {
+                    console.log(444, e);
+                    term.destroy();
+                }
+
+                return true;
+            } else {
+                return false;
+            }
+        })
+
+    </script>
+{% endblock %}

@@ -1,0 +1,102 @@
+{% extends 'layout/manage.html' %}
+
+{% block title %}
+    FastWork 系统设置-邀请注册
+{% endblock %}
+
+{% block css %}
+    <style>
+        .choose {
+            border-left: 2px solid #f90 !important;
+        }
+    </style>
+{% endblock %}
+
+
+{% block content %}
+    <div class="container clearfix" style="margin-top: 20px;">
+        <div class="col-sm-3">
+            <div class="panel panel-default">
+                <div class="panel-heading" style="background-color:transparent;font-weight: bold;">
+                    个人中心
+                </div>
+                <div class="list-group" style="border-radius: 0">
+                    <div>
+                        <a href="{% url 'web:rebuild_invite_register' project_id=request.tracer.project.id %}"
+                           class="list-group-item choose">邀请注册</a>
+                        <a href="{% url 'web:changepwd'  project_id=request.tracer.project.id %}"
+                           class="list-group-item">修改密码</a>
+                        <a href="{% url 'web:project_backup' project_id=request.tracer.project.id %}"
+                           class="list-group-item">打包项目</a>
+                        {% if request.tracer.user.username == request.tracer.project.creator.username %}
+                            <a href="{% url 'web:project_users_unbind' project_id=request.tracer.project.id %}"
+                               class="list-group-item">项目设置</a>
+                            <a href="{% url 'web:settings_delete'  project_id=request.tracer.project.id %}"
+                               class="list-group-item">删除项目</a>
+                        {% endif %}
+
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-sm-9">
+            <div class="panel panel-default">
+                <div class="panel-heading"><i class="fa fa-share" aria-hidden="true"></i> 邀请注册</div>
+                <div class="panel-body">
+
+                    <form class="form-horizontal" method="post">
+                        {% csrf_token %}
+                        <div class="form-group">
+                            <label class="col-sm-2 control-label" style="margin-top: -7px;margin-right: -10px">
+                                <input type="button" class="btn btn-primary " value="一键复制"
+                                       style="background-color: #499ef3"
+                                       id="btnCopyUrl">
+                            </label>
+                            <div class="col-sm-5">
+                                <input type="text" class="form-control" value="{{ url }}" id="inviteUrl" readonly>
+                            </div>
+                        </div>
+                    </form>
+
+                </div>
+            </div>
+
+        </div>
+    </div>
+{% endblock %}
+
+{% block js %}
+    <script>
+
+        $(function () {
+            bindCopyUrl();
+        });
+
+        /*
+            点击拷贝邀请码
+            */
+        function bindCopyUrl() {
+            $('#btnCopyUrl').click(function () {
+                var textInput = $('#inviteUrl')[0]; // document.getElementById('inviteUrl')
+                textInput.select();
+
+                document.execCommand("Copy");
+                alert('复制成功');
+            })
+        }
+
+        {#var btn = document.getElementById("register_btn");#}
+        {#btn.onclick = function () {#}
+        {#    var url = "{% url 'web:invite_register_url' project_id=request.tracer.project.id %}"#}
+        {#    $.get(url, function (ret) {#}
+        {#        if (ret.code == 200) {#}
+        {#            document.getElementById("resgite_value").value = "";#}
+        {#            document.getElementById("resgite_value").value = ret.url;#}
+        {#        } else {#}
+        {#            document.getElementById("resgite_value").value = "";#}
+        {#            document.getElementById("resgite_value").value = "生成注册链接出错，请刷新后尝试";#}
+        {#        }#}
+        {#    })#}
+        {##}
+    </script>
+{% endblock %}

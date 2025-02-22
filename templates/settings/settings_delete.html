@@ -1,0 +1,75 @@
+{% extends 'base/site-base.html' %}
+
+{% block title %}
+    FastWork - 删除项目
+{% endblock %}
+
+{% block css %}
+    <style>
+        .choose {
+            border-left: 2px solid #f90 !important;
+        }
+    </style>
+{% endblock %}
+
+
+
+{% block content %}
+    <div class="container clearfix" style="margin-top: 20px;">
+        <div class="col-sm-3">
+            <div class="panel panel-default">
+                <div class="panel-heading" style="background-color:transparent;font-weight: bold;">
+                    个人中心
+                </div>
+                <div class="list-group" style="border-radius: 0">
+                    <div>
+
+                        <a href="{% url 'project:settings-invite-register' %}?project_id={{ request.tracer.project.id }}"
+                           class="list-group-item">邀请注册</a>
+
+                        <a href="{% url 'project:settings-change-password' %}?project_id={{ request.tracer.project.id }}"
+                           class="list-group-item">修改密码</a>
+
+                        <a href="{% url 'project:settings-backup' %}?project_id={{ request.tracer.project.id }}"
+                           class="list-group-item">打包项目</a>
+
+                        <a href="{% url 'project:settings-users-unbind' %}?project_id={{ request.tracer.project.id }}"
+                           class="list-group-item">项目设置</a>
+
+                        <a href="{% url 'project:settings-delete' %}?project_id={{ request.tracer.project.id }}"
+                           class="list-group-item choose">删除项目</a>
+
+
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-sm-9">
+            <div class="panel panel-default">
+                <div class="panel-heading"><i class="fa fa-trash-o" aria-hidden="true"></i> 删除项目</div>
+                <div class="panel-body">
+
+                    <form class="form-horizontal" method="post">
+                        {% csrf_token %}
+                        <div class="form-group">
+                            <label class="col-sm-2 control-label">项目名:</label>
+                            <div class="col-sm-5">
+                                <input type="text" class="form-control" placeholder="请输入项目名称"
+                                       name="project_name">
+                                <span class="error-msg" style="color: red">{{ error }}</span>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <div class="col-sm-offset-2 col-sm-5">
+                                <input type="submit" class="btn btn-danger" value="删 除" style="margin-top: 10px">
+                            </div>
+                        </div>
+
+                    </form>
+
+                </div>
+            </div>
+
+        </div>
+    </div>
+{% endblock %}

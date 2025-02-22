@@ -1,0 +1,587 @@
+{% extends 'base/site-base.html' %}
+{% load static %}
+
+{% block title %}
+    FastWork - 文件仓库
+{% endblock %}
+
+{% block css %}
+    <link rel="stylesheet" href="{% static 'global_css/file_depository_search.css' %}">
+    <link rel="stylesheet" href="/static/ladda-bootstrap/dist/ladda-themeless.min.css">
+    <link rel="stylesheet" href="/static/ladda-bootstrap/css/prism.css">
+    <style>
+        .dropdown-menu {
+            min-width: 95px;
+        }
+    </style>
+{% endblock %}
+
+
+{% block content %}
+    <div class="container-fluid content" style="margin-top: 20px">
+        <div class="col-sm-12">
+            <div class="panel-heading">
+                <ol class="breadcrumb">
+                    <li><a href="{% url 'project:list' %}" style="color: #337ab7">项目大厅</a></li>
+                    <li>
+                        <a href="{% url 'file_depository:file_depository-files' %}?project_id={{ request.tracer.project.id }}"
+                           style="color: #337ab7">文件仓库</a></li>
+                    <li class="active">文件仓库列表</li>
+                </ol>
+            </div>
+        </div>
+
+        <div class="col-sm-12" style="margin-top: -20px">
+            <form method="post"
+                  action="{% url 'file_depository:file_depository-files-search' %}?project_id={{ request.tracer.project.id }}"
+                  style="transform: scale(1.0)">
+                {% csrf_token %}
+                <div class="col-lg-6">
+                    <div class="input-group">
+                        <input type="text" class="form-control" placeholder="输入文件名来模糊查找" name="q"
+                               style="width: 200px">
+                        <input type="submit" value="文件查找" class="btn btn-default" style="margin-left: -5px">
+                        <a href="{% url 'file_depository:file_depository-files-upload' %}?project_id={{ request.tracer.project.id }}"
+                           class="btn btn-default"
+                           style="color: #333">
+                            <span class="glyphicon glyphicon-plus" aria-hidden="true"></span>
+                            上传文件</a>
+
+                        <a href="#" id="form-submit" class="btn btn-primary ladda-button" data-style="zoom-out"
+                           style="margin-left: 5px;color: white;background-color: #167be0" data-size="l">
+                            <span class="glyphicon glyphicon-refresh" aria-hidden="true"></span>
+                            同步文件</a>
+
+                    </div>
+                </div>
+            </form>
+        </div>
+
+        <div class="col-sm-12">
+            <div class="panel-heading">
+                <div class="panel-body">
+                    {% if categroy_count %}
+                        {% for category in categroy_count %}
+                            <a class="btn btn-default btn-sm"
+                               style="font-size: 15px;margin-left: 5px;color: black;margin-top: 10px"
+                               href="{% url 'file_depository:file_depository-files-category-search' %}?project_id={{ request.tracer.project.id }}&category_id={{ category.category.id }}">
+                                {{ category.category.name }} <span class="badge"
+                                                                   style="background-color: #337ab7">{{ category.count }}</span>
+                            </a>
+                        {% endfor %}
+                    {% endif %}
+
+                    {% if categroy_count %}
+                        <a class="btn btn-default btn-sm"
+                           style="font-size: 15px;margin-left: 5px;color: black;margin-top: 10px"
+                           data-toggle="modal"
+                           data-target="#AddGroupModel"
+                           onclick="">
+                            <span class="glyphicon glyphicon-plus"></span>
+                        </a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <div class="col-sm-12">
+
+            {% if file_obj %}
+                <div>
+                    <div class="panel-body">
+                        {% for item in file_obj %}
+                            <div class="item" style="transform: scale(0.9);margin:10px">
+                                <span class="form-control"
+                                      style="text-align: center;border: none;background-color: #f5f5f5;font-size: 13px"
+                                      title="{{ item.name }}">{{ item.name|truncatechars:14 }}...</span>
+                                <a class="title" style="text-align: center;margin-top: 3px">
+                                    {% if item.suffix == '.docx' or item.suffix == '.doc' %}
+                                        <img src="{% static 'file_respostory/docs.ico' %}"
+                                             title="{{ item.name }}"
+                                             style="width: 100px;margin-bottom: 10px">
+                                    {% elif item.suffix == '.xlsx' or item.suffix == '.xls' %}
+                                        <img src="{% static 'file_respostory/excel.ico' %}"
+                                             title="{{ item.name }}"
+                                             style="width: 100px;margin-bottom: 10px">
+
+                                        {#new add#}
+                                    {% elif item.suffix == '.csv' %}
+                                        <img src="{% static 'file_respostory/csv.ico' %}"
+                                             title="{{ item.name }}"
+                                             style="width: 100px;margin-bottom: 10px">
+
+                                    {% elif item.suffix == '.py' %}
+                                        <img src="{% static 'file_respostory/python.ico' %}"
+                                             title="{{ item.name }}"
+                                             style="width: 100px;margin-bottom: 10px">
+
+                                    {% elif item.suffix == '.md' %}
+                                        <img src="{% static 'file_respostory/md.ico' %}"
+                                             title="{{ item.name }}"
+                                             style="width: 100px;margin-bottom: 10px">
+
+                                    {% elif item.suffix == '.xml' or item.suffix == '.yaml' %}
+                                        <img src="{% static 'file_respostory/xml.ico' %}"
+                                             title="{{ item.name }}"
+                                             style="width: 100px;margin-bottom: 10px">
+
+                                    {% elif item.suffix == '.html' %}
+                                        <img src="{% static 'file_respostory/html.ico' %}"
+                                             title="{{ item.name }}"
+                                             style="width: 100px;margin-bottom: 10px">
+
+
+                                    {% elif item.suffix == '.pptx' or item.suffix == '.ppt' %}
+                                        <img src="{% static 'file_respostory/ppt.ico' %}"
+                                             title="{{ item.name }}"
+                                             style="width: 100px;margin-bottom: 10px">
+                                    {% elif item.suffix == '.jpeg' or item.suffix == '.jpg' %}
+                                        <img src="{% static 'file_respostory/jpg.ico' %}"
+                                             title="{{ item.name }}"
+                                             style="width: 90px;margin-bottom: 10px">
+                                    {% elif item.suffix == '.gz' %}
+                                        <img src="{% static 'file_respostory/gz.ico' %}"
+                                             title="{{ item.name }}"
+                                             style="width: 100px;margin-bottom: 10px">
+                                    {% elif item.suffix == '.json' %}
+                                        <img src="{% static 'file_respostory/json_new.ico' %}"
+                                             title="{{ item.name }}"
+                                             style="width: 100px;margin-bottom: 10px">
+                                    {% elif item.suffix == '.zip' %}
+                                        <img src="{% static 'file_respostory/zip.ico' %}"
+                                             title="{{ item.name }}"
+                                             style="width: 100px;margin-bottom: 10px">
+                                    {% elif item.suffix == '.rar' %}
+                                        <img src="{% static 'file_respostory/rar.ico' %}"
+                                             title="{{ item.name }}"
+                                             style="width: 100px;margin-bottom: 10px">
+                                    {% elif item.suffix == '.pdf' %}
+                                        <img src="{% static 'file_respostory/pdf.ico' %}"
+                                             title="{{ item.name }}"
+                                             style="width: 100px;margin-bottom: 10px">
+                                    {% elif item.suffix == '.png' %}
+                                        <img src="{% static 'file_respostory/png.ico' %}"
+                                             title="{{ item.name }}"
+                                             style="width: 100px;margin-bottom: 10px">
+                                    {% elif item.suffix == '.txt' %}
+                                        <img src="{% static 'file_respostory/txt_new.ico' %}"
+                                             style="width: 100px;margin-bottom: 10px">
+                                    {% else %}
+                                        <img src="{% static 'file_respostory/other_new.jpg' %} "
+                                             title="{{ item.name }}"
+                                             style="width: 100px;height: 100px;margin-bottom: 10px">
+                                    {% endif %}
+
+
+                                </a>
+
+                                <input id="btn_value" type="text" value="{{ item.id }}" hidden>
+
+                                <hr style="margin-top: -5px;margin-bottom: -3px">
+
+                                <div class="info">
+                                    <div style="margin: 0 auto">
+                                            <span>
+                                                    <a onclick="" style="color: #333"
+                                                       href="{% url 'file_depository:file_depository-files-download' %}?project_id={{ request.tracer.project.id }}&file_id={{ item.id }}"
+                                                       class="btn btn-default btn-sm">
+                                                    <span class="glyphicon glyphicon-download"
+                                                          aria-hidden="true"></span>
+                                                    下载</a>
+                                                </span>
+
+                                        <span>
+                                                    <a class="btn btn-default btn-sm" data-toggle="modal"
+                                                       data-target="#inviteModal" onclick="get_code({{ item.id }})">
+                                                    <span class="glyphicon glyphicon-share" aria-hidden="true"></span>
+                                                    分享</a>
+
+                                                </span>
+
+                                        {% if item.suffix == ".txt" %}
+                                            <span>
+                                                    <a class="btn btn-default btn-sm" data-toggle="modal"
+                                                       data-target="#myModal"
+                                                       onclick="preRead({{ item.project.id }},{{ item.id }},'{{ item.suffix }}')">
+                                                    <span class="glyphicon glyphicon-eye-open"
+                                                          aria-hidden="true"></span>
+                                                    预览</a>
+                                                </span>
+                                        {% elif item.suffix == ".png" or item.suffix == ".jpg" or item.suffix == ".jpeg" %}
+                                            <span>
+                                                    <a class="btn btn-default btn-sm"
+                                                       onclick="preRead({{ item.project.id }},{{ item.id }},'{{ item.suffix }}')">
+                                                    <span class="glyphicon glyphicon-eye-open"
+                                                          aria-hidden="true"></span>
+                                                    预览</a>
+                                                </span>
+                                        {% else %}
+                                            <span>
+                                                    <a class="btn btn-default btn-sm" disabled=""
+                                                       title="该文件不支持预览，请下载后查看！">
+                                                    <span class="glyphicon glyphicon-eye-open"
+                                                          aria-hidden="true"></span>
+                                                    预览</a>
+                                                </span>
+
+                                        {% endif %}
+
+                                        <span>
+                                                   <div class="btn-group dropup">
+                                                      <button type="button"
+                                                              class="btn btn-default btn-sm dropdown-toggle"
+                                                              data-toggle="dropdown" aria-haspopup="true"
+                                                              aria-expanded="false">
+                                                        <span class="caret"></span>
+                                                      </button>
+                                                      <ul class="dropdown-menu">
+                                                        <li><a onclick="get_files_infos({{ item.id }})"
+                                                               data-toggle="modal"
+                                                               data-target="#GroupModel"
+                                                               aria-hidden="true">
+                                                            <span class="glyphicon glyphicon-edit"></span>
+                                                            修改分组</a></li>
+                                                            <li role="separator" class="divider"></li>
+                                                          <li><a href="{% url 'file_depository:file_depository-files-send' %}?project_id={{ request.tracer.project.id }}&file_id={{ item.id }}">
+                                                                <span class="glyphicon glyphicon-send"></span>
+                                                                文件分发</a></li>
+                                                        <li role="separator" class="divider"></li>
+                                                              <li> <a href="{% url 'file_depository:file_depository-files-delete' %}?project_id={{ request.tracer.project.id }}&file_id={{ item.id }}">
+                                                              <span class="glyphicon glyphicon-trash"></span>
+                                                              删除</a>
+                                                          </li>
+                                                      </ul>
+                                                    </div>
+                                                </span>
+                                    </div>
+                                </div>
+                            </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            {% else %}
+                <div>
+                    <div style="text-align: center;margin-top: 200px">
+                            <span style="text-align: center;font-size: 15px">暂无文件，请点击
+                            <a class="btn btn-default btn-sm" style="color: #333"
+                               href="{% url 'file_depository:file_depository-files-upload' %}?project_id={{ request.tracer.project.id }}"><span
+                                    class="glyphicon glyphicon-plus"
+                                    aria-hidden="true"></span> 上传文件</a>
+                                添加
+                            </span>
+                    </div>
+                </div>
+            {% endif %}
+
+        </div>
+    </div>
+
+    <!-- 预览 -->
+    <div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+        <div class="modal-dialog" role="document" style="width: 850px;">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h4 class="modal-title" id="myModalLabel">预览页面</h4>
+                </div>
+                <div class="modal-body">
+                    <div id="preRead" style="width: 800px;height: 500px;overflow: scroll">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {#文件分享页面#}
+    <div class="modal fade in" id="inviteModal" role="dialog">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
+                            aria-hidden="true">&times;</span></button>
+                    <h5 class="modal-title" id="myModalLabel">文件分享页面</h5>
+                </div>
+                <div class="modal-body" style="padding-right: 40px;">
+                    <div id="inviteArea">
+                        <div class="form-group">
+                            <div class="input-group">
+                                <div class="input-group-btn">
+                                    <input type="button" value="分享链接" class="btn btn-default">
+                                </div>
+                                <input type="text" class="form-control" id="inviteUrl"
+                                       value="http://127.0.0.1:8000/web/invite/join/file/depository/f370c950dd3a67b2eee95b56ff57515a/">
+                                <div class="input-group-btn">
+                                    <input type="button" value="复制链接" class="btn btn-primary" id="btnCopyUrl"
+                                           style="background-color: #167be0">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {#    修改分组#}
+    <div class="modal fade" id="GroupModel" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
+                            aria-hidden="true">&times;</span></button>
+                    <h2 class="modal-title" id="myModalLabel">文件信息修改</h2>
+                </div>
+                <div class="modal-body">
+                    <form id="editForm">
+                        <div>
+                            <div class="form-group">
+                                <input type="text" hidden value="" id="file_id">
+                                <h3>文件名称:</h3>
+                                <input type="text" class="form-control" id="file_name" style="margin-top: 3px"
+                                       value="" disabled>
+                                <p style="margin-top: 10px"></p>
+                                <h3>文件分组:</h3>
+                                <select class="form-control" id="selected_tools_wiki" style="margin-top: 3px">
+                                    {% for foo in categroy_count %}
+                                        <option>{{ foo.category.name }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">取 消</button>
+                    <button id="btnSubmitEdit" type="button" class="btn btn-primary" style="background-color: #167be0">修
+                        改
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {#    增加分类#}
+    <div class="modal fade" id="AddGroupModel" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
+                            aria-hidden="true">&times;</span></button>
+                    <h2 class="modal-title" id="myModalLabel">添加分组</h2>
+                </div>
+                <div class="modal-body">
+                    <form id="editForm">
+                        <div>
+                            <div class="form-group">
+                                <input type="text" hidden value="" id="file_id">
+                                <h3>分组名称:</h3>
+                                <input type="text" class="form-control" id="category_name" style="margin-top: 3px"
+                                       value="">
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">取 消</button>
+                    <button id="AddGroupBTN" type="button" class="btn btn-primary" style="background-color: #167be0">添
+                        加
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+{% endblock %}
+
+{% block js %}
+    <script>
+        function get_code(file_id) {
+            $.ajax({
+                url: "{% url 'file_depository:file_depository-files-invite-url' %}?project_id={{ request.tracer.project.id }}&file_id=" + file_id,
+                type: "GET",
+                success: function (res) {
+                    if (res.status) {
+                        $('#inviteArea').removeClass('hide').find('#inviteUrl').val(res.data);
+                    } else {
+                        $.each(res.error, function (k, v) {
+                            $('#id_' + k).next('.error-msg').text(v[0]);
+                        })
+                    }
+                }
+            })
+        }
+    </script>
+    <script>
+
+        $(function () {
+            bindCopyUrl();
+        });
+
+        /*
+        点击拷贝邀请码
+        */
+        function bindCopyUrl() {
+            $('#btnCopyUrl').click(function () {
+                var textInput = $('#inviteUrl')[0]; // document.getElementById('inviteUrl')
+                textInput.select();
+
+                document.execCommand("Copy");
+                alert('复制成功');
+            })
+        }
+    </script>
+    <script>
+        function preRead(pid, fid, suffix) {
+            $.ajax({
+                url: "{% url 'file_depository:file_depository-files-details' %}",
+                type: "POST",
+                dataType: "json",
+                data: {
+                    "suffix": suffix,
+                    "file_id": fid,
+                    "project_id": pid,
+                    'csrfmiddlewaretoken': '{{ csrf_token }}'
+                },
+                success: function (data) {
+                    var wObj = document.getElementById("preRead")
+
+                    console.log(data.type);
+                    if (data.type === ".txt") {
+                        var content = JSON.parse(data.name)
+                        var dh = ''
+                        for (j = 0, len = content.length; j < len; j++) {
+                            dh += content[j] + "<br>"
+                        }
+                        wObj.innerHTML = dh
+                        return false
+                    } else if (data.type === ".img") {
+                        window.open(data.name)
+                        return false
+                    } else {
+                        return false
+                    }
+                }
+            })
+        }
+    </script>
+
+    <script>
+        function get_files_infos(file_id) {
+            $.ajax({
+                url: "{% url 'file_depository:file_depository-files-information-edit' %}?project_id={{ request.tracer.project.id }}&file_id=" + file_id,
+                type: "GET",
+                success: function (res) {
+                    if (res.status) {
+                        $("#file_name").val(res.data.file_name);
+                        $("#file_id").val(file_id);
+                        $("#selected_tools_wiki").val(res.data.file_category);
+                    }
+                }
+            })
+        }
+    </script>
+    <script>
+        $(function () {
+            $("#btnSubmitEdit").click(function () {
+                var wiki_index = document.getElementById("selected_tools_wiki").selectedIndex;
+                var category = document.getElementById("selected_tools_wiki").options[wiki_index].text;
+                var file_id = $("#file_id").val();
+
+                $.ajax({
+                    url: "{% url 'file_depository:file_depository-files-information-edit' %}",
+                    type: "POST",
+                    dataType: 'json',
+                    data: {
+                        'category': category,
+                        'project_id': {{ request.tracer.project.id }},
+                        'file_id': file_id,
+                        'csrfmiddlewaretoken': '{{ csrf_token }}'
+                    },
+                    success: function (data) {
+                        if (data.state == 0) {
+                            alert(data.data)
+                            location.href = '{% url 'file_depository:file_depository-files' %}?project_id={{ request.tracer.project.id }}'
+                        } else {
+                            alert(data.data)
+                        }
+                    }
+                })
+
+
+            })
+        })
+    </script>
+    <script>
+        $(function () {
+            $("#AddGroupBTN").click(function () {
+                var category_name = $("#category_name").val();
+
+                if (category_name === "") {
+                    alert("【分类名称】不能为空！");
+                    return false;
+                }
+
+                $.ajax({
+                    url: "{% url 'file_depository:file_depository-files-category-add' %}",
+                    type: "POST",
+                    dataType: 'json',
+                    data: {
+                        'category_name': category_name,
+                        'project_id': {{ request.tracer.project.id }},
+                        'csrfmiddlewaretoken': '{{ csrf_token }}'
+                    },
+                    success: function (data) {
+                        if (data.status) {
+                            alert(data.data)
+                            location.href = '{% url 'file_depository:file_depository-files' %}?project_id={{ request.tracer.project.id }}'
+                        } else {
+                            alert(data.data)
+                        }
+                    }
+                })
+
+
+            })
+        })
+    </script>
+
+    <script src="/static/ladda-bootstrap/dist/spin.min.js"></script>
+    <script src="/static/ladda-bootstrap/dist/ladda.min.js"></script>
+    <script>
+        $(function () {
+            $('#form-submit').click(function (e) {
+                var data = {
+                    "age": 12,
+                    "address": "AnHui"
+                }
+                e.preventDefault();
+                var l = Ladda.create(this);
+                l.start();
+                $.get("{% url 'file_depository:file_depository-sync-files' %}?project_id={{ request.tracer.project.id }}",
+                    {#{#}
+                    {#    "data": data,#}
+                    {#    'csrfmiddlewaretoken': '{{ csrf_token }}'#}
+                    function (response) {
+                        console.log(response);
+                    }, "json")
+                    .always(function () {
+                        sleep(2000)
+                        l.stop();
+                        window.location.href = '{% url 'file_depository:file_depository-files' %}?project_id={{ request.tracer.project.id }}'
+                    });
+                return false;
+
+            });
+
+        });
+
+        function sleep(numberMillis) {
+            var now = new Date();
+            var exitTime = now.getTime() + numberMillis;
+            while (true) {
+                now = new Date();
+                if (now.getTime() > exitTime)
+                    return;
+            }
+        }
+    </script>
+{% endblock %}

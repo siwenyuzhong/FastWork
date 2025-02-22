@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.6.0/jquery.js"></script>
+</head>
+<body>
+<video id="media" src="" width="720" height="480" controls autoplay>浏览器不支持video标签</video>
+</video>
+</body>
+<script>
+    $(function () {
+        $("#media").attr('src', '{{ paht }}');
+    })
+
+</script>
+</html>

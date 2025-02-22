@@ -1,0 +1,169 @@
+{% extends 'layout/manage.html' %}
+
+{% block title %}
+    FastWork 系统设置-打包项目
+{% endblock %}
+
+{% block css %}
+    <style>
+        .choose {
+            border-left: 2px solid #f90 !important;
+        }
+
+        .tableW {
+            width: 200px;
+        }
+
+        .content {
+            height: calc(100vh - 100px);
+            overflow: scroll;
+        }
+    </style>
+{% endblock %}
+
+
+{% block content %}
+    <div class="container clearfix content" style="margin-top: 20px;">
+        <div class="col-sm-3">
+            <div class="panel panel-default">
+                <div class="panel-heading" style="background-color:transparent;font-weight: bold;">
+                    个人中心
+                </div>
+                <div class="list-group" style="border-radius: 0">
+                    <div>
+                        <a href="{% url 'web:invite_register' project_id=request.tracer.project.id %}"
+                           class="list-group-item">邀请注册</a>
+                        <a href="{% url 'web:changepwd'  project_id=request.tracer.project.id %}"
+                           class="list-group-item">修改密码</a>
+                        <a href="{% url 'web:project_backup' project_id=request.tracer.project.id %}"
+                           class="list-group-item choose">打包项目</a>
+                        {% if request.tracer.user.username == request.tracer.project.creator.username %}
+                            <a href="{% url 'web:project_users_unbind' project_id=request.tracer.project.id %}"
+                               class="list-group-item">项目设置</a>
+                            <a href="{% url 'web:settings_delete'  project_id=request.tracer.project.id %}"
+                               class="list-group-item">删除项目</a>
+                        {% endif %}
+
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-sm-9">
+            <div class="panel panel-default">
+                <div class="panel-heading"><i class="fa fa-shopping-bag" aria-hidden="true"></i> 打包项目</div>
+                <div class="panel-body">
+
+                    <div class="panel panel-default">
+                        <div class="panel-heading">
+                            <strong>项目情况：</strong>
+                        </div>
+                        <div class="panel-body">
+                            <table class="table table-hover table-bordered">
+                                <tbody>
+                                <tr>
+                                    <td class="tableW">项目名称：</td>
+                                    <td>{{ project_obj.name }}</td>
+                                </tr>
+                                <tr>
+                                    <td>项目描述：</td>
+                                    <td>{{ project_obj.desc }}</td>
+                                </tr>
+                                <tr>
+                                    <td>创建时间：</td>
+                                    <td>{{ project_obj.create_datetime }}</td>
+                                </tr>
+                                <tr>
+                                    <td>创 建 人：</td>
+                                    <td>{{ project_obj.creator.username }}</td>
+                                </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        <div class="panel-heading">
+                            <strong>知识文档统计：</strong>
+                        </div>
+                        <div class="panel-body">
+                            <table class="table table-hover table-bordered">
+                                <tbody>
+                                <tr>
+                                    <td class="tableW">知识库数量：</td>
+                                    <td>{{ wiki_count }}</td>
+                                </tr>
+                                </tbody>
+                            </table>
+                        </div>
+
+
+                        <div class="panel-heading">
+                            <strong>工具库统计：</strong>
+                        </div>
+                        <div class="panel-body">
+                            <table class="table table-hover table-bordered">
+                                <tbody>
+                                <tr>
+                                    <td class="tableW">工具库数量：</td>
+                                    <td>{{ scripts_count }}</td>
+                                </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        <div class="panel-heading">
+                            <strong>文件仓库统计：</strong>
+                        </div>
+                        <div class="panel-body">
+                            <table class="table table-hover table-bordered">
+                                <tbody>
+                                <tr>
+                                    <td class="tableW">文件仓库数量：</td>
+                                    <td>{{ files_count }}</td>
+                                </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- Split button -->
+            <div class="btn-group">
+                <button type="button" class="btn btn-primary" id="back_up_btn"
+                        style="background-color: #499ef3;border: none">
+                    <span class="glyphicon glyphicon-download-alt" aria-hidden="true"></span>
+                    一键打包
+                </button>
+            </div>
+
+        </div>
+    </div>
+{% endblock %}
+
+{% block js %}
+    <script>
+        $("#back_up_btn").click(function () {
+
+            if (window.confirm('确定要打包整个项目吗？')) {
+                $.ajax({
+                    url: "{% url 'wiki:project_backup' project_id=request.tracer.project.id %}",
+                    type: "POST",
+                    dataType: "json",
+                    data: {
+                        'csrfmiddlewaretoken': '{{ csrf_token }}'
+                    },
+                    success: function (data) {
+                        download(data.url)
+                    }
+                })
+                return true;
+            } else {
+                return false;
+            }
+
+            // 直接下载，用户体验好
+            function download(url) {
+                var $form = $('<form method="GET"></form>');
+                $form.attr('action', url);
+                $form.appendTo($('body'));
+                $form.submit();
+            }
+        })
+    </script>
+{% endblock %}

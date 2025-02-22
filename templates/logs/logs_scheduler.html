@@ -1,0 +1,63 @@
+{% extends 'base/site-base.html' %}
+{% block css %}
+    <style>
+        .content {
+            height: calc(100vh - 120px);
+            overflow: scroll;
+            margin-left: -1px;
+        }
+    </style>
+{% endblock %}
+
+{% block title %}
+    FastWork - 定时任务日志中心
+{% endblock %}
+
+{% block content %}
+    <div class="container-fluid content" style="margin-top: 20px">
+
+        <div class="col-sm-12">
+            <div class="panel-heading">
+                <ol class="breadcrumb">
+                    <li><a href="{% url 'project:list' %}" style="color: #337ab7">项目大厅</a></li>
+                    <li><a href="{% url 'journal:journal-logs_management' %}?project_id={{ request.tracer.project.id }}"
+                           style="color: #337ab7">日志中心</a></li>
+                    <li class="active">定时任务日志中心</li>
+                </ol>
+            </div>
+        </div>
+
+        <div class="col-sm-12" style="margin-top: -20px">
+            <div class="panel-body">
+                <table class="table table-hover">
+                    <thead>
+                    <tr>
+                        <th scope="col">序号</th>
+                        <th scope="col">任务ID</th>
+                        <th scope="col">执行时间</th>
+                        <th scope="col">执行动作</th>
+                        <th scope="col">执行结果</th>
+                        <th scope="col">状态</th>
+                        <th scope="col">所属项目</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {% for scheduler_obj in scheduler_objs %}
+                        <tr>
+                            <th scope="row">{{ forloop.counter }}</th>
+                            <td>{{ scheduler_obj.task_id }}</td>
+                            <td>{{ scheduler_obj.exe_time }}</td>
+                            <td>{{ scheduler_obj.cmd }}</td>
+                            <td>{{ scheduler_obj.stdout }}</td>
+                            <td>{{ scheduler_obj.status }}</td>
+                            <th><span class="label label-success">{{ scheduler_obj.project.name }}+</span></th>
+                        </tr>
+                    {% endfor %}
+
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+{% endblock %}

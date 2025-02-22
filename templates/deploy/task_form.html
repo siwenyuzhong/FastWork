@@ -1,0 +1,417 @@
+{% extends 'base/site-base.html' %}
+{% load static %}
+
+{% block css %}
+    <style>
+        .outline .series .module {
+            line-height: 100px;
+            vertical-align: middle;
+            width: 940px;
+            margin: 0 auto;
+            padding-bottom: 10px;
+        }
+
+        .outline .series .module .item .line {
+            float: left;
+            width: 80px;
+
+        }
+
+        .outline .series .module .item .line hr {
+            margin-top: 49px
+        }
+
+        .outline .series .module .item .icon {
+            float: left;
+            color: #dddddd;
+            position: relative;
+
+        }
+
+        .outline .series .module .item .icon .up, .outline .series .module .item .icon .down {
+            position: absolute;
+            line-height: 49px;
+            min-width: 90px;
+            left: 0;
+            text-align: center;
+            margin-left: -38px;
+            color: #337ab7;
+        }
+
+        .outline .series .module .item:hover .icon, .outline .series .module .item.active .icon {
+            color: green;
+        }
+
+        .outline .series .module .item .icon .up {
+            top: 0;
+        }
+
+        .outline .series .module .item .icon .down {
+            bottom: 0;
+
+        }
+
+        .hooks textarea {
+            min-height: 200px;
+            resize: none;
+        }
+
+        .content {
+            height: calc(100vh - 120px);
+            overflow: scroll;
+            margin-left: -1px;
+        }
+
+        #id_tag {
+            width: 80%;
+        }
+
+    </style>
+{% endblock %}
+{% block title %}
+    FastWork - 部署管理
+{% endblock %}
+{% block content %}
+    <div class="container-fluid content" style="margin-top: 20px">
+        <div class="col-sm-12">
+            <div class="panel-heading">
+                <ol class="breadcrumb">
+                    <li><a href="{% url 'project:list' %}" style="color: #337ab7">项目大厅</a></li>
+                    <li>
+                        <a href="{% url 'deploy:deplot-task-list' %}?project_id={{ request.tracer.project.id }}&programme_id={{ programme_object.id }}"
+                           style="color: #337ab7">发布任务</a></li>
+                    <li class="active">新增发布
+                    </li>
+                </ol>
+            </div>
+        </div>
+
+        <div class="panel-body" style="margin-top: -20px">
+            <div class="col-sm-12">
+                <table class="table table-bordered">
+                    <tbody>
+                    <tr>
+                        <td>项目名称：<span style="color: gray;">{{ programme_object.title }}</span></td>
+                        <td>项目环境：<span style="color: gray">{{ programme_object.get_env_display }}</span></td>
+                    </tr>
+                    <tr>
+                        <td colspan="2">仓库地址：<span style="color: gray">{{ programme_object.repo }}</span></td>
+                    </tr>
+                    <tr>
+                        <td colspan="2">线上项目路径：<span style="color: gray">{{ programme_object.path }}</span></td>
+                    </tr>
+
+                    <tr>
+                        <td colspan="2">
+                            <div>管理服务器：</div>
+                            <ul>
+                                {% for pro in programme_object.server.all %}
+                                    <li style="color: gray">{{ pro }}</li>
+                                    {#                                    <span class="label label-info">{{ pro }}</span><br>#}
+                                {% endfor %}
+                            </ul>
+
+                        </td>
+                    </tr>
+
+                    </tbody>
+                </table>
+                <form action="" method="post" novalidate>
+                    {% csrf_token %}
+                    <div class="panel panel-default">
+                        <div class="panel-heading"><span class="glyphicon glyphicon-cog"
+                                                         aria-hidden="true">基础配置</span></div>
+                        <div class="panel-body">
+
+                            <div class="form-horizontal">
+                                <div class="form-group">
+                                    <label for="" class="col-sm-2 control-label">{{ form.tag.label }}</label>
+                                    <div class="col-sm-10">
+                                        {{ form.tag }}
+                                        <span style="color: red">{{ form.tag.errors.0 }}</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+
+                    <div class="panel panel-default">
+                        <div class="panel-heading"><span class="glyphicon glyphicon-gift"
+                                                         aria-hidden="true">发布流程&钩子</span>
+                        </div>
+                        <div class="panel-body">
+                            <div class="outline">
+                                <div class="series">
+                                    <div class="module clearfix">
+                                        <div class="item left">
+                                            <div class="line">
+                                                <hr>
+                                            </div>
+                                            <div class="icon">
+                                                        <span class="glyphicon glyphicon-record"
+                                                              aria-hidden="true"></span>
+                                                <a class="down">01 开始</a>
+                                            </div>
+                                        </div>
+
+                                        <div class="item left active">
+                                            <div class="line">
+                                                <hr>
+                                            </div>
+                                            <div class="icon">
+                                                        <span class="glyphicon glyphicon-record"
+                                                              aria-hidden="true"></span>
+                                                <a class="up">02 下载前</a>
+                                            </div>
+                                        </div>
+                                        <div class="item left">
+                                            <div class="line">
+                                                <hr>
+                                            </div>
+                                            <div class="icon">
+                                                        <span class="glyphicon glyphicon-record"
+                                                              aria-hidden="true"></span>
+                                                <a class="down">03 下载代码</a>
+                                            </div>
+                                        </div>
+
+                                        <div class="item left active">
+                                            <div class="line">
+                                                <hr>
+                                            </div>
+                                            <div class="icon">
+                                                        <span class="glyphicon glyphicon-record"
+                                                              aria-hidden="true"></span>
+                                                <a class="up">04 下载后</a>
+                                            </div>
+                                        </div>
+
+                                        <div class="item left">
+                                            <div class="line">
+                                                <hr>
+                                            </div>
+                                            <div class="icon">
+                                                        <span class="glyphicon glyphicon-record"
+                                                              aria-hidden="true"></span>
+                                                <a class="down">05 打包上传</a>
+                                            </div>
+                                        </div>
+
+                                        <div class="item left active">
+                                            <div class="line">
+                                                <hr>
+                                            </div>
+                                            <div class="icon">
+                                                        <span class="glyphicon glyphicon-record"
+                                                              aria-hidden="true"></span>
+                                                <a class="up">06 发布前</a>
+                                            </div>
+                                        </div>
+
+                                        <div class="item left">
+                                            <div class="line">
+                                                <hr>
+                                            </div>
+                                            <div class="icon">
+                                                        <span class="glyphicon glyphicon-record"
+                                                              aria-hidden="true"></span>
+                                                <a class="down">07 发布</a>
+                                            </div>
+                                        </div>
+
+                                        <div class="item left active">
+                                            <div class="line">
+                                                <hr>
+                                            </div>
+                                            <div class="icon">
+                                                        <span class="glyphicon glyphicon-record"
+                                                              aria-hidden="true"></span>
+                                                <a class="up">08 发布后</a>
+                                            </div>
+                                        </div>
+
+                                        <div class="item left">
+                                            <div class="line">
+                                                <hr>
+                                            </div>
+                                        </div>
+
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="hooks">
+
+                                <div class="col-md-6">
+                                    <div class="panel panel-default">
+                                        <div class="panel-heading">02 下载前</div>
+
+                                        <div class="panel-body form-horizontal">
+                                            <div class="form-group">
+                                                <div class="col-sm-12">
+                                                    {{ form.before_download_select }}
+                                                </div>
+                                            </div>
+                                            <div class="form-group">
+                                                <div class="col-sm-12">
+                                                    {{ form.before_download_script }}
+                                                    <span style="color: red">{{ form.before_download_script.errors.0 }}</span>
+                                                </div>
+                                            </div>
+                                            <div class="form-group" style="height: 80px;">
+                                                <div class="col-sm-3">
+                                                    <div class="checkbox">
+                                                        <label>
+                                                            {{ form.before_download_template }} 保存为模板
+                                                        </label>
+                                                    </div>
+                                                </div>
+                                                <div class="col-sm-9">
+                                                    {{ form.before_download_title }}
+                                                    <span style="color: red">{{ form.before_download_title.errors.0 }}</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="col-md-6">
+                                    <div class="panel panel-default">
+                                        <div class="panel-heading">04 下载后</div>
+
+                                        <div class="panel-body form-horizontal">
+                                            <div class="form-group">
+                                                <div class="col-sm-12">
+                                                    {{ form.after_download_select }}
+                                                </div>
+                                            </div>
+                                            <div class="form-group">
+                                                <div class="col-sm-12">
+                                                    {{ form.after_download_script }}
+                                                    <span style="color: red">{{ form.after_download_script.errors.0 }}</span>
+                                                </div>
+                                            </div>
+                                            <div class="form-group" style="height: 80px;">
+                                                <div class="col-sm-3">
+                                                    <div class="checkbox">
+                                                        <label>
+                                                            {{ form.after_download_template }} 保存为模板
+                                                        </label>
+                                                    </div>
+                                                </div>
+                                                <div class="col-sm-9">
+                                                    {{ form.after_download_title }}
+                                                    <span style="color: red">{{ form.after_download_title.errors.0 }}</span>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                    </div>
+                                </div>
+
+                                <div class="col-md-6">
+                                    <div class="panel panel-default">
+                                        <div class="panel-heading">06 上传前</div>
+                                        <div class="panel-body form-horizontal">
+                                            <div class="form-group">
+                                                <div class="col-sm-12">
+                                                    {{ form.before_deploy_select }}
+                                                </div>
+                                            </div>
+                                            <div class="form-group">
+                                                <div class="col-sm-12">
+                                                    {{ form.before_deploy_script }}
+                                                    <span style="color: red">{{ form.before_deploy_script.errors.0 }}</span>
+                                                </div>
+                                            </div>
+                                            <div class="form-group" style="height: 80px;">
+                                                <div class="col-sm-3">
+                                                    <div class="checkbox">
+                                                        <label>
+                                                            {{ form.before_deploy_template }} 保存为模板
+                                                        </label>
+                                                    </div>
+                                                </div>
+                                                <div class="col-sm-9">
+                                                    {{ form.before_deploy_title }}
+                                                    <span style="color: red">{{ form.before_deploy_title.errors.0 }}</span>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                    </div>
+                                </div>
+
+                                <div class="col-md-6">
+                                    <div class="panel panel-default">
+                                        <div class="panel-heading">08 上传后</div>
+                                        <div class="panel-body form-horizontal">
+                                            <div class="form-group">
+                                                <div class="col-sm-12">
+                                                    {{ form.after_deploy_select }}
+                                                </div>
+                                            </div>
+                                            <div class="form-group">
+                                                <div class="col-sm-12">
+                                                    {{ form.after_deploy_script }}
+                                                    <span style="color: red">{{ form.after_deploy_script.errors.0 }}</span>
+                                                </div>
+                                            </div>
+                                            <div class="form-group" style="height: 80px;">
+                                                <div class="col-sm-3">
+                                                    <div class="checkbox">
+                                                        <label>
+                                                            {{ form.after_deploy_template }} 保存为模板
+                                                        </label>
+                                                    </div>
+                                                </div>
+                                                <div class="col-sm-9">
+                                                    {{ form.after_deploy_title }}
+                                                    <span style="color: red">{{ form.after_deploy_title.errors.0 }}</span>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                    </div>
+                                </div>
+
+                            </div>
+
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <div>
+                            <button type="submit" class="btn btn-default">
+                                <i class="fa fa-plus"> 添加</i>
+                            </button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+{% endblock %}
+
+{% block js %}
+    <script>
+        $(".hooks").find("select").change(function () {
+            var that = $(this);
+            var hid = $(this).val();
+            $.ajax({
+                url: "{% url 'deploy:deplot-hook-template'   %}",
+                type: 'GET',
+                data: {
+                    "hid": hid,
+                    "project_id":{{ request.tracer.project.id }}
+                },
+                dataType: 'JSON',
+                success: function (res) {
+                    that.parent().parent().next().find('textarea').val(res.content);
+                }
+            })
+        })
+    </script>
+{% endblock %}

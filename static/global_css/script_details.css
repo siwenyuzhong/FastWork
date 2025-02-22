@@ -1,0 +1,95 @@
+
+a, a:link, a:visited, a:hover {
+    color: white;
+}
+
+.CodeMirror {
+    border: 1px solid black;
+    font-size: 14px
+}
+
+.panel-default {
+    margin-top: 10px;
+}
+
+.panel-default .panel-heading {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+}
+
+.panel-body {
+    padding: 0;
+}
+
+.title-list ul {
+    padding-left: 15px;
+}
+
+.title-list ul a {
+    display: block;
+    padding: 5px 0;
+}
+
+.content {
+    height: calc(100vh - 100px);
+    overflow: scroll;
+    border-left: 1px solid #dddddd;
+    min-height: 600px;
+    margin-left: -1px;
+}
+
+.modal.left .modal-dialog, .modal.right .modal-dialog {
+    position: fixed;
+    margin: auto;
+    width: 600px;
+    height: 100%;
+    -webkit-transform: translate3d(0, 0, 0);
+    -ms-transform: translate3d(0, 0, 0);
+    -o-transform: translate3d(0, 0, 0);
+    transform: translate3d(0, 0, 0)
+}
+
+.modal.left .modal-content, .modal.right .modal-content {
+    height: 100%;
+    overflow-y: auto
+}
+
+.modal.left .modal-body, .modal.right .modal-body {
+    padding: 15px 15px 80px
+}
+
+.modal.left.fade .modal-dialog {
+    left: -320px;
+    -webkit-transition: opacity .3s linear, left .3s ease-out;
+    -moz-transition: opacity .3s linear, left .3s ease-out;
+    -o-transition: opacity .3s linear, left .3s ease-out;
+    transition: opacity .3s linear, left .3s ease-out
+}
+
+.modal.left.fade.in .modal-dialog {
+    left: 0
+}
+
+.modal.right.fade .modal-dialog {
+    right: -320px;
+    -webkit-transition: opacity .3s linear, right .3s ease-out;
+    -moz-transition: opacity .3s linear, right .3s ease-out;
+    -o-transition: opacity .3s linear, right .3s ease-out;
+    transition: opacity .3s linear, right .3s ease-out
+}
+
+.modal.right.fade.in .modal-dialog {
+    right: 0
+}
+
+.modal-content {
+    border-radius: 0;
+    border: none
+}
+
+.modal-header {
+    border-bottom-color: #eee;
+    background-color: #fafafa
+}
+

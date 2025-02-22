@@ -1,0 +1,301 @@
+{% extends 'base/site-base.html' %}
+{% block title %}
+    FastWork - 添加Date Job任务
+{% endblock %}
+{% block  content %}
+    <div class="container-fluid" style="margin-top: 20px">
+
+        <div class="col-sm-12">
+            <div class="panel-heading">
+                <ol class="breadcrumb">
+                    <li><a href="{% url 'project:list' %}" style="color: #337ab7">项目大厅</a></li>
+                    <li>
+                        <a href="{% url 'task_scheduler:task_scheduler-task-list' %}?project_id={{ request.tracer.project.id }}"
+                           style="color: #337ab7">定时任务</a></li>
+                    <li>
+                        <a href="{% url 'task_scheduler:task_scheduler-task-add' %}?project_id={{ request.tracer.project.id }}"
+                           style="color: #337ab7">定时任务类型大厅</a></li>
+                    <li class="active">创建Date Job任务</li>
+                </ol>
+            </div>
+            <div class="panel-body" style="margin-top: -30px">
+                <div class="panel panel-default">
+                    <div class="panel-body">
+                        <h3 style="margin-top: 10px;margin-bottom: 5px;color: gray">
+                            1、配置任务名称</h3>
+                        <input type="text"
+                               class="form-control"
+                               id="date_name"
+                               placeholder=""
+                               value="DATE-" style="width: 400px">
+
+                        <h3 style="margin-top: 30px;margin-bottom: 5px;color: gray">
+                            2、配置任务逻辑 (若不需要进行告警，忽略后置告警条件即可)
+                            <a href="{% url 'task_scheduler:task_scheduler-task-useage-help' %}?project_id={{ request.tracer.project.id }}"
+                               target="_blank"><span
+                                    class="glyphicon glyphicon-question-sign"></span>查看告警帮助文档</a>
+                        </h3>
+                        </h3>
+                        <ul id="myTab"
+                            class="nav nav-tabs">
+                            <li class="active">
+                                <a href="#cron_define"
+                                   style="color: #333"
+                                   data-toggle="tab">
+                                    <strong>自定义命令</strong>
+                                </a>
+                            </li>
+                            <li><a href="#cron_scripts"
+                                   style="color: #333"
+                                   data-toggle="tab"><strong>工具库工具</strong></a>
+                            </li>
+                        </ul>
+                        <div id="myTabContent"
+                             class="tab-content">
+
+                            <div class="tab-pane fade in active"
+                                 id="cron_define">
+                                <div class="col-md-12">
+                                    <div class="col-md-4">
+                                        <div class="form-group"
+                                             style="margin-top: 15px">
+                                            <input type="text" style="margin-left: -30px;"
+                                                   class="form-control"
+                                                   id="date_cmd"
+                                                   placeholder="自定义命令或工具"
+                                                   value="">
+                                        </div>
+                                    </div>
+                                    <div class="col-md-1">
+                                        <button class="btn btn-success"
+                                                style="margin-top: 15px;margin-bottom: 30px;margin-left: -10px;pointer-events: none">
+                                            的结果
+                                        </button>
+                                    </div>
+                                    <div class="col-md-2">
+                                        <select class="form-control"
+                                                id="date_operate_condition"
+                                                style="margin-top: 15px;margin-bottom: 30px;">
+                                            <option id="date_operate_condition">判断条件
+                                            </option>
+                                            <option id="date_operate_condition">等于</option>
+                                            <option id="date_operate_condition">大于或等于
+                                            </option>
+                                            <option id="date_operate_condition">小于或等于
+                                            </option>
+                                            <option id="date_operate_condition">不等于</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-md-2">
+                                        <div class="form-group"
+                                             style="margin-top: 15px">
+                                            <input type="text"
+                                                   class="form-control"
+                                                   id="date_alarm_threshold"
+                                                   placeholder="判断阈值"
+                                                   value="">
+                                        </div>
+                                    </div>
+                                    <div class="col-md-1">
+                                        <button class="btn btn-success"
+                                                style="margin-top: 15px;margin-bottom: 30px;pointer-events: none">
+                                            则进行
+                                        </button>
+                                    </div>
+                                    <div class="col-md-2">
+                                        <select class="form-control" id="date_div_alarm_way"
+                                                style="margin-top: 15px;margin-bottom: 30px;">
+                                            <option id="date_div_alarm_way">无告警方式</option>
+                                            {#                                                                        <option>企业微信告警</option>#}
+                                            {#                                                                        <option>邮件告警</option>#}
+                                            <option id="date_div_alarm_way">钉钉群告警</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+
+                            {# 工具库选择 #}
+                            <div class="tab-pane fade"
+                                 id="cron_scripts">
+                                <div class="col-md-12">
+                                    <div class="col-md-2">
+                                        <input type="text"
+                                               style="margin-top: 15px;margin-left: -30px"
+                                               class="form-control"
+                                               id="date_run_env"
+                                               value="/root/miniconda3/envs/documentwiki_env/bin/python3">
+                                    </div>
+                                    <div class="col-md-3">
+                                        <select class="form-control"
+                                                style="margin-top: 15px;margin-bottom: 15px;margin-left: -30px"
+                                                id="selected_date_tools">
+                                            <option id="selected_date_tools"
+                                                    style="color: gray">
+                                                请选择需要设置的工具
+                                            </option>
+                                            {% for foo in scripts_obj %}
+                                                <option id="selected_date_tools">
+                                                    {{ foo.title }}{{ foo.suffix }}</option>
+                                            {% endfor %}
+                                        </select>
+                                    </div>
+                                    <div class="col-md-1">
+                                        <button class="btn btn-success"
+                                                style="margin-top: 15px;margin-bottom: 30px;margin-left: -30px;pointer-events: none">
+                                            的结果
+                                        </button>
+                                    </div>
+                                    <div class="col-md-2">
+                                        <select class="form-control"
+                                                id="tool_operate_condition"
+                                                style="margin-top: 15px;margin-bottom: 30px;margin-left: -30px">
+                                            <option id="tool_operate_condition">判断条件
+                                            </option>
+                                            <option id="tool_operate_condition">等于</option>
+                                            <option id="tool_operate_condition">大于或等于
+                                            </option>
+                                            <option id="tool_operate_condition">小于或等于
+                                            </option>
+                                            <option id="tool_operate_condition">不等于</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-md-1">
+                                        <div class="form-group"
+                                             style="margin-top: 15px;margin-left: -35px">
+                                            <input type="text"
+                                                   class="form-control"
+                                                   id="tool_alarm_threshold"
+                                                   placeholder="判断阈值"
+                                                   value="" style="width: 150px">
+                                        </div>
+                                    </div>
+                                    <div class="col-md-1">
+                                        <button class="btn btn-success"
+                                                style="margin-top: 15px;margin-bottom: 30px;pointer-events: none;margin-left: 30px">
+                                            则进行
+                                        </button>
+                                    </div>
+                                    <div class="col-md-2">
+                                        <select class="form-control" id="tool_div_alarm_way"
+                                                style="margin-top: 15px;margin-bottom: 30px;margin-left: 10px">
+                                            <option id="tool_div_alarm_way">无告警方式</option>
+                                            {#                                                                        <option>企业微信告警</option>#}
+                                            {#                                                                        <option>邮件告警</option>#}
+                                            <option id="tool_div_alarm_way">钉钉群告警</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+
+                        <h3 style="margin-top: 30px;margin-bottom: 5px;color: gray">
+                            3、配置运行时间</h3>
+                        <input type="text"
+                               class="form-control"
+                               id="date_time"
+                               placeholder="" style="width: 400px;"
+                               value="{{ now }}">
+
+
+                        <div style="margin-top: 20px">
+
+                            <button class="btn btn-primary"
+                                    id="date_btn" style="background-color: #167be0">
+                                确认创建
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                <h3 style="margin-bottom: 5px;color: gray">
+                    <span class="glyphicon glyphicon-question-sign"></span> Date 调度器参数说明
+                </h3>
+                <div class="alert alert-warning" role="alert">
+                    <p>
+                        run_date (datetime|str) –
+                        作业的运行日期或时间<br>
+                        timezone
+                        (datetime.tzinfo|str) –
+                        指定时区(默认无需指定)
+                    </p>
+                    <p> 任务名称:
+                        以调度器名称为统一前缀,后面可按照任务功能自定义名字。</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+{% endblock %}
+
+{% block js %}
+    <script>
+        $("#date_btn").click(function () {
+            date_name = $("#date_name").val();
+            date_cmd = $("#date_cmd").val();
+            date_run_env = $("#date_run_env").val();
+            //自定义参数
+            //运算条件
+            var date_operate_condition_index = document.getElementById("date_operate_condition").selectedIndex;
+            date_operate_condition = document.getElementById("date_operate_condition").options[date_operate_condition_index].text;
+            //判断阈值
+            date_alarm_threshold = $("#date_alarm_threshold").val();
+            //告警方式
+            var date_div_alarm_way_index = document.getElementById("date_div_alarm_way").selectedIndex;
+            date_div_alarm_way = document.getElementById("date_div_alarm_way").options[date_div_alarm_way_index].text;
+
+            //工具库参数
+            //获取工具
+            var date_index = document.getElementById("selected_date_tools").selectedIndex;
+            date_script = document.getElementById("selected_date_tools").options[date_index].text;
+
+            //获取工具库运算条件
+            var tool_operate_condition_index = document.getElementById("tool_operate_condition").selectedIndex;
+            tool_operate_condition = document.getElementById("tool_operate_condition").options[tool_operate_condition_index].text;
+
+            //获取工具库告警阈值
+            tool_alarm_threshold = $("#tool_alarm_threshold").val();
+
+            //获取工具库告警方式
+            var tool_div_alarm_way_index = document.getElementById("tool_div_alarm_way").selectedIndex;
+            tool_div_alarm_way = document.getElementById("tool_div_alarm_way").options[tool_div_alarm_way_index].text;
+
+            //获取时间
+            date_time = $("#date_time").val();
+
+            if (date_cmd !== "" && date_script !== "请选择需要设置的工具") {
+                alert("两种方式不能同时设置");
+                return false;
+            } else {
+                $.ajax({
+                    url: "{% url 'task_scheduler:task_scheduler-taskdate-job' %}",
+                    type: "POST",
+                    dataType: 'json',
+                    data: {
+                        'date_name': date_name,
+                        'project_id': {{ request.tracer.project.id }},
+                        'date_cmd': date_cmd,
+                        'date_time': date_time,
+                        'date_script': date_script,
+                        'date_operate_condition': date_operate_condition,
+                        'date_alarm_threshold': date_alarm_threshold,
+                        'date_div_alarm_way': date_div_alarm_way,
+                        'tool_operate_condition': tool_operate_condition,
+                        'tool_alarm_threshold': tool_alarm_threshold,
+                        'tool_div_alarm_way': tool_div_alarm_way,
+                        'date_run_env': date_run_env,
+                        'type': "date",
+                        'csrfmiddlewaretoken': '{{ csrf_token }}'
+                    },
+                    success: function (data) {
+                        if (data.status == 200) {
+                            alert(data.msg);
+                            location.href = "{% url 'task_scheduler:task_scheduler-task-list' %}?project_id={{ request.tracer.project.id }}"
+                        } else {
+                            alert(data.msg)
+                        }
+                    }
+                })
+            }
+        })
+    </script>
+{% endblock %}

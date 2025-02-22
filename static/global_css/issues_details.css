@@ -1,0 +1,72 @@
+
+.comment-area .item {
+    margin-top: 20px;
+}
+
+.comment-area .left-avatar {
+    float: left;
+    margin-right: 10px;
+    display: inline-block;
+    width: 30px;
+    height: 30px;
+    background-color: #304659;
+    color: white;
+    text-align: center;
+    line-height: 30px;
+    border-radius: 50%;
+}
+
+.comment-area .right-info {
+    padding-left: 35px;
+}
+
+.comment-area .right-info .desc .msg {
+    display: inline-block;
+    padding-right: 20px;
+    color: #8c8c8c;
+}
+
+.comment-area .child {
+    padding-left: 55px;
+}
+
+.comment-area .error-msg {
+    color: red;
+}
+
+.comment-area .reply-user {
+    display: inline-block;
+    background-color: #ddd;
+    color: black;
+    padding: 6px 8px;
+    margin-left: 20px;
+    border-radius: 8px;
+    cursor: pointer;
+}
+
+.editormd-fullscreen {
+    z-index: 1001;
+}
+
+pre {
+    display: block;
+    padding: 9.5px;
+    margin: 0 0 10px;
+    font-size: 13px;
+    line-height: 1.42857143;
+    color: #333;
+    word-break: break-all;
+    word-wrap: break-word;
+    background-color: #f5f5f5;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+}
+
+.content {
+    height: calc(100vh - 100px);
+    overflow: scroll;
+    border-left: 1px solid #dddddd;
+    border-right: 1px solid #dddddd;
+    margin-left: -1px;
+}
+

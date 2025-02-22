@@ -1,0 +1,113 @@
+{% extends 'base/site-base.html' %}
+{% block css %}
+    <style>
+        .content {
+            height: calc(100vh - 120px);
+            overflow: scroll;
+            margin-left: -1px;
+        }
+    </style>
+{% endblock %}
+
+{% block title %}
+    FastWork - 日志中心
+{% endblock %}
+
+{% block content %}
+    <div class="container-fluid content" style="margin-top: 20px">
+
+        <div class="col-sm-12">
+            <div class="panel-heading">
+                <ol class="breadcrumb">
+                    <li><a href="{% url 'project:list' %}" style="color: #337ab7">项目大厅</a></li>
+                    <li><a href="{% url 'journal:journal-logs_management' %}?project_id={{ request.tracer.project.id }}"
+                           style="color: #337ab7">日志中心</a></li>
+                    <li class="active">分模块日志中心</li>
+                </ol>
+            </div>
+        </div>
+
+        <div class="col-sm-12" style="margin-top: -20px">
+            <div class="col-sm-12">
+                <div class="jumbotron">
+                    <p style="font-size: 25px;">用户登录日志中心</p>
+                    <p style="color: gray">记录了包括用户登录的登录状态、登录时间、用户角色等...</p>
+                    <p><a class="btn btn-primary"
+                          href="{% url 'journal:journal-logs_user_login' %}?project_id={{ request.tracer.project.id }}"
+                          role="button"
+                          style="background-color: #167be0;color: white;border: none">
+                        <span class="glyphicon glyphicon-facetime-video"></span>点击查看
+                    </a></p>
+                </div>
+            </div>
+            <div class="col-sm-12">
+                <div class="jumbotron">
+                    <p style="font-size: 25px">WebSSH日志中心</p>
+                    <p style="color: gray">记录了包括WebSSH登录之后的执行命令、执行结果等...</p>
+                    <p><a class="btn btn-primary"
+                          href="{% url 'journal:journal-logs_webssh' %}?project_id={{ request.tracer.project.id }}"
+                          role="button"
+                          style="background-color: #167be0;color: white;border: none">
+                        <span class="glyphicon glyphicon-facetime-video"></span>点击查看
+                    </a></p>
+                </div>
+            </div>
+            <div class="col-sm-12">
+                <div class="jumbotron">
+                    <p style="font-size: 25px">定时任务日志中心</p>
+                    <p style="color: gray">记录了包括定时任务的执行时间、执行命令、执行状态、执行结果等...</p>
+                    <p><a class="btn btn-primary"
+                          href="{% url 'journal:journal-logs_scheduler' %}?project_id={{ request.tracer.project.id }}"
+                          role="button"
+                          style="background-color: #167be0;color: white;border: none">
+                        <span class="glyphicon glyphicon-facetime-video"></span>点击查看
+                    </a></p>
+                </div>
+            </div>
+            <div class="col-sm-12">
+                <div class="jumbotron">
+                    <p style="font-size: 25px">工具库日志中心</p>
+                    <p style="color: gray">记录了包括定时任务的执行时间、执行状态、执行结果等...</p>
+                    <p><a class="btn btn-primary"
+                          href="{% url 'journal:journal-logs_tools' %}?project_id={{ request.tracer.project.id }}"
+                          role="button"
+                          style="background-color: #167be0;color: white;border: none">
+                        <span class="glyphicon glyphicon-facetime-video"></span>点击查看
+                    </a></p>
+                </div>
+            </div>
+            <div class="col-sm-12">
+                <div class="jumbotron">
+                    <p style="font-size: 25px">文件分发日志中心</p>
+                    <p style="color: gray">记录了包括文件分发的分发时间、分发文件、分发结果等...</p>
+                    <p><a class="btn btn-primary"
+                          href="{% url 'journal:journal-logs_file_send' %}?project_id={{ request.tracer.project.id }}"
+                          role="button"
+                          style="background-color: #167be0;color: white;border: none">
+                        <span class="glyphicon glyphicon-facetime-video"></span>点击查看
+                    </a></p>
+                </div>
+            </div>
+
+            <div class="col-sm-12">
+                <div class="jumbotron">
+                    <p style="font-size: 25px">项目部署日志中心</p>
+                    <p style="color: gray">记录了包括项目部署的工程信息、部署状态、部署结果详情等...</p>
+                    <p><a class="btn btn-primary"
+                          href="{% url 'journal:journal-logs_deploy' %}?project_id={{ request.tracer.project.id }}"
+                          role="button"
+                          style="background-color: #167be0;color: white;border: none">
+                        <span class="glyphicon glyphicon-facetime-video"></span>点击查看
+                    </a></p>
+                </div>
+            </div>
+
+
+        </div>
+
+    </div>
+
+{% endblock %}
+
+
+

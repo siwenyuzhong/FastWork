@@ -1,0 +1,75 @@
+{% extends 'base/5.1_base.html' %}
+{% load static %}
+{% block css %}
+    <link href="{% static 'index-5.1-bootstrap/bootstrap-5.1.css' %}" rel="stylesheet">
+    <link rel="stylesheet" href="{% static 'css/account.css' %}">
+    <style>
+        .error-msg {
+            color: red;
+            position: absolute;
+            font-size: 13px;
+        }
+    </style>
+{% endblock %}
+
+{% block logo %}
+    <small style="font-size: 5px">1.0</small>
+{% endblock %}
+
+{% block content %}
+    <div class="account" style="margin-top: 80px">
+        <div class="title" style="margin-bottom: 20px">成为FastWork用户</div>
+        <form id="regForm" method="post" novalidate id="form">
+            {% csrf_token %}
+            {% for field in form %}
+                <div class="form-group">
+                    <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+                    {{ field }}
+                    <span class="error-msg"></span>
+                </div>
+            {% endfor %}
+            <div class="row">
+                <div class="col-xs-3">
+                    <input id="btnSubmit" type="button" class="btn btn-primary" value="注  册" style="margin-top: 10px">
+                </div>
+            </div>
+        </form>
+    </div>
+{% endblock %}
+
+{% block js %}
+    <script src="{% static 'js/jquery-3.4.1.min.js' %}"></script>
+    <script src="{% static 'plugin/bootstrap/js/bootstrap.min.js' %}"></script>
+    <script>
+        //页面框架加载完成之后会自动执行的函数
+        $(function () {
+            bindClickSubmit();
+        });
+
+        /*点击提交注册*/
+        function bindClickSubmit() {
+            $("#btnSubmit").click(function () {
+                $(".error-msg").empty();
+                //收集表单中数据
+                //数据ajax发送到后台
+                $.ajax({
+                    url: '{% url 'web:register' %}',
+                    type: 'POST',
+                    data: $("#regForm").serialize(),//包含所有字段的数据 + csrf token
+                    dataType: "JSON",
+                    success: function (res) {
+                        if (res.status) {
+                            location.href = res.data;
+                        } else {
+                            $.each(res.error, function (key, value) {
+                                //console.log(key);
+                                //打印报错信息
+                                $("#id_" + key).next().text(value[0]);
+                            })
+                        }
+                    }
+                })
+            })
+        }
+    </script>
+{% endblock %}

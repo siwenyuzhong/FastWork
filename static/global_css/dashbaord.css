@@ -1,0 +1,56 @@
+.table-right > tbody > tr > td.label-left {
+    width: 90px;
+}
+
+.table-right > tbody > tr > td {
+    border: 0;
+}
+
+.status-count {
+    text-align: center;
+    margin-top: 10px;
+    margin-bottom: 30px;
+    font-size: 14px;
+}
+
+.status-count .count {
+    font-size: 25px;
+}
+
+.status-count a {
+    text-decoration: none;
+}
+
+.user-item .title {
+    margin-bottom: 20px;
+}
+
+.user-item .avatar, .top-10 .avatar {
+    float: left;
+    margin-right: 10px;
+    display: inline-block;
+    width: 30px;
+    height: 30px;
+    background-color: #304659;
+    color: white;
+    text-align: center;
+    line-height: 30px;
+    border-radius: 50%;
+}
+
+.user-item .text {
+    line-height: 30px;
+}
+
+.top-10 .avatar {
+    margin-right: 0;
+}
+
+.top-10 td {
+    padding: 5px 10px;
+}
+
+.top-10 .table > tbody > tr > td {
+    border-top: 0;
+    border-bottom: 1px solid #ddd;
+}

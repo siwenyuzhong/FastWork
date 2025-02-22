@@ -1,0 +1,24 @@
+.choose {
+    border-left: 2px solid #f90 !important;
+}
+
+.user-item .title {
+    margin-bottom: 20px;
+}
+
+.user-item .avatar, .top-10 .avatar {
+    float: left;
+    margin-right: 10px;
+    display: inline-block;
+    width: 30px;
+    height: 30px;
+    background-color: #304659;
+    color: white;
+    text-align: center;
+    line-height: 30px;
+    border-radius: 50%;
+}
+
+.user-item .text {
+    line-height: 30px;
+}

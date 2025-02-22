@@ -1,0 +1,94 @@
+{% extends 'base/site-base.html' %}
+
+{% block title %}
+    FastWork - 服务器列表
+{% endblock %}
+{% block content %}
+    <div class="container-fluid" style="margin-top: 20px">
+
+        <div class="col-sm-12">
+            <div class="panel-heading">
+                <ol class="breadcrumb">
+                    <li><a href="{% url 'project:list' %}" style="color: #337ab7">项目大厅</a></li>
+                    <li>
+                        <a href="{% url 'tools_execution:tools-webssh-server' %}?project_id={{ request.tracer.project.id }}"
+                           style="color: #337ab7">WebSSH</a></li>
+                    <li class="active">服务器账户列表</li>
+                </ol>
+            </div>
+        </div>
+
+        <div class="col-sm-12" style="margin-top: -20px">
+            <div class="container-fluid">
+                <div class="panel panel-default">
+                    <div class="panel-body">
+                        <div>
+                            <table class="table table-bordered">
+                                <thead>
+                                <tr>
+                                    <th style="text-align: center"><strong>编号</strong></th>
+                                    <th style="text-align: center"><strong>主机地址</strong></th>
+                                    <th style="text-align: center"><strong>用户名</strong></th>
+                                    <th style="text-align: center"><strong>认证密码</strong></th>
+                                    <th style="text-align: center"><strong>端口</strong></th>
+                                    <th style="text-align: center"><strong>描述</strong></th>
+                                    <th style="text-align: center"><strong>操作</strong></th>
+                                </tr>
+                                </thead>
+                                <tbody style="text-align: center">
+                                {% for foo in accounts_obj %}
+                                    <tr>
+                                        <td style="width: 100px">
+                                            <input type="text" style="border: none;text-align: center" id="id"
+                                                   value="{{ foo.id }}" disabled>
+                                        </td>
+                                        <td style="width: 100px">
+                                            <input type="text" style="border: none;text-align: center" id="address"
+                                                   value="{{ foo.hostname }}" disabled>
+                                        </td>
+                                        <td style="width: 100px">
+                                            <input type="text" style="border: none;text-align: center" id="username"
+                                                   value="{{ foo.username }}" disabled>
+                                        </td>
+                                        <td style="width: 100px">
+                                            <input type="password" style="border: none;text-align: center" id="password"
+                                                   value="{{ foo.password }}" disabled>
+                                        </td>
+                                        <td style="width: 100px">
+                                            <input type="text" style="border: none;text-align: center" id="port"
+                                                   value="{{ foo.port }}" disabled>
+                                        </td>
+                                        <td style="width: 100px">
+                                            <input type="text" style="border: none;text-align: center" id="desc"
+                                                   value="{{ foo.desc }}" disabled>
+                                        </td>
+                                        <td style="width: 100px">
+                                            <a href="{% url 'tools_execution:tools-webssh-page' %}?project_id={{ request.tracer.project.id }}&id={{ foo.id }}"
+                                               class="btn btn-primary btn-sm" target="_blank"
+                                               style="color: white;background-color: rebeccapurple;border: none">
+                                                <span class="glyphicon glyphicon-send" aria-hidden="true"></span>
+                                                远程登录
+                                            </a>
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+
+{% block js %}
+    <script>
+        function jump(id) {
+            //发送账户信息，给后端
+            var url = "{% url 'tools_execution:tools-webssh-page' %}?project_id={{ request.tracer.project.id }}&id={{ foo.id }}";
+            window.open(url, "", "location=no,status=no,scrollvars=no");
+        }
+    </script>
+{% endblock %}

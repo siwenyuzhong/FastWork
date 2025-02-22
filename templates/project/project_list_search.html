@@ -1,0 +1,524 @@
+{% load static %}
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>FastWork - 搜索结果</title>
+    <link rel="shortcut icon" href="{% static 'img/head_logo.png' %}" type="image/x-icon"/>
+    <link rel="stylesheet" href="{% static 'plugin/bootstrap/css/bootstrap.min.css' %}">
+    <link rel="stylesheet" href="/static/aliyun/css/global.css">
+    <link rel="stylesheet" href="/static/aliyun/css/common-header9.css">
+    <link rel="stylesheet" href="{% static 'plugin/font-awesome/css/font-awesome.min.css' %}">
+    <link rel="stylesheet" href="{% static 'global_css/project_*.css' %}">
+    <style>
+        .panel-body > .item {
+            width: 228px;
+        }
+
+        .fileCard {
+            width: 285px;
+            border-radius: 6px;
+            border: 1px solid #dddddd;
+            margin: 20px 10px;
+            text-align: center;
+        }
+
+        .divCenter {
+            position: absolute;
+            left: 20%;
+            top: 80%;
+            margin: -50px 0 0 -50px;
+        }
+
+        .email_reg_control {
+            height: 50px;
+            margin: 0;
+            outline: none;
+            font-size: 16px;
+            vertical-align: top;
+            -webkit-appearance: textfield;
+            -moz-appearance: textfield;
+            border: 1px solid #d3d3d3;
+            border-radius: 3px;
+            background: #fff;
+            width: 330px;
+            padding: 5px 20px;
+            transition: all 0.2s ease;
+        }
+
+        .email_reg_control:focus {
+            border: 1px solid #48a6f7;
+            box-shadow: 0 0 5px #48a6f7;
+            outline: none;
+        }
+
+        .email_reg_control.has-error {
+            box-shadow: 0 0 10px #ec154d;
+        }
+
+        .email_reg_control:-ms-input-placeholder {
+            color: #999;
+        }
+
+        .email_reg_control::-ms-input-placeholder {
+            color: #999;
+        }
+
+        .pink_button_landing {
+            display: inline-block;
+            height: 50px;
+            line-height: 50px;
+            padding: 0 20px;
+            font-size: 16px;
+            font-weight: 500;
+            border: none;
+            background: #167be0;
+            color: #fff;
+            border-radius: 3px;
+            transition: all 0.2s ease-in-out;
+        }
+
+        .pink_button_landing.button_long {
+            padding: 0 35px;
+        }
+
+        .pink_button_landing:hover, .pink_button_landing:focus {
+            color: #fff;
+            outline: none;
+            text-decoration: none;
+            background: #167be0;
+        }
+
+        .pink_button_landing:active {
+            background: #167be0;
+        }
+    </style>
+</head>
+<body>
+<div data-spm="2">
+    <div class="ali-common-header">
+        <div class="ali-common-header-inner common-header-clearfix">
+            <!-- 运营专区 -->
+            <div class="activity item pull-left" style="margin-right: 50px">
+                <ul class="menu item pull-left" id="J_common_header_menu" data-spm="201">
+                    <li class="" has-dropdown="true" menu-type="product" data-spm-click="">
+          <span class="menu-hd" style="margin-left: -50px;font-size: 20px">
+            <strong style="margin-left: -50px"><a href="{% url 'project:list' %}"
+                                                  style="color: white;text-decoration: none">FastWork</a></strong>
+          </span>
+                    </li>
+                </ul>
+            </div>
+            <!-- 导航菜单 -->
+            <ul class="menu item pull-left" id="J_common_header_menu" data-spm="201">
+
+                <li class="top-menu-item" style="margin-left: 80px;float: right">
+                    <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true"
+                       aria-expanded="false">
+                        <strong style="color: white;float: right;font-size: 15px;margin-right: -100px">
+                            <span style="color: white;font-size: 10px" class="glyphicon glyphicon-user"
+                                  aria-hidden="true"></span>
+                            <small>{{ request.tracer.user.username }}</small>
+                        </strong></a>
+                    <ul class="dropdown-menu">
+
+                        <li>
+                            <a href="">
+                                <i class="fa fa-bullhorn"></i> 未读消息 <span
+                                    class="label label-danger">{{ request.tracer.count }}</span>
+                            </a>
+                        </li>
+                        <li role="separator" class="divider"></li>
+
+
+                        {% for foo in request.tracer.sitemap %}
+                            {% if request.tracer.user.is_superuser == 1 %}
+                                <li>
+                                    <a href="{% url foo.link %}">
+                                        <i class="{{ foo.logo }}"></i> {{ foo.name }}
+                                    </a>
+                                </li>
+                                <li role="separator" class="divider"></li>
+                            {% else %}
+                                {% if foo.visible %}
+                                    <li>
+                                        <a href="{% url foo.link %}">
+                                            <i class="{{ foo.logo }}"></i> {{ foo.name }}
+                                        </a>
+                                    <li role="separator" class="divider"></li>
+                                {% endif %}
+                            {% endif %}
+                        {% endfor %}
+
+
+                        <li><a href="{% url 'user:logout' %}"><i class="fa fa-sign-out"></i> 注销登录</a></li>
+                    </ul>
+                </li>
+            </ul>
+        </div>
+    </div>
+</div>
+
+
+<div style="height:calc(100vh - 100px);overflow: scroll">
+    <div class="container-fluid project">
+        <div class="row" style="margin-top: 100px;margin-bottom: 100px">
+            <div class="col-lg-3"></div>
+            <div class="col-lg-6">
+                <form method="get" action="{% url 'project:search' %}">
+                    <div class="input-group divCenter">
+                        <input type="text" class="email_reg_control autofocus" style="width: 450px;margin-top: 40px"
+                               name="q"
+                               placeholder="全局搜索项目文档、脚本工具、文件等"/>
+                        <input type="submit" class="pink_button_landing button_long" value="全局搜索"
+                               style="margin-top: 40px;background-color: #2563fc">
+                    </div>
+                </form>
+            </div>
+            <div class="col-lg-3"></div>
+        </div>
+
+        <div style="margin: 10px 0;margin-top: 20px">
+            <a class="btn btn-default" href="{% url 'project:list' %}" style="color: black">
+                <i class="fa fa-backward" aria-hidden="true"></i> 返回
+            </a>
+        </div>
+
+
+        {% if q %}
+            <div class="panel panel-default">
+                <div class="panel-heading"><i class="fa fa-cog" aria-hidden="true"></i> 工具库</div>
+                <div class="panel-body" style="margin-left: 25px">
+
+                    {% if results.scripts_obj %}
+                        {#工具#}
+                        {% for item in results.scripts_obj %}
+                            <div>
+                                <div class="panel-body">
+                                    <div class="item" style="margin-left: 30px">
+
+                                        <div style="height: 30px;text-align: center;padding: 10px 10px;color: #8c8c8c;background-color: #f5f5f5;overflow: scroll">
+                                            <span title="{{ item.title }}">{{ item.title }}</span>
+                                        </div>
+
+                                        <a href="{% url 'script:scripts-detail' %}?project_id={{ item.project_id }}&script_id={{ item.id }}"
+                                           class="title" target="_blank">
+                                            <img src="{{ item.showImage }}" alt="">
+                                        </a>
+
+                                        <hr>
+
+                                        <div style="height: 30px;padding: 10px 10px;color: #8c8c8c;overflow: scroll">
+                                            {% if item.desc %}
+                                                <span title="{{ item.desc }}"><small>说明：{{ item.desc }}</small></span>
+                                            {% else %}
+                                                <span title="{{ item.desc }}"><small>说明：暂无说明</small></span>
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        {% endfor %}
+                    {% else %}
+                        未查询到搜索条件为 <span class="error-msg">【{{ q }}】</span> 的脚本工具
+                    {% endif %}
+
+                </div>
+            </div>
+
+            <div class="panel panel-default">
+                <div class="panel-heading"><i class="fa fa-wikipedia-w" aria-hidden="true"></i> 知识库</div>
+                {% if results.wikis_obj %}
+                    <div class="panel-body" style="margin-left: 25px;margin-top: 10px;margin-bottom: 10px">
+                        {#文档#}
+                        {% for result in results.wikis_obj %}
+                            <a class="btn btn-default" style="margin: 10px;color: black"
+                               href="{% url 'wiki:wiki-list' %}?project_id={{ result.project_id }}&wiki_id={{ result.id }}"
+                               target="_blank">
+                                {{ result.title }} <span class="badge" style="background-color: red">知识库</span>
+                            </a>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    <div class="panel-body" style="margin-left: 25px">
+                        未查询到搜索条件为 <span class="error-msg">【{{ q }}】</span> 的知识文档
+                    </div>
+                {% endif %}
+            </div>
+
+            <div class="panel panel-default">
+                <div class="panel-heading"><i class="fa fa-bank" aria-hidden="true"></i> 文件仓库</div>
+                <div class="panel-body" style="margin-left: 25px">
+                    {% if results.files_obj %}
+                        {#文件#}
+                        {% for item in results.files_obj %}
+                            <div class="fileCard" style="transform: scale(0.9)">
+                                            <span class="form-control"
+                                                  style="text-align: center;border: none;background-color: #f5f5f5;font-size: 13px"
+                                                  title="{{ item.name }}">{{ item.name|truncatechars:14 }}...</span>
+                                <a class="title" style="text-align: center;margin-top: 3px">
+                                    {% if item.suffix == '.docx' or item.suffix == '.doc' %}
+                                        <img src="{% static 'file_respostory/docs.ico' %}"
+                                             title="{{ item.name }}"
+                                             style="width: 100px;margin-bottom: 10px">
+                                    {% elif item.suffix == '.xlsx' or item.suffix == '.xls' or item.suffix == '.csv' %}
+                                        <img src="{% static 'file_respostory/excel.ico' %}"
+                                             title="{{ item.name }}"
+                                             style="width: 100px;margin-bottom: 10px">
+                                    {% elif item.suffix == '.pptx' or item.suffix == '.ppt' %}
+                                        <img src="{% static 'file_respostory/ppt.ico' %}"
+                                             title="{{ item.name }}"
+                                             style="width: 100px;margin-bottom: 10px">
+                                    {% elif item.suffix == '.jpeg' or item.suffix == '.jpg' %}
+                                        <img src="{% static 'file_respostory/jpg.ico' %}"
+                                             title="{{ item.name }}"
+                                             style="width: 90px;margin-bottom: 10px">
+                                    {% elif item.suffix == '.gz' %}
+                                        <img src="{% static 'file_respostory/gz.ico' %}"
+                                             title="{{ item.name }}"
+                                             style="width: 100px;margin-bottom: 10px">
+                                    {% elif item.suffix == '.json' %}
+                                        <img src="{% static 'file_respostory/json.png' %}"
+                                             title="{{ item.name }}"
+                                             style="width: 100px;margin-bottom: 10px">
+                                    {% elif item.suffix == '.zip' %}
+                                        <img src="{% static 'file_respostory/zip.ico' %}"
+                                             title="{{ item.name }}"
+                                             style="width: 100px;margin-bottom: 10px">
+                                    {% elif item.suffix == '.rar' %}
+                                        <img src="{% static 'file_respostory/rar.ico' %}"
+                                             title="{{ item.name }}"
+                                             style="width: 100px;margin-bottom: 10px">
+                                    {% elif item.suffix == '.pdf' %}
+                                        <img src="{% static 'file_respostory/pdf.ico' %}"
+                                             title="{{ item.name }}"
+                                             style="width: 100px;margin-bottom: 10px">
+                                    {% elif item.suffix == '.png' %}
+                                        <img src="{% static 'file_respostory/png.ico' %}"
+                                             title="{{ item.name }}"
+                                             style="width: 100px;margin-bottom: 10px">
+                                    {% elif item.suffix == '.txt' %}
+                                        <img src="{% static 'file_respostory/txt.ico' %}"
+                                             title="{{ item.name }}"
+                                             style="width: 100px;margin-bottom: 10px">
+                                    {% else %}
+                                        <img src="{% static 'file_respostory/other.ico' %}"
+                                             title="{{ item.name }}"
+                                             style="width: 100px;margin-bottom: 10px">
+                                    {% endif %}
+
+
+                                </a>
+
+                                <input id="btn_value" type="text" value="{{ item.id }}" hidden>
+
+                                <hr style="margin-top: -5px;margin-bottom: -3px">
+
+                                <div class="info" style="margin-top:10px;margin-bottom:5px">
+                                    <div style="margin: 0 auto">
+                                        <span>
+                                            <a href="{% url 'file_depository:file_depository-files-download' %}?project_id={{ item.project_id }}&file_id={{ item.id }}"
+                                               class="btn btn-default btn-sm" style="color: #333">
+                                                    <span class="glyphicon glyphicon-download"
+                                                          aria-hidden="true"></span>
+                                                    下载</a>
+                                        </span>
+
+                                        <span>
+                                                    <a class="btn btn-default btn-sm" data-toggle="modal"
+                                                       data-target="#inviteModal"
+                                                       onclick="get_code({{ item.project_id }},{{ item.id }})">
+                                                    <span class="glyphicon glyphicon-share" aria-hidden="true"></span>
+                                                    分享</a>
+                                        </span>
+
+                                        {% if item.suffix == ".txt" %}
+                                            <span>
+                                                    <a class="btn btn-default btn-sm" data-toggle="modal"
+                                                       data-target="#myModal"
+                                                       onclick="preRead({{ item.project.id }},{{ item.id }},'{{ item.suffix }}')">
+                                                    <span class="glyphicon glyphicon-eye-open"
+                                                          aria-hidden="true"></span>
+                                                    预览</a>
+                                                </span>
+                                        {% elif item.suffix == ".png" or item.suffix == ".jpg" or item.suffix == ".jpeg" %}
+                                            <span>
+                                                    <a class="btn btn-default btn-sm"
+                                                       onclick="preRead({{ item.project.id }},{{ item.id }},'{{ item.suffix }}')">
+                                                    <span class="glyphicon glyphicon-eye-open"
+                                                          aria-hidden="true"></span>
+                                                    预览</a>
+                                                </span>
+                                        {% else %}
+                                            <span>
+                                                    <a class="btn btn-default btn-sm" disabled=""
+                                                       title="该文件不支持预览，请下载后查看！">
+                                                    <span class="glyphicon glyphicon-eye-open"
+                                                          aria-hidden="true"></span>
+                                                    预览</a>
+                                                </span>
+                                        {% endif %}
+
+                                        <span>
+                                                    <a class="btn btn-default btn-sm"
+                                                       style="color: #333" disabled="">
+                                                    <span class="glyphicon glyphicon-trash"
+                                                          aria-hidden="true"></span>
+                                                    删除</a>
+                                                </span>
+                                    </div>
+                                </div>
+                            </div>
+                        {% endfor %}
+                    {% else %}
+                        未查询到搜索条件为 <span class="error-msg">【{{ q }}】</span> 的文件资料
+                    {% endif %}
+                </div>
+            </div>
+
+        {% else %}
+            <div class="panel panel-default">
+                <div class="panel-heading"><i class="fa fa-cog" aria-hidden="true"></i> 工具库</div>
+                <div class="panel-body" style="margin-left: 25px">
+                    <span class="error-msg">{{ err_msg }} 【工具名称】</span>
+                </div>
+            </div>
+            <div class="panel panel-default">
+                <div class="panel-heading"><i class="fa fa-wikipedia-w" aria-hidden="true"></i> 知识库</div>
+                <div class="panel-body" style="margin-left: 25px">
+                    <span class="error-msg">{{ err_msg }} 【知识名称】</span>
+                </div>
+            </div>
+            <div class="panel panel-default">
+                <div class="panel-heading"><i class="fa fa-bank" aria-hidden="true"></i> 文件仓库</div>
+                <div class="panel-body" style="margin-left: 25px">
+                    <span class="error-msg">{{ err_msg }} 【文件名称】</span>
+                </div>
+            </div>
+        {% endif %}
+
+
+    </div>
+</div>
+
+<!-- 预览 -->
+<div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+    <div class="modal-dialog" role="document" style="width: 850px;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="myModalLabel">预览页面</h4>
+            </div>
+            <div class="modal-body">
+                <div id="preRead" style="width: 800px;height: 500px;overflow: scroll">
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade in" id="inviteModal" role="dialog">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
+                        aria-hidden="true">&times;</span></button>
+                <h5 class="modal-title" id="myModalLabel">文件分享页面</h5>
+            </div>
+            <div class="modal-body" style="padding-right: 40px;">
+                <div id="inviteArea">
+                    <div class="form-group">
+                        <div class="input-group">
+                            <div class="input-group-btn">
+                                <input type="button" value="分享链接" class="btn btn-default">
+                            </div>
+                            <input type="text" class="form-control" id="inviteUrl"
+                                   value="http://127.0.0.1:8000/web/invite/join/file/depository/f370c950dd3a67b2eee95b56ff57515a/">
+                            <div class="input-group-btn">
+                                <input type="button" value="复制链接" class="btn btn-primary" id="btnCopyUrl"
+                                       style="background-color: #167be0">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<script type="text/javascript" src="/static/aliyun/js/base-all.js"></script>
+<script type="text/javascript" src="/static/aliyun/js/common-header.js"></script>
+<script src="{% static 'js/jquery-3.4.1.min.js' %}"></script>
+<script src="{% static 'plugin/bootstrap/js/bootstrap.min.js' %}"></script>
+<script>
+
+    $(function () {
+        bindCopyUrl();
+    });
+
+    function get_code(project_id, file_id) {
+        $.ajax({
+            {#url: "/web/manage/" + project_id + "/files/depository/" + value + "/invite/url/",#}
+            url: "{% url 'file_depository:file_depository-files-invite-url' %}?project_id=" + project_id + "&file_id=" + file_id,
+            type: "GET",
+            success: function (res) {
+                if (res.status) {
+                    $('#inviteArea').removeClass('hide').find('#inviteUrl').val(res.data);
+                } else {
+                    $.each(res.error, function (k, v) {
+                        $('#id_' + k).next('.error-msg').text(v[0]);
+                    })
+                }
+            }
+        })
+    }
+
+    /*
+       点击拷贝邀请码
+       */
+    function bindCopyUrl() {
+        $('#btnCopyUrl').click(function () {
+            var textInput = $('#inviteUrl')[0]; // document.getElementById('inviteUrl')
+            textInput.select();
+
+            document.execCommand("Copy");
+            alert('复制成功');
+        })
+    }
+</script>
+<script>
+    function preRead(pid, fid, suffix) {
+        $.ajax({
+            url: "{% url 'file_depository:file_depository-files-details' %}",
+            type: "POST",
+            dataType: "json",
+            data: {
+                "suffix": suffix,
+                "file_id": fid,
+                "project_id": pid,
+                'csrfmiddlewaretoken': '{{ csrf_token }}'
+            },
+            success: function (data) {
+                var wObj = document.getElementById("preRead")
+
+                console.log(data.type);
+                if (data.type === ".txt") {
+                    var content = JSON.parse(data.name)
+                    var dh = ''
+                    for (j = 0, len = content.length; j < len; j++) {
+                        dh += content[j] + "<br>"
+                    }
+                    wObj.innerHTML = dh
+                    return false
+                } else if (data.type === ".img") {
+                    window.open(data.name)
+                    return false
+                } else {
+                    return false
+                }
+            }
+        })
+    }
+</script>
+</body>
+</html>

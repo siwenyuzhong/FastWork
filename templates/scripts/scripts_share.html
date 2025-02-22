@@ -1,0 +1,198 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>FastWork - 工具分享- {{ comment.title }}.{{ comment.suffix }}</title>
+    <link rel="shortcut icon" href="{% static 'img/head_logo.png' %}" type="image/x-icon"/>
+    <link rel="stylesheet" href="{% static 'plugin/bootstrap/css/bootstrap.min.css' %}">
+    <link rel="stylesheet" href="{% static 'plugin/font-awesome/css/font-awesome.min.css' %}">
+    <link rel="stylesheet" href="{% static 'css/manage.css' %}">
+    <link rel="stylesheet" href="/static/codemirror_latest/lib/codemirror.css">
+    <link rel="stylesheet" href="/static/codemirror_latest/theme/monokai.css">
+    <link rel="stylesheet" href="/static/codemirror_latest/theme/darcula.css">
+
+    <style>
+        .CodeMirror {
+            border: 1px solid black;
+            font-size: 14px
+        }
+
+        .panel-default {
+            margin-top: 10px;
+        }
+
+        .panel-default .panel-heading {
+            display: flex;
+            flex-direction: row;
+            justify-content: space-between;
+        }
+
+        .panel-body {
+            padding: 0;
+        }
+
+        .title-list ul {
+            padding-left: 15px;
+        }
+
+        .title-list ul a {
+            display: block;
+            padding: 5px 0;
+        }
+
+        .content {
+            height: calc(100vh - 20px);
+            overflow: scroll;
+        {#background-color: #272822;#} border-left: 1px solid #dddddd;
+        {#    min-height: 650px;#} min-height: 650px;
+            margin-left: -1px;
+        }
+
+        .content2 {
+            height: 800px;
+            overflow: scroll;
+        }
+
+    </style>
+</head>
+<body>
+<div class="container-fluid content">
+    <div class="panel panel-default">
+        <div class="panel-heading">
+            <div>
+                <i class="fa fa-share" aria-hidden="true"></i>【 {{ comment.title }} 】工具分享
+                <div class="container-fluid">
+                    <div class="accordion" id="accordion2">
+                        <div class="accordion-group">
+                            <div id="collapseOne" class="accordion-body collapse" style="height: 0px; ">
+                                <div class="accordion-inner">
+                                    <table>
+                                        <tbody>
+                                        <textarea id="inxxxxxxxx" style="margin-top: -100px;opacity: 0"
+                                                  readonly>{{ comment.content }}</textarea>
+                                        <tr>
+                                            <td style="font-size: 16px">工具名称：</td>
+                                            <td><strong>{{ comment.title }}</strong></td>
+                                        </tr>
+                                        <tr>
+                                            <td style="font-size: 16px">功能描述：</td>
+                                            {% if comment.desc %}
+                                                <td><strong>{{ comment.desc }}</strong></td>
+                                            {% else %}
+                                                <td><strong>暂无说明</strong></td>
+                                            {% endif %}
+                                        </tr>
+                                        </tbody>
+                                    </table>
+                                    <div class="layui-btn-container" style="margin-top: 10px">
+
+                                        <a href="{% url 'script:scripts-invite-join-download' %}?code={{ code }}"
+                                           class="btn btn-success btn-sm"><span
+                                                class="glyphicon glyphicon-save"
+                                                aria-hidden="true"></span> 下载</a>
+
+                                        <a id="copyBtn" type="button" onclick="copyText()"
+                                           class="btn btn-info btn-sm"><span
+                                                class="glyphicon glyphicon-ok"
+                                                aria-hidden="true"></span> 复制</a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div>
+                <i class="fa" aria-hidden="true" style="float: right">
+                    <a class="btn btn-default btn-sm" data-parent="#accordion2" data-toggle="collapse"
+                       data-parent="#accordion2"
+                       href="#collapseOne"><span class="glyphicon glyphicon-eye-open"
+                                                 aria-hidden="true"></span>&nbsp;{{ comment.title }}</a>
+                </i>
+            </div>
+        </div>
+        <div class="panel-body">
+            <div class="col-sm-12 content2">
+                <div>
+                    <article>
+                        {% if comment.suffix == ".py" %}
+                            <form>
+                                <textarea id="code" name="code">{{ comment.content }}</textarea>
+                            </form>
+                        {% else %}
+                            <form>
+                                <textarea id="shellcode" name="shellcode">{{ comment.content }}</textarea>
+                            </form>
+                        {% endif %}
+                    </article>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script src="{% static 'js/jquery-3.4.1.min.js' %}"></script>
+<script src="{% static 'plugin/bootstrap/js/bootstrap.min.js' %}"></script>
+<script src="/static/codemirror_latest/lib/codemirror.js"></script>
+<script src="/static/codemirror_latest/mode/javascript/javascript.js"></script>
+<script src="/static/codemirror_latest/mode/shell/shell.js"></script>
+<script src="/static/codemirror_latest/mode/python/python.js"></script>
+<script src="/static/codemirror_latest/addon/selection/active-line.js"></script>
+<script src="/static/codemirror_latest/addon/edit/matchbrackets.js"></script>
+
+
+<script>
+    {#document.onreadystatechange = function () {#}
+    {#    if (document.readyState == 'complete') {#}
+    {#        initLanguage("python")#}
+    {#    }#}
+    var editor = CodeMirror.fromTextArea(document.getElementById("code"), {
+        lineNumbers: true,
+        readOnly: "nocursor",
+        mode: "python",
+        theme: 'monokai',
+        {#readOnly: true,#}
+        {#styleActiveLine: true,#}
+        {#matchBrackets: true,#}
+        {#smartIndent: true,#}
+        {#indentUnit: 4,#}
+        {#abSize: 4,#}
+    });
+    //595px
+    editor.setSize('auto', 'auto');
+
+</script>
+
+<script>
+    function copyText() {
+        var input = document.getElementById("inxxxxxxxx");
+        console.log(input)
+        input.select(); // 选中文本
+        document.execCommand("copy"); // 执行浏览器复制命令
+        alert("复制成功");
+    }
+</script>
+
+<script>
+    {#document.onreadystatechange = function () {#}
+    {#    if (document.readyState == 'complete') {#}
+    {#        initLanguage("python")#}
+    {#    }#}
+    var shell_editor = CodeMirror.fromTextArea(document.getElementById("shellcode"), {
+        lineNumbers: true,
+        readOnly: "nocursor",
+        mode: "python",
+        theme: 'monokai',
+        {#readOnly: true,#}
+        {#styleActiveLine: true,#}
+        {#matchBrackets: true,#}
+        {#smartIndent: true,#}
+        {#indentUnit: 4,#}
+        {#abSize: 4,#}
+    });
+    shell_editor.setSize('auto', 'auto');
+
+</script>
+
+</body>
+</html>

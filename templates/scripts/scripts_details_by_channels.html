@@ -1,0 +1,493 @@
+{% extends 'base/site-base.html' %}
+{% load static %}
+{% block css %}
+    <link rel="stylesheet" href="/static/codemirror_latest/lib/codemirror.css">
+    <link rel="stylesheet" href="/static/codemirror_latest/theme/monokai.css">
+    <link rel="stylesheet" href="/static/global_css/script_details.css">
+{% endblock %}
+
+{% block title %}
+    FastWork - {{ comment }}.{{ comment.suffix }}
+{% endblock %}
+
+{% block content %}
+    <div class="container-fluid content" style="margin-top: 20px">
+        <div class="panel panel-default">
+            <div class="panel-heading">
+                <div>
+                    <i class="fa fa-book" aria-hidden="true"></i> 工具详情
+                    <div class="container-fluid">
+                        <div class="accordion" id="accordion2">
+                            <div class="accordion-group">
+                                <div id="collapseOne" class="accordion-body collapse" style="height: 0px; ">
+                                    <div class="accordion-inner">
+                                        <table>
+                                            <tbody>
+                                            <textarea id="inxxxxxxxx" style="margin-top: -100px;opacity: 0"
+                                                      readonly>{{ comment.content }}</textarea>
+                                            <tr>
+                                                <td style="font-size: 16px">工具名称：</td>
+                                                <td><strong>{{ comment.title }}</strong></td>
+                                            </tr>
+                                            <tr>
+                                                <td style="font-size: 16px">功能描述：</td>
+                                                {% if comment.desc %}
+                                                    <td style="width: 950px;height:10px;overflow: scroll">
+                                                        <strong>{{ comment.desc }}</strong></td>
+                                                {% else %}
+                                                    <td><strong>暂无说明</strong></td>
+                                                {% endif %}
+                                            </tr>
+                                            <tr>
+                                                <td style="font-size: 16px">工具作者：</td>
+                                                <td><strong>{{ request.tracer.user.username }}</strong></td>
+                                            </tr>
+                                            <tr>
+                                                <td style="font-size: 16px">创建时间：</td>
+                                                <td><strong>{{ comment.datetime }}</strong></td>
+                                            </tr>
+                                            </tbody>
+                                        </table>
+
+
+                                        <div class="layui-btn-container" style="margin-top: 10px">
+                                            <a href="{% url 'script:scripts-all' %}?project_id={{ request.tracer.project.id }}"
+                                               class="btn btn-default btn-sm"
+                                               style="color:#333;"><span
+                                                    class="glyphicon glyphicon-backward"
+                                                    aria-hidden="true"></span> 返回</a>
+
+                                            <a href="{% url 'script:scripts-edit' %}?project_id={{ request.tracer.project.id }}&script_id={{ comment.id }}"
+                                               class="btn btn-default btn-sm" style="color:#333;"><span
+                                                    class="glyphicon glyphicon-pencil"
+                                                    aria-hidden="true"></span> 编辑</a>
+
+                                            <a href="{% url 'script:scripts-download' %}?project_id={{ request.tracer.project.id }}&script_id={{ comment.id }}"
+                                               class="btn btn-default btn-sm" style="color: #333"><span
+                                                    class="glyphicon glyphicon-save"
+                                                    aria-hidden="true"></span> 下载</a>
+
+                                            <a id="copyBtn" type="button" onclick="copyText()"
+                                               class="btn btn-default btn-sm" style="color: #333"><span
+                                                    class="glyphicon glyphicon-ok"
+                                                    aria-hidden="true"></span> 复制</a>
+
+                                            <a class="btn btn-default btn-sm" data-toggle="modal"
+                                               data-target="#inviteModal" style="color: #333">
+                                                        <span class="glyphicon glyphicon-share"
+                                                              aria-hidden="true"></span>
+                                                分享</a>
+
+                                            <a href="javascript:;" class="btn btn-default btn-sm mybtn"
+                                               data-toggle="modal"
+                                               data-target="#myModal" style="color: #333"><span
+                                                    class="glyphicon glyphicon-send"></span> 执行</a>
+
+
+                                            <a onclick="get_files_infos({{ comment.id }})"
+                                               class="btn btn-default btn-sm"
+                                               data-toggle="modal"
+                                               data-target="#GroupModel"
+                                               aria-hidden="true">
+                                                <span class="glyphicon glyphicon-edit"></span> 修改</a>
+
+                                            <a href="{% url 'script:scripts-delete' %}?project_id={{ request.tracer.project.id }}&script_id={{ comment.id }}"
+                                               class="btn btn-default btn-sm" style="color: #333"><span
+                                                    class="glyphicon glyphicon-trash"
+                                                    aria-hidden="true"></span> 删除</a>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div>
+                    <i class="fa" aria-hidden="true" style="float: right">
+                        <a class="btn btn-default btn-sm" data-parent="#accordion2" data-toggle="collapse"
+                           data-parent="#accordion2" style="color: black" title="点击展开操作"
+                           href="#collapseOne"><span class="glyphicon glyphicon-eye-open"
+                                                     aria-hidden="true"></span>&nbsp;{{ comment.title }}</a>
+                    </i>
+                </div>
+            </div>
+            <div class="panel-body">
+                <div class="col-sm-12 content">
+                    <div>
+                        <article>
+                            {% if comment.suffix == ".py" %}
+                                <form>
+                                    <textarea id="code" name="code">{{ comment.content }}</textarea>
+                                </form>
+                            {% elif comment.suffix == ".sh" %}
+                                <form>
+                                    <textarea id="shellcode" name="shellcode">{{ comment.content }}</textarea>
+                                </form>
+                            {% else %}
+                                <form>
+                                    <textarea id="javacode" name="javacode">{{ comment.content }}</textarea>
+                                </form>
+                            {% endif %}
+                        </article>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade in" id="inviteModal" role="dialog">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
+                            aria-hidden="true">&times;</span></button>
+                    <h5 class="modal-title" id="myModalLabel">【{{ comment.title }}】 工具分享页面</h5>
+                </div>
+                <div class="modal-body" style="padding-right: 40px;">
+                    <form id="inviteForm">
+                        {% csrf_token %}
+                        <button type="button" class="btn btn-primary" id="btnGenInviteCode"
+                                style="background-color: #167be0">生成工具分享链接
+                        </button>
+                    </form>
+                    <div id="inviteArea" class="hide">
+                        <hr/>
+                        <div class="form-group">
+                            <div class="input-group" style="margin-top: 20px">
+                                <div class="input-group-btn">
+                                    <input type="button" value="分享链接" class="btn btn-default">
+                                </div>
+                                <input type="text" class="form-control" id="inviteUrl">
+                                <div class="input-group-btn">
+                                    <input type="button" value="复制链接" class="btn btn-primary" id="btnCopyUrl"
+                                           style="background-color: #167be0">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 工具执行弹出层 modal -->
+    <div class="modal right fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel"
+         aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                    <h4 class="modal-title" id="myModalLabel">1、正在操作工具：{{ comment.title }}</h4>
+                </div>
+                <div class="modal-body">
+                    <h3 style="color: rgba(0,0,0,0.65);margin-bottom: 5px">Linux执行用户</h3>
+                    <input type="text" class="form-control" value="root" disabled>
+                    <p style="margin-top: 20px"></p>
+
+                    <h3 style="color: rgba(0,0,0,0.65);margin-bottom: 5px">执行目标</h3>
+                    <select class=" form-control" id="selectpicker2">
+                        <option>请选择执行机器</option>
+                        <option>本机执行 - FastWork服务器</option>
+                        {% for acc in accounts_obj %}
+                            <option value="{{ acc.hostname }}">{{ acc.hostname }}
+                                - {{ acc.desc }}</option>
+                        {% endfor %}
+                    </select>
+                    <p style="margin-top: 20px"></p>
+                    <h3 style="color: rgba(0,0,0,0.65);margin-bottom: 5px">执行环境</h3>
+
+                    {% if comment.suffix == "py" %}
+                        <select class=" form-control" id="select_env">
+                            <option>请选择执行环境</option>
+                            <option value="python3">Python3+</option>
+                            <option value="python2">Python2+</option>
+                        </select>
+                    {% else %}
+                        <select class=" form-control" id="select_env" disabled>
+                            <option value="bash">Bash</option>
+                        </select>
+                    {% endif %}
+
+                    <!--点击右侧弹出-->
+                    {#                    <a href="javascript:;" class="btn btn-primary" data-toggle="modal" id="backup_all"#}
+                    {#                       data-target="#myModal2" style="color: white">立即执行</a>#}
+
+                    <input type="button" class="btn btn-primary" id="backup_all"
+                           style="margin-top: 20px;background-color: #167be0"
+                           value="立即执行" data-loading-text="执行中">
+
+                    <hr style="margin-top: 20px;margin-bottom: 20px">
+                    <h4 class="modal-title">2、工具执行结果，将会在此处打印</h4>
+                    <div id="messagecontainer"
+                         style="margin-top:10px;height: 500px;background-color: #333;overflow: scroll;width: 580px;margin-left: -3px;color: whitesmoke">
+                        <h5 style="margin-left: 8px;margin-top: 5px;color: whitesmoke;">工具:【{{ comment.title }}】执行结果，将会在此处打印。</h5>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+    {#    修改分组#}
+    <div class="modal fade" id="GroupModel" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
+                            aria-hidden="true">&times;</span></button>
+                    <h2 class="modal-title" id="myModalLabel">工具信息修改</h2>
+                </div>
+                <div class="modal-body">
+                    <form id="editForm">
+                        <div>
+                            <div class="form-group">
+                                <input type="text" hidden value="" id="file_id">
+                                <h3 style="margin-bottom: 5px">工具名称:</h3>
+                                <input type="text" class="form-control" id="file_name" style="margin-top: 3px"
+                                       value="" disabled>
+                                <p style="margin-top: 10px"></p>
+                                <h3 style="margin-bottom: 5px">工具分组:</h3>
+                                <select class="form-control" id="selected_tools_wiki" style="margin-top: 3px">
+                                    {% for foo in categroy_count %}
+                                        {% if foo.category.name == "默认" %}
+                                            <option disabled>{{ foo.category.name }}</option>
+                                        {% else %}
+                                            <option>{{ foo.category.name }}</option>
+                                        {% endif %}
+                                    {% endfor %}
+                                </select>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">取 消</button>
+                    <button id="btnSubmitEdit" type="button" class="btn btn-primary" style="background-color: #167be0">修
+                        改
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+{% endblock %}
+
+{% block js %}
+
+{#    <script src="{% static 'js/jquery-3.4.1.min.js' %}"></script>#}
+{#    <script src="{% static 'plugin/bootstrap/js/bootstrap.min.js' %}"></script>#}
+    <script src="/static/codemirror_latest/lib/codemirror.js"></script>
+    <script src="/static/codemirror_latest/mode/javascript/javascript.js"></script>
+    <script src="/static/codemirror_latest/mode/shell/shell.js"></script>
+    <script src="/static/codemirror_latest/mode/python/python.js"></script>
+    <script src="/static/codemirror_latest/addon/selection/active-line.js"></script>
+    <script src="/static/codemirror_latest/addon/edit/matchbrackets.js"></script>
+
+    <script>
+
+        $(function () {
+            bindCopyUrl();
+        });
+
+
+        $('#btnGenInviteCode').click(function () {
+            $.ajax({
+                url: "{% url 'script:scripts-url' %}?project_id={{ request.tracer.project.id }}&script_id={{ comment.id }}",
+                type: "GET",
+                success: function (res) {
+                    if (res.status) {
+                        $('#inviteArea').removeClass('hide').find('#inviteUrl').val(res.data);
+                    } else {
+                        $.each(res.error, function (k, v) {
+                            $('#id_' + k).next('.error-msg').text(v[0]);
+                        })
+                    }
+                }
+            })
+
+        });
+
+        /*
+        点击拷贝邀请码
+        */
+        function bindCopyUrl() {
+            $('#btnCopyUrl').click(function () {
+                var textInput = $('#inviteUrl')[0]; // document.getElementById('inviteUrl')
+                textInput.select();
+
+                document.execCommand("Copy");
+                alert('复制成功');
+            })
+        }
+    </script>
+
+    <script>
+        {#document.onreadystatechange = function () {#}
+        {#    if (document.readyState == 'complete') {#}
+        {#        initLanguage("python")#}
+        {#    }#}
+        var editor = CodeMirror.fromTextArea(document.getElementById("code"), {
+            lineNumbers: true,
+            readOnly: "nocursor",
+            mode: "python",
+            theme: 'monokai',
+            {#readOnly: true,#}
+            {#styleActiveLine: true,#}
+            {#matchBrackets: true,#}
+            {#smartIndent: true,#}
+            {#indentUnit: 4,#}
+            {#abSize: 4,#}
+        });
+        //595px
+        editor.setSize('auto', 'auto');
+
+    </script>
+
+    <script>
+        function copyText() {
+            var input = document.getElementById("inxxxxxxxx");
+            console.log(input)
+            input.select(); // 选中文本
+            document.execCommand("copy"); // 执行浏览器复制命令
+            alert("复制成功");
+        }
+    </script>
+
+    <script>
+        {#document.onreadystatechange = function () {#}
+        {#    if (document.readyState == 'complete') {#}
+        {#        initLanguage("python")#}
+        {#    }#}
+        var shell_editor = CodeMirror.fromTextArea(document.getElementById("shellcode"), {
+            lineNumbers: true,
+            readOnly: "nocursor",
+            mode: "shell",
+            theme: 'monokai',
+            {#readOnly: true,#}
+            {#styleActiveLine: true,#}
+            {#matchBrackets: true,#}
+            {#smartIndent: true,#}
+            {#indentUnit: 4,#}
+            {#abSize: 4,#}
+        });
+        shell_editor.setSize('auto', 'auto');
+
+    </script>
+    <script>
+        {#document.onreadystatechange = function () {#}
+        {#    if (document.readyState == 'complete') {#}
+        {#        initLanguage("python")#}
+        {#    }#}
+        var shell_editor = CodeMirror.fromTextArea(document.getElementById("javacode"), {
+            lineNumbers: true,
+            readOnly: "nocursor",
+            mode: "javascript",
+            theme: 'monokai',
+            {#readOnly: true,#}
+            {#styleActiveLine: true,#}
+            {#matchBrackets: true,#}
+            {#smartIndent: true,#}
+            {#indentUnit: 4,#}
+            {#abSize: 4,#}
+        });
+        shell_editor.setSize('auto', 'auto');
+
+    </script>
+
+    {#    执行逻辑#}
+    <script>
+        $('#backup_all').click(function () {
+            var hostname = document.getElementById("selectpicker2").value;
+            var select_env = document.getElementById("select_env").value;
+
+            if (hostname === "请选择执行机器" || select_env === "请选择执行环境") {
+                alert("执行目标 或 执行环境 不能为空");
+                return false;
+            } else {
+                //第一次清空内容
+                $('#messagecontainer').empty();
+                $(this).button('loading').delay(1000).queue(function () {
+                    var host = window.location.host;
+                    var url = "ws://" + host + "/execution/script/";
+                    //生产环境
+                    {#var url = "wss://" + host + "/execution/script/";#}
+                    ws = new WebSocket(url);
+                    //发起socket连接
+                    ws.onopen = function () {
+                        console.log("socket开始连接");
+                        data = {
+                            "cmd": "backup_all",
+                            "hostname": hostname,
+                            "creator": "{{ request.tracer.user.username }}",
+                            "select_env": select_env,
+                            "script_id": {{ comment.id }},
+                            "project_id": {{ comment.project_id }},
+                        };
+                        {#console.log(data);#}
+                        ws.send(JSON.stringify(data));//发送数据到服务端
+                    }
+                    ws.onmessage = function (e) {
+                        {#var result = JSON.parse(event.data);#}
+                        if (e.data !== "close") {
+                            //console.log(e.data)
+                            $('#messagecontainer').append('<p style="margin-left: 8px;margin-top: 6px;font-size: 14px">' + e.data + '</p>');
+                        } else {
+                            ws.close()
+                            $("#backup_all").button('reset');
+                            $("#backup_all").dequeue();
+                        }
+                    }
+                    ws.onerror = function (e) {
+                        ws.close()
+                    }
+                })
+            }
+        })
+    </script>
+
+    <script>
+        function get_files_infos(file_id) {
+            $.ajax({
+                url: "{% url 'script:scripts-information-edit' %}?project_id={{ request.tracer.project.id }}&script_id=" + file_id,
+                type: "GET",
+                success: function (res) {
+                    if (res.status) {
+                        $("#file_name").val(res.data.script_name);
+                        $("#file_id").val(file_id);
+                        $("#selected_tools_wiki").val(res.data.script_category);
+                    }
+                }
+            })
+        }
+    </script>
+    <script>
+        $(function () {
+            $("#btnSubmitEdit").click(function () {
+                var wiki_index = document.getElementById("selected_tools_wiki").selectedIndex;
+                var category = document.getElementById("selected_tools_wiki").options[wiki_index].text;
+                var file_id = $("#file_id").val();
+
+                $.ajax({
+                    url: "{% url 'script:scripts-information-edit' %}",
+                    type: "POST",
+                    dataType: 'json',
+                    data: {
+                        'category': category,
+                        'script_id': file_id,
+                        'project_id': {{ request.tracer.project.id }},
+                        'csrfmiddlewaretoken': '{{ csrf_token }}'
+                    },
+                    success: function (data) {
+                        if (data.state == 0) {
+                            alert(data.data)
+                            location.href = '{% url 'script:scripts-detail' %}?project_id={{ request.tracer.project.id }}&script_id=' + file_id;
+                        } else {
+                            alert(data.data)
+                        }
+                    }
+                })
+
+
+            })
+        })
+    </script>
+{% endblock %}

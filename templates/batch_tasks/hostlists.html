@@ -1,0 +1,228 @@
+{% extends 'base/site-base.html' %}
+{% load static %}
+{% block css %}
+    {#    <link rel="stylesheet" href="{% static 'nifty/nifty.min.css' %}">#}
+    <link rel="stylesheet" href="{% static 'nifty/pace.min.css' %}">
+    <style>
+        .content {
+            height: calc(100vh - 120px);
+            overflow: scroll;
+            margin-left: -1px;
+        }
+
+        .xxx {
+            background-color: black;
+            color: white;
+        }
+    </style>
+{% endblock %}
+
+{% block title %}
+    FastWork - 批量命令
+{% endblock %}
+
+{% block content %}
+    <div class="container-fluid content body" style="margin-top: 20px">
+
+        <div class="col-sm-12">
+            <div class="panel-heading">
+                <ol class="breadcrumb">
+                    <li><a href="{% url 'project:list' %}" style="color: #337ab7">项目大厅</a></li>
+                    <li>
+                        <a href="{% url 'batch_tasks:batch_tasks-batch_index' %}?project_id={{ request.tracer.project.id }}"
+                           style="color: #337ab7">批量任务广场</a></li>
+                    <li class="active">批量命令</li>
+                </ol>
+            </div>
+        </div>
+
+        <div class="col-sm-12" style="margin-top: -20px">
+            <div class="panel-body">
+                {% csrf_token %}
+                <div class="row">
+                    {% include 'batch_tasks/host_list.html' %}
+                    <div class="col-sm-9">
+                        <div class="panel ">
+                            <div class="panel-heading">
+                                <h3 class="panel-title">命令操作</h3>
+                            </div>
+                            <div class="panel-body">
+                                <textarea id="cmd_input" class="form-control" style="resize: none"> </textarea>
+
+                                <a href="{% url 'batch_tasks:batch_tasks-batch_tasks' %}?project_id={{ request.tracer.project.id }}"
+                                   class="btn btn-warning pull-right"
+                                   style="margin-left:10px ;margin-top: 10px;color:white;border: none">清空选项</a>
+
+                                <input type="button" id="task_submit_btn" onclick="PostTask(this,'cmd')"
+                                       class="btn btn-success pull-right"
+                                       style="margin-top: 10px;background-color: #167be0;border: none" value="立即执行">
+                            </div>
+                        </div>
+                        {% include 'batch_tasks/task_result.html' %}
+                    </div>
+
+
+                </div>
+            </div>
+        </div>
+    </div>
+
+{% endblock %}
+
+
+{% block js %}
+    <script src="/static/nifty/fastclick.min.js"></script>
+    <!--Nifty Admin [ RECOMMENDED ]-->
+    <script src="/static/nifty/nifty.min.js"></script>
+    <script>
+        function ItemToggle(ele) {
+            $(ele).next().toggle()
+        }
+
+        //files
+        function CheckFileTransferType(ele) {
+            if ($(ele).val() == 'send') {
+                $("#local_file_path").removeClass("hide");
+            } else {
+                $("#local_file_path").addClass("hide");
+            }
+        }
+
+        //post cmds
+        function PostTask(self, task_type) {
+
+            var selected_host_ids = [];
+            $("[tag='host-select']:checked").each(function () {
+                selected_host_ids.push($(this).val());
+            });
+            //console.log(selected_host_ids);
+            if (selected_host_ids.length == 0) {
+                alert("必须选择主机!");
+                return false;
+            }
+
+            var task_arguments = {};
+
+            if (task_type == 'cmd') {
+                var cmd_text = $("#cmd_input").val().trim();
+                if (cmd_text.length == 0) {
+                    alert("必须输入要执行的命令!");
+                    return false;
+                }
+
+                //console.log("ready to post task");
+
+                var task_arguments = {
+                    'selected_hosts': selected_host_ids,
+                    'task_type': 'cmd',
+                    'project_id': {{ request.tracer.project.id }},
+                    'cmd': cmd_text,
+                };
+
+
+            } else {
+                //console.log("ready to post task");
+
+                var local_file_path = $("#local_file_path").val().trim();
+                var remote_file_path = $("#remote_file_path").val().trim();
+                var file_transfer_type = $("#file_transfer_type").val();
+
+                if (file_transfer_type == 'send') {
+                    if (local_file_path.length == 0) {
+                        alert("必须输入要上传到远程服务器的本地文件路径！");
+                        return false;
+                    }
+                }
+
+                if (remote_file_path.length == 0) {
+                    alert("必须输入要远程的服务器的文件路径！");
+                    return false;
+                }
+                var task_arguments = {
+                    'selected_hosts': selected_host_ids,
+                    'task_type': 'file_transfer',
+                    'file_transfer_type': file_transfer_type,
+                    'local_file_path': local_file_path,
+                    'project_id': {{ request.tracer.project.id }},
+                    'remote_file_path': remote_file_path,
+                };
+            }
+
+
+            //禁用提交按钮
+            $(self).addClass("disabled");
+            $("#task_result_container").empty();//清空之前的任务结果
+
+
+            var csrftoken = $("input[name='csrfmiddlewaretoken']").val();
+            $.post("{% url 'batch_tasks:batch_tasks-batch_task_mgr' %}", {
+                'task_data': JSON.stringify(task_arguments),
+                'project_id': {{ request.tracer.project.id }},
+                "csrfmiddlewaretoken": csrftoken
+            }, function (callback) {
+                //console.log("task callback", task_arguments);
+
+                var callback = JSON.parse(callback);
+
+                $.each(callback.selected_hosts, function (index, ele) {
+                    var li_ele = "<li log_id='" + ele['id'] + "'>----------远程服务器: 【" + ele.host_to_remote_user__desc + "(" + ele.host_to_remote_user__hostname + ")】----------<span tag='log_status'></span></li>";
+
+                    li_ele += "<pre>等待结果中...</pre>";
+
+                    $("#task_result_container").append(li_ele);
+                });
+
+
+                //start to get result.
+                ResultRefreshObj = setInterval(function () {
+
+                    GetTaskResult(callback.task_id)
+
+                }, 2000);
+
+
+            });//end post
+
+        }
+
+
+        //get results
+        function GetTaskResult(task_id) {
+            $.getJSON("{% url 'batch_tasks:batch_tasks-get_task_result' %}?project_id={{ request.tracer.project.id }}", {"task_id": task_id}, function (callback) {
+                //console.log(callback);
+                var all_task_done = true;
+
+                $.each(callback, function (index, ele) {
+                    var li_ele = $("li[log_id=" + ele['id'] + "]");
+
+                    {#var status = li_ele.children().first().text(ele['status']);#}
+
+                    if (ele['status'] == 0) {
+                        li_ele.children().first().html("命令执行状态：<span style='color:gray'>" + "initialized..." + "</span>");
+
+                    } else if (ele['status'] == 1) {
+                        li_ele.children().first().html("命令执行状态：<span style='color:green'>" + "successful..." + "</span>");
+                    } else {
+                        li_ele.children().first().html("命令执行状态：<span style='color:red'>" + "failed..." + "</span>");
+                    }
+
+                    li_ele.next().text(ele['result']).addClass("xxx");
+
+                    if (ele['status'] == 0) {
+                        all_task_done = false; //有任务没完成
+                    }
+                });
+
+                if (all_task_done) {
+                    clearInterval(ResultRefreshObj);
+                    $("#task_submit_btn").removeClass("disabled");
+                    //console.log("-------all task done---------");
+                }
+            })//end getJSON
+        }
+
+
+    </script>
+
+
+{% endblock %}

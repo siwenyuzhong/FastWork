@@ -1,0 +1,51 @@
+{% extends 'base/site-base.html' %}
+{% block css %}
+    <style>
+        .content {
+            height: calc(100vh - 120px);
+            overflow: scroll;
+            margin-left: -1px;
+        }
+    </style>
+{% endblock %}
+
+{% block title %}
+    FastWork - WebSSH日志中心
+{% endblock %}
+
+{% block content %}
+    <div class="container-fluid content" style="margin-top: 20px">
+
+        <div class="col-sm-12">
+            <div class="panel-heading">
+                <ol class="breadcrumb">
+                    <li><a href="{% url 'project:list' %}" style="color: #337ab7">项目大厅</a></li>
+                    <li><a href="{% url 'journal:journal-logs_management' %}?project_id={{ request.tracer.project.id }}"
+                           style="color: #337ab7">日志中心</a></li>
+                    <li class="active">WebSSH日志中心</li>
+                </ol>
+            </div>
+        </div>
+
+        <div class="col-sm-12" style="margin-top: -20px">
+            <div class="panel-body">
+                <table class="table table-hover">
+                    <thead>
+                    <tr>
+
+                        <th scope="col"></th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr>
+                        <td style="font-size: 20px;text-align: center">
+                            WebSSH日志,请去该项目【logs】目录下查看以【*.webssh.command.log】的日志文件
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+{% endblock %}

@@ -1,0 +1,292 @@
+{% extends 'base/site-base.html' %}
+{% load static %}
+{% block title %}
+    FastWork - 添加Cron Job任务
+{% endblock %}
+
+{% block  content %}
+    <div class="container-fluid" style="margin-top: 20px">
+        <div class="col-sm-12">
+            <div class="panel-heading">
+                <ol class="breadcrumb">
+                    <li><a href="{% url 'project:list' %}" style="color: #337ab7">项目大厅</a></li>
+                    <li>
+                        <a href="{% url 'task_scheduler:task_scheduler-task-list' %}?project_id={{ request.tracer.project.id }}"
+                           style="color: #337ab7">定时任务</a></li>
+                    <li>
+                        <a href="{% url 'task_scheduler:task_scheduler-task-add' %}?project_id={{ request.tracer.project.id }}"
+                           style="color: #337ab7">定时任务类型大厅</a></li>
+                    <li class="active">创建Cron Job任务</li>
+                </ol>
+            </div>
+            <div class="panel-body" style="margin-top: -30px">
+                <div class="panel panel-default">
+                    <div class="panel-body">
+                        <h3 style="margin-top: 10px;margin-bottom: 5px;color: gray">
+                            1、配置任务名称</h3>
+                        <input type="text"
+                               class="form-control"
+                               id="cron_name"
+                               placeholder=""
+                               value="CRON-" style="width: 400px">
+
+                        <h3 style="margin-top: 30px;margin-bottom: 5px;color: gray">
+                            2、配置任务逻辑 (若不需要进行告警，忽略后置告警条件即可)
+                            <a href="{% url 'task_scheduler:task_scheduler-task-useage-help' %}?project_id={{ request.tracer.project.id }}"
+                               target="_blank"><span
+                                    class="glyphicon glyphicon-question-sign"></span>查看告警帮助文档</a>
+                        </h3>
+                        <ul id="myTab"
+                            class="nav nav-tabs">
+                            <li class="active">
+                                <a href="#cron_define"
+                                   style="color: #333"
+                                   data-toggle="tab">
+                                    <strong>自定义命令</strong>
+                                </a>
+                            </li>
+                            <li><a href="#cron_scripts"
+                                   style="color: #333"
+                                   data-toggle="tab"><strong>工具库工具</strong></a>
+                            </li>
+                        </ul>
+                        <div id="myTabContent"
+                             class="tab-content">
+
+                            <div class="tab-pane fade in active"
+                                 id="cron_define">
+                                <div class="col-md-12">
+                                    <div class="col-md-4">
+                                        <div class="form-group"
+                                             style="margin-top: 15px">
+                                            <input type="text" style="margin-left: -30px;"
+                                                   class="form-control"
+                                                   id="cron_cmd"
+                                                   placeholder="自定义命令或工具"
+                                                   value="">
+                                        </div>
+                                    </div>
+                                    <div class="col-md-1">
+                                        <button class="btn btn-success"
+                                                style="margin-top: 15px;margin-bottom: 30px;margin-left: -10px;pointer-events: none">
+                                            的结果
+                                        </button>
+                                    </div>
+                                    <div class="col-md-2">
+                                        <select class="form-control" id="operate_condition"
+                                                style="margin-top: 15px;margin-bottom: 30px;">
+                                            <option id="operate_condition">判断条件</option>
+                                            <option id="operate_condition">等于</option>
+                                            <option id="operate_condition">大于或等于</option>
+                                            <option id="operate_condition">小于或等于</option>
+                                            <option id="operate_condition">不等于</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-md-2">
+                                        <div class="form-group"
+                                             style="margin-top: 15px">
+                                            <input type="text"
+                                                   class="form-control"
+                                                   id="alarm_threshold"
+                                                   placeholder="判断阈值"
+                                                   value="">
+                                        </div>
+                                    </div>
+                                    <div class="col-md-1">
+                                        <button class="btn btn-success"
+                                                style="margin-top: 15px;margin-bottom: 30px;pointer-events: none">
+                                            则进行
+                                        </button>
+                                    </div>
+                                    <div class="col-md-2">
+                                        <select class="form-control" id="cron_div_alarm_way"
+                                                style="margin-top: 15px;margin-bottom: 30px;">
+                                            <option id="cron_div_alarm_way">无告警方式</option>
+                                            {#                                                                        <option>企业微信告警</option>#}
+                                            {#                                                                        <option>邮件告警</option>#}
+                                            <option id="cron_div_alarm_way">钉钉群告警</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+
+                            {# 工具库选择 #}
+                            <div class="tab-pane fade"
+                                 id="cron_scripts">
+                                <div class="col-md-12">
+                                    <div class="col-md-2">
+                                        <input type="text"
+                                               style="margin-top: 15px;margin-left: -30px"
+                                               class="form-control"
+                                               id="cron_run_env"
+                                               value="/root/miniconda3/envs/documentwiki_env/bin/python3">
+                                    </div>
+                                    <div class="col-md-3">
+                                        <select class="form-control"
+                                                style="margin-top: 15px;margin-bottom: 15px;margin-left: -30px"
+                                                id="selected_cron_tools">
+                                            <option id="selected_cron_tools"
+                                                    style="color: gray">
+                                                请选择需要设置的工具
+                                            </option>
+                                            {% for foo in scripts_obj %}
+                                                <option id="selected_cron_tools">
+                                                    {{ foo.title }}{{ foo.suffix }}</option>
+                                            {% endfor %}
+                                        </select>
+                                    </div>
+                                    <div class="col-md-1">
+                                        <button class="btn btn-success"
+                                                style="margin-top: 15px;margin-bottom: 30px;margin-left: -30px;pointer-events: none">
+                                            的结果
+                                        </button>
+                                    </div>
+                                    <div class="col-md-2">
+                                        <select class="form-control"
+                                                id="tool_operate_condition"
+                                                style="margin-top: 15px;margin-bottom: 30px;margin-left: -30px">
+                                            <option id="tool_operate_condition">判断条件
+                                            </option>
+                                            <option id="tool_operate_condition">等于</option>
+                                            <option id="tool_operate_condition">大于或等于
+                                            </option>
+                                            <option id="tool_operate_condition">小于或等于
+                                            </option>
+                                            <option id="tool_operate_condition">不等于</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-md-1">
+                                        <div class="form-group"
+                                             style="margin-top: 15px;margin-left: -35px">
+                                            <input type="text"
+                                                   class="form-control"
+                                                   id="tool_alarm_threshold"
+                                                   placeholder="判断阈值"
+                                                   value="" style="width: 150px">
+                                        </div>
+                                    </div>
+                                    <div class="col-md-1">
+                                        <button class="btn btn-success"
+                                                style="margin-top: 15px;margin-bottom: 30px;pointer-events: none;margin-left: 30px">
+                                            则进行
+                                        </button>
+                                    </div>
+                                    <div class="col-md-2">
+                                        <select class="form-control" id="tool_div_alarm_way"
+                                                style="margin-top: 15px;margin-bottom: 30px;margin-left: 10px">
+                                            <option id="tool_div_alarm_way">无告警方式</option>
+                                            {#                                                                        <option>企业微信告警</option>#}
+                                            {#                                                                        <option>邮件告警</option>#}
+                                            <option id="tool_div_alarm_way">钉钉群告警</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+
+                        <h3 style="margin-top: 30px;margin-bottom: 5px;color: gray">
+                            3、配置运行时间：计划运行时间(秒 分 时 日 月 周)</h3>
+                        <input type="text"
+                               class="form-control"
+                               id="cron_time"
+                               placeholder="" style="width: 400px;"
+                               value="20 10-15 11-15 * * *">
+
+
+                        <div style="margin-top: 20px">
+
+                            <button class="btn btn-primary"
+                                    id="cron_btn" style="background-color: #167be0">
+                                确认创建
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                <h3 style="margin-bottom: 5px;color: gray">
+                    <span class="glyphicon glyphicon-question-sign"></span> Cron 调度器说明
+                </h3>
+                <div class="alert alert-warning" role="alert">
+                    <p> 1.任务名称:
+                        以调度器名称为统一前缀,后面可按照任务功能自定义名字。</p>
+                    <p> 2.计划运行时间的格式为
+                        <code>秒 分 时 日 月 周</code>,这里注意与interval调度器的区别。
+                        以上默认值表示的是该计划定于每天的11点到15点的第10分钟到15分钟，这5分钟的每第20秒执行该任务。
+                    <p>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block js %}
+    <script>
+        $("#cron_btn").click(function () {
+            //公用参数
+            var cron_name = $("#cron_name").val();
+            var cron_cmd = $("#cron_cmd").val();
+            var cron_time = $("#cron_time").val();
+
+            var cron_run_env = $("#cron_run_env").val();
+            //获取工具库工具
+            var cron_index = document.getElementById("selected_cron_tools").selectedIndex;
+            var cron_script = document.getElementById("selected_cron_tools").options[cron_index].text;
+
+            //自定义选项
+            //获取阈值
+            var alarm_threshold = $("#alarm_threshold").val();
+            //获取告警方式
+            var alarm_index = document.getElementById("cron_div_alarm_way").selectedIndex;
+            var alarm_ways = document.getElementById("cron_div_alarm_way").options[alarm_index].text;
+            //获取运算符号
+            var operate_condition_index = document.getElementById("operate_condition").selectedIndex;
+            var operate_condition = document.getElementById("operate_condition").options[operate_condition_index].text;
+
+            //工具库选项
+            //选择运算符号
+            var tool_operate_condition_index = document.getElementById("tool_operate_condition").selectedIndex;
+            var tool_operate_condition = document.getElementById("tool_operate_condition").options[tool_operate_condition_index].text;
+            //自定义阈值
+            var tool_alarm_threshold = $("#tool_alarm_threshold").val();
+            //告警方式
+            var tool_div_alarm_way_index = document.getElementById("tool_div_alarm_way").selectedIndex;
+            var tool_div_alarm_ways = document.getElementById("tool_div_alarm_way").options[tool_div_alarm_way_index].text;
+
+            if (cron_cmd !== "" && cron_script !== "请选择需要设置的工具") {
+                alert("两种方式不能同时设置");
+                return false;
+            } else {
+                $.ajax({
+                    url: "{% url 'task_scheduler:task_scheduler-task-crontab-job' %}",
+                    type: "POST",
+                    dataType: 'json',
+                    data: {
+                        'cron_name': cron_name,
+                        'project_id': {{ request.tracer.project.id }},
+                        'cron_cmd': cron_cmd,
+                        'cron_time': cron_time,
+                        'cron_script': cron_script,
+                        'cron_run_env': cron_run_env,
+                        'operate_condition': operate_condition,
+                        'tool_operate_condition': tool_operate_condition,
+                        'tool_alarm_threshold': tool_alarm_threshold,
+                        'tool_div_alarm_ways': tool_div_alarm_ways,
+                        'alarm_threshold': alarm_threshold,
+                        'alarm_way': alarm_ways,
+                        'type': "cron",
+                        'csrfmiddlewaretoken': '{{ csrf_token }}'
+                    },
+                    success: function (data) {
+                        if (data.status == 200) {
+                            alert(data.msg);
+                            location.href = "{% url 'task_scheduler:task_scheduler-task-list' %}?project_id={{ request.tracer.project.id }}"
+                        } else {
+                            alert(data.msg)
+                        }
+                    }
+                })
+            }
+
+        })
+    </script>
+{% endblock %}

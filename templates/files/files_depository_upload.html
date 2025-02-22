@@ -1,0 +1,88 @@
+{% extends 'base/site-base.html' %}
+{% load static %}
+
+{% block title %}
+    FastWork - 文件上传
+{% endblock %}
+
+{% block css %}
+    <link rel="stylesheet" href="{% static 'global_css/file_depository_upload.css' %}">
+{% endblock %}
+
+
+{% block content %}
+    <div class="container-fluid content" style="margin-top: 20px">
+        <div class="panel panel-default">
+            <div class="panel-heading" style="height: 50px">
+                <ol class="breadcrumb">
+                    <li><a href="{% url 'project:list' %}" style="color: #337ab7">项目大厅</a></li>
+                    <li>
+                        <a href="{% url 'file_depository:file_depository-files' %}?project_id={{ request.tracer.project.id }}"
+                           style="color: #337ab7">文件仓库</a></li>
+                    <li class="active">文件上传</li>
+                </ol>
+            </div>
+        </div>
+        <div class="panel-body" style="margin-top: -20px;margin-left: 2px">
+            <div class="col-sm-12 content">
+                <hr>
+                <div class="container">
+                    <div>
+                        <div style="margin-bottom: 20px;margin-top: 20px">
+                            {# 1. 添加附件的按钮 #}
+                            <button type="button" class="btn btn-default js-upload-photos">
+                                <span class="glyphicon glyphicon-cloud-upload"></span> 上传文件
+                            </button>
+
+                            {# 2. 上传图片的插件 #}
+                            <input id="fileupload" type="file" name="file" multiple
+                                   style="display: none;"
+                                   data-url="{% url 'file_depository:file_depository-files-upload' %}?project_id={{ request.tracer.project.id }}"
+                                   data-form-data='{"csrfmiddlewaretoken": "{{ csrf_token }}"}'>
+                        </div>
+
+                        {# 3. 显示上传的文件 #}
+                        <table id="gallery" class="table table-bordered">
+                            <thead>
+                            <tr>
+                                <th>已上传文件</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            </tbody>
+                        </table>
+                        <div class="well text-muted text-center" style="padding-top: 4rem; padding-bottom: 4rem;">
+                            <span class="glyphicon glyphicon-cloud-upload" style="font-size: 4rem;"></span>
+                            <h3 style="margin-top: 5px">将文件拖入此处上传</h3>
+                        </div>
+                    </div>
+                </div>
+                <hr>
+
+                <div class="modal fade" id="modal-progress" data-backdrop="static" data-keyboard="false">
+                    <div class="modal-dialog">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h4 class="modal-title">正在上传中...</h4>
+                            </div>
+                            <div class="modal-body">
+                                <div class="progress">
+                                    <div class="progress-bar" role="progressbar" style="width: 0%;">0%</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block js %}
+    <script src="/static/upload_files/jquery.ui.widget.js"></script>
+    <script src="/static/upload_files/jquery.iframe-transport.js"></script>
+    <script src="/static/upload_files/jquery.fileupload.js"></script>
+    <script src="/static/upload_files/progress-bar-upload.js"></script>
+{% endblock %}

@@ -1,0 +1,72 @@
+{% extends 'base/site-base.html' %}
+{% load static %}
+{% block css %}
+    {#    <link rel="stylesheet" href="{% static 'nifty/nifty.min.css' %}">#}
+    <link rel="stylesheet" href="{% static 'nifty/pace.min.css' %}">
+    <style>
+        .content {
+            height: calc(100vh - 120px);
+            overflow: scroll;
+            margin-left: -1px;
+        }
+
+        .xxx {
+            background-color: black;
+            color: white;
+        }
+    </style>
+{% endblock %}
+
+{% block title %}
+    FastWork - 批量任务广场
+{% endblock %}
+
+{% block content %}
+    <div class="container-fluid content body" style="margin-top: 20px">
+
+        <div class="col-sm-12">
+            <div class="panel-heading">
+                <ol class="breadcrumb">
+                    <li><a href="{% url 'project:list' %}" style="color: #337ab7">项目大厅</a></li>
+                    <li>
+                        <a href="{% url 'batch_tasks:batch_tasks-batch_index' %}?project_id={{ request.tracer.project.id }}"
+                           style="color: #337ab7">批量操作</a></li>
+                    <li class="active">批量任务广场</li>
+                </ol>
+            </div>
+        </div>
+
+        <div class="col-sm-12" style="margin-top: -20px">
+            <div class="panel-body">
+
+                <div class="row">
+                    <div class="col-md-4">
+                        <div class="jumbotron">
+                            <h2>批量执行命令!</h2>
+                            <p><img src="/static/img/shells.png" style="width: 200px;margin-top: 15px;height: 80px">
+                            </p>
+                            <p><a class="btn btn-primary"
+                                  href="{% url 'batch_tasks:batch_tasks-batch_tasks' %}?project_id={{ request.tracer.project.id }}"
+                                  role="button"
+                                  style="margin-top: 15px;color: white;background-color: #167be0">点击执行</a></p>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="jumbotron">
+                            <h2>文件批量上传、下载!</h2>
+                            <p><img src="/static/img/file-respostory/file.png" alt=""
+                                    style="width: 100px;margin-top: 10px;height: 100px"></p>
+                            <p><a class="btn btn-primary"
+                                  href="{% url 'batch_tasks:batch_tasks-file_transfer' %}?project_id={{ request.tracer.project.id }}"
+                                  role="button"
+                                  style="color: white;background-color: #167be0">点击执行</a></p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+{% endblock %}
+
+

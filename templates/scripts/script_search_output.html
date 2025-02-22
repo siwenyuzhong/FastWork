@@ -1,0 +1,147 @@
+{% extends 'base/site-base.html' %}
+{% load static %}
+
+
+{% block title %}
+    FastWork - 工具库导出
+{% endblock %}
+
+{% block css %}
+    {#    <link rel="stylesheet" href="/global_css/script_search_output.css">#}
+    {#        <link rel="stylesheet" href="/static/global_css/scripts_list.css">#}
+    <link rel="stylesheet" href="{% static 'global_css/output_all_scripts.css' %}">
+
+
+{% endblock %}
+
+{% block content %}
+    <div class="container-fluid content" style="margin-top: 20px">
+        <div class="col-sm-12">
+            <div class="panel-heading">
+                <ol class="breadcrumb">
+                    <li><a href="{% url 'project:list' %}" style="color: #337ab7">项目大厅</a></li>
+                    <li><a href="{% url 'script:scripts-all' %}?project_id={{ request.tracer.project.id }}">工具库</a>
+                    </li>
+                    <li class="active">工具导出</li>
+                </ol>
+            </div>
+        </div>
+
+
+        <div class="col-sm-12" style="margin-top: -20px">
+            <form method="post" action="{% url 'script:scripts-search' %}?project_id={{ request.tracer.project.id }}"
+                  style="transform: scale(1.0)">
+                {% csrf_token %}
+                <div class="col-lg-6">
+                    <div class="input-group">
+                        <input type="checkbox" onclick="checkAll(this)" id="all"
+                               style="width: 15px;height: 15px;"/><span style="font-size: 15px">全选</span>
+
+                        <input class="btn btn-primary btn-xs" type="button" onclick="selValue()" value="一键导出"
+                               style="margin-left: 10px;margin-top: -5px">
+                    </div>
+                </div>
+            </form>
+        </div>
+        <div class="col-sm-12">
+            {% if scripts_obj %}
+                <div>
+                    <div class="panel-body">
+
+                        {% for foo in scripts_obj %}
+                            <div class="item" style="margin-left: 30px">
+
+                                <div style="height: 30px;text-align: center;padding: 10px 10px;color: #8c8c8c;background-color: #f5f5f5;overflow: scroll">
+                                    <span title="{{ foo.title }}">{{ foo.title }}</span>
+                                </div>
+
+                                <a href="{% url 'script:scripts-detail' %}?project_id={{ request.tracer.project.id }}&script_id={{ foo.id }}"
+                                   class="title">
+                                    <img src="{{ foo.showImage }}" alt="">
+                                </a>
+
+                                <hr>
+
+                                <div style="height: 30px;padding: 10px 10px;color: #8c8c8c;overflow: scroll">
+                                    {% if foo.desc %}
+                                        <span title="{{ foo.desc }}"><small>说明：{{ foo.desc }}</small></span>
+                                    {% else %}
+                                        <span title="{{ foo.desc }}"><small>说明：暂无说明</small></span>
+                                    {% endif %}
+                                </div>
+                                <input type="checkbox" name="box"
+                                       style="border:none;margin:0 auto;width: 15px;height: 15px;margin-top: -10px;float: right"
+                                       value="{{ foo.id }}">
+                            </div>
+                        {% endfor %}
+
+                    </div>
+                </div>
+            {% else %}
+                <div style="height:calc(100vh - 100px)">
+                    <div style="text-align: center;margin-top: 200px">
+                            <span style="text-align: center;font-size: 15px">暂无工具，请点击
+                            <a class="btn btn-primary btn-sm" style="background-color: #167be0"
+                               href="{% url 'script:scripts-add' %}?project_id={{ request.tracer.project.id }}"><span
+                                    class="glyphicon glyphicon-plus"
+                                    aria-hidden="true"></span> 新建工具</a>
+                                创建
+                            </span>
+                    </div>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+
+{% endblock %}
+
+{% block js %}
+    <script>
+        //全选
+        function checkAll(obj) {
+            //获取name=box的复选框
+            var boxs = document.getElementsByName("box");
+            for (var i = 0; i < boxs.length; i++) {
+                boxs[i].checked = obj.checked;
+            }
+        }
+
+        //获取选中的值
+        function selValue() {
+            var valArr = [];
+            var boxs = document.getElementsByName("box");
+            for (var i = 0; i < boxs.length; i++) {
+                if (boxs[i].checked == true) {
+                    valArr[i] = boxs[i].value;
+                }
+            }
+            var vals = valArr.join(',');
+            if (vals === '') {
+                alert("请选择需要导出的工具")
+                return
+            }
+            $.ajax({
+                url: "{% url 'script:scripts-export-output' %}?project_id={{ request.tracer.project.id }}",
+                type: "POST",
+                dataType: "json",
+                data: {
+                    "value": vals,
+                    'csrfmiddlewaretoken': '{{ csrf_token }}'
+                },
+                success: function (data) {
+                    download(data.url)
+                }
+            })
+        };
+
+        // 直接下载，用户体验好
+        function download(url) {
+            var $form = $('<form method="GET"></form>');
+            $form.attr('action', url);
+            $form.appendTo($('body'));
+            $form.submit();
+        }
+    </script>
+
+
+{% endblock %}

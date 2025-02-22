@@ -1,0 +1,87 @@
+{% extends 'base/site-base.html' %}
+{% load static %}
+{% block css %}
+    <link rel="stylesheet" href="{% static 'global_css/script_auto_add.css' %}">
+{% endblock %}
+
+{% block title %}
+    FastWork - 工具上传
+{% endblock %}
+
+{% block content %}
+    <div class="container-fluid content" style="margin-top: 20px">
+        <div class="panel panel-default">
+            <div class="panel-heading" style="height: 50px">
+                <ol class="breadcrumb">
+                    <li><a href="{% url 'project:list' %}" style="color: #337ab7">项目大厅</a></li>
+                    <li><a href="{% url 'script:scripts-all' %}?project_id={{ request.tracer.project.id }}">工具库</a>
+                    </li>
+                    <li class="active">工具录入</li>
+                </ol>
+            </div>
+        </div>
+
+        <div class="panel-body" style="margin-top: -20px;margin-left: 2px">
+            <div class="col-sm-12 content">
+
+
+                <hr>
+                <div class="container">
+                    <div>
+                        <div style="margin-bottom: 20px;">
+                            {# 1. 添加附件的按钮 #}
+                            <button type="button" class="btn btn-default js-upload-photos"
+                                    style="margin-top: 20px">
+                                <span class="glyphicon glyphicon-cloud-upload"></span> 上传工具
+                            </button>
+
+                            {# 2. 上传图片的插件 #}
+                            <input id="fileupload" class="fileupload" type="file" name="file" multiple
+                                   style="display: none;"
+                                   data-url="{% url 'script:scripts-auto-add' %}?project_id={{ request.tracer.project.id }}"
+                                   data-form-data='{"csrfmiddlewaretoken": "{{ csrf_token }}"}'>
+
+                        </div>
+
+                        {# 3. 显示上传的文件 #}
+                        <table id="gallery" class="table table-bordered">
+                            <thead>
+                            <tr>
+                                <div class="alert alert-warning">提示：上传后，请至 "工具库"
+                                    查看上传工具，目前工具录入类型只支持python(.py)、shell(.sh)工具、Java(.java)工具、Go(.go)工具，其余类型将不被识别录入。
+                                </div>
+                            </tr>
+                            </thead>
+                        </table>
+                        <div class="well text-muted text-center"
+                             style="padding-top: 4rem; padding-bottom: 4rem;margin-top: -20px">
+                            <span class="glyphicon glyphicon-cloud-upload" style="font-size: 4rem;"></span>
+                            <h3>将工具拖入此处上传</h3>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block js %}
+    <script src="/static/upload_files/jquery.ui.widget.js"></script>
+    <script src="/static/upload_files/jquery.iframe-transport.js"></script>
+    <script src="/static/upload_files/jquery.fileupload.js"></script>
+    <script src="/static/upload_files/progress-bar-upload.js"></script>
+    <script>
+        $(function () {
+            $("#fileupload").fileupload({  //fileupload
+                done: function (e, data) {
+                    if (data.result.status === 0) {
+                        alert("工具录入成功")
+                        location.href = "{% url 'script:scripts-auto-add' %}?project_id={{ request.tracer.project.id }}"
+                    } else {
+                        alert("工具录入失败，请选择python(.py)或shell(.sh)类型工具再进行录入")
+                    }
+                }
+            })
+        })
+    </script>
+{% endblock %}

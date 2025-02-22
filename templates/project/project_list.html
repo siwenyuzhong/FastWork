@@ -1,0 +1,390 @@
+{% load static %}
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>FastWork - 项目列表</title>
+    <link rel="shortcut icon" href="{% static 'img/head_logo.png' %}" type="image/x-icon"/>
+    <link rel="stylesheet" href="{% static 'plugin/bootstrap/css/bootstrap.min.css' %}">
+    <link rel="stylesheet" href="/static/aliyun/css/global.css">
+    <link rel="stylesheet" href="/static/aliyun/css/common-header9.css">
+    <link rel="stylesheet" href="{% static 'plugin/font-awesome/css/font-awesome.min.css' %}">
+    <link rel="stylesheet" href="{% static 'global_css/project_*.css' %}">
+    <style>
+        .panel-body > .item {
+            width: 228px;
+        }
+
+        .damacontent {
+            filter: blur(6px);
+        }
+
+        .divCenter {
+            position: absolute;
+            left: 20%;
+            top: 80%;
+            margin: -50px 0 0 -50px;
+        }
+
+        .email_reg_control {
+            height: 50px;
+            margin: 0;
+            outline: none;
+            font-size: 16px;
+            vertical-align: top;
+            -webkit-appearance: textfield;
+            -moz-appearance: textfield;
+            border: 1px solid #d3d3d3;
+            border-radius: 3px;
+            background: #fff;
+            width: 330px;
+            padding: 5px 20px;
+            transition: all 0.2s ease;
+        }
+
+        .email_reg_control:focus {
+            border: 1px solid #48a6f7;
+            box-shadow: 0 0 5px #48a6f7;
+            outline: none;
+        }
+
+        .email_reg_control.has-error {
+            box-shadow: 0 0 10px #167be0;
+        }
+
+        .email_reg_control:-ms-input-placeholder {
+            color: #999;
+        }
+
+        .email_reg_control::-ms-input-placeholder {
+            color: #999;
+        }
+
+        .pink_button_landing {
+            display: inline-block;
+            height: 50px;
+            line-height: 50px;
+            padding: 0 20px;
+            font-size: 16px;
+            font-weight: 500;
+            border: none;
+            background: #167be0;
+            color: #fff;
+            border-radius: 3px;
+            transition: all 0.2s ease-in-out;
+        }
+
+        .pink_button_landing.button_long {
+            padding: 0 35px;
+        }
+
+        .pink_button_landing:hover, .pink_button_landing:focus {
+            color: #fff;
+            outline: none;
+            text-decoration: none;
+            background: #167be0;
+        }
+
+        .pink_button_landing:active {
+            background: #167be0;
+        }
+
+    </style>
+</head>
+<body>
+<div data-spm="2">
+    <div class="ali-common-header">
+        <div class="ali-common-header-inner common-header-clearfix">
+            <!-- 运营专区 -->
+            <div class="activity item pull-left" style="margin-right: 50px">
+                <ul class="menu item pull-left" id="J_common_header_menu" data-spm="201">
+                    <li class="" has-dropdown="true" menu-type="product" data-spm-click="">
+          <span class="menu-hd" style="margin-left: -50px;font-size: 20px">
+            <strong style="margin-left: -50px"><a href="{% url 'index' %}"
+                                                  style="color: white;text-decoration: none">FastWork</a></strong>
+          </span>
+                    </li>
+                </ul>
+            </div>
+            <!-- 导航菜单 -->
+            <ul class="menu item pull-left" id="J_common_header_menu" data-spm="201">
+
+                <li class="top-menu-item" style="margin-left: 80px;float: right">
+                    <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true"
+                       aria-expanded="false">
+                        <strong style="color: white;float: right;font-size: 15px;margin-right: -100px">
+                            <span style="color: white;font-size: 10px" class="glyphicon glyphicon-user"
+                                  aria-hidden="true"></span>
+                            <small>{{ request.tracer.user.username }}</small>
+                        </strong></a>
+
+
+                    <ul class="dropdown-menu">
+
+
+                        <li>
+                            <a href="{% url 'user:notifications' %}">
+                                <i class="fa fa-bullhorn"></i> 未读消息 <span
+                                    class="label label-danger">{{ request.tracer.count }}</span>
+                            </a>
+                        </li>
+                        <li role="separator" class="divider"></li>
+
+                        {% for foo in request.tracer.sitemap %}
+                            {% if request.tracer.user.is_superuser == 1 %}
+                                <li>
+                                    <a href="{% url foo.link %}">
+                                        <i class="{{ foo.logo }}"></i> {{ foo.name }}
+                                    </a>
+                                </li>
+                                <li role="separator" class="divider"></li>
+                            {% else %}
+                                {% if foo.visible %}
+                                    <li>
+                                        <a href="{% url foo.link %}">
+                                            <i class="{{ foo.logo }}"></i> {{ foo.name }}
+                                        </a>
+                                    <li role="separator" class="divider"></li>
+                                {% endif %}
+                            {% endif %}
+                        {% endfor %}
+
+                        <li>
+                            <a href="{% url 'user:logout' %}">
+                                <i class="fa fa-sign-out"></i> 注销登录
+                            </a>
+                        </li>
+
+
+                    </ul>
+
+
+                </li>
+            </ul>
+        </div>
+    </div>
+</div>
+
+
+<div style="height:calc(100vh - 100px);overflow: scroll">
+    <div class="container-fluid project">
+
+        <div class="row" style="margin-top: 100px;margin-bottom: 100px">
+            <div class="col-lg-3"></div>
+            <div class="col-lg-6">
+                <form method="get" action="{% url 'project:search' %}">
+                    <div class="input-group divCenter">
+                        <input type="text" class="email_reg_control autofocus" style="width: 450px;margin-top: 40px"
+                               name="q"
+                               placeholder="全局搜索项目文档、脚本工具、文件等"/>
+                        <input type="submit" class="pink_button_landing button_long" value="全局搜索"
+                               style="margin-top: 40px;background-color: #2563fc">
+                    </div>
+                </form>
+            </div>
+            <div class="col-lg-3"></div>
+        </div>
+
+        <div style="margin: 10px 0;margin-top: 20px">
+            <a class="btn btn-default" data-toggle="modal" data-target="#addModal">
+                <i class="fa fa-plus" aria-hidden="true"></i> 添加项目
+            </a>
+        </div>
+        <div class="panel panel-default">
+            <div class="panel-heading"><i class="fa fa-star" aria-hidden="true"></i> 星标</div>
+            <div class="panel-body" style="margin-left: 25px">
+                {% for item in project_dict.star %}
+                    <div class="item" style="margin-left: 30px">
+                        {% if item.value.logo %}
+                            {% if  item.value.isShow == "True" %}
+                                <a class="title damacontent"
+                                   href="{% url 'project:dashboard' %}?project_id={{ item.value.id }}"><img
+                                        src="{{ item.value.logo }}"
+                                        style="width: 200px;height: 100px"></a>
+                            {% else %}
+                                <a class="title"
+                                   href="{% url 'project:dashboard' %}?project_id={{ item.value.id }}"><img
+                                        src="{{ item.value.logo }}"
+                                        style="width: 200px;height: 100px"></a>
+                            {% endif %}
+                        {% else %}
+                            {% if item.value.isShow == "True" %}
+                                <a href="{% url 'project:dashboard' %}?project_id={{ item.value.id }}"
+                                   class="title damacontent"
+                                   style="background-color: {{ item.value.get_color_display }};height: 104px"><strong>{{ item.value.name }}</strong></a>
+                            {% else %}
+                                <a href="{% url 'project:dashboard' %}?project_id={{ item.value.id }}"
+                                   class="title"
+                                   style="background-color: {{ item.value.get_color_display }};height: 104px"><strong>{{ item.value.name }}</strong></a>
+                            {% endif %}
+                        {% endif %}
+
+                        <div class="info">
+                            <div>
+                                <a href="{% url 'project:unstar' %}?project_type={{ item.type }}&project_id={{ item.value.id }}">
+                                    <i class="fa fa-star" aria-hidden="true" style="color: #f0ad4e;"></i>
+                                </a>
+                                <span>{{ item.value.creator.username }}</span>
+                            </div>
+                            <div>
+                                <i class="fa fa-user-o" aria-hidden="true"></i>
+                                <span>{{ item.value.join_count }}</span>
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+        <div class="panel panel-default">
+            <div class="panel-heading"><i class="fa fa-list" aria-hidden="true"></i> 我创建的</div>
+            <div class="panel-body" style="margin-left: 25px">
+                {% for item in project_dict.my %}
+                    <div class="item" style="margin-left: 30px">
+                        {% if item.logo %}
+                            {% if item.isShow == "True" %}
+                                <a class="title damacontent"
+                                   href="{% url 'project:dashboard' %}?project_id={{ item.id }}"><img
+                                        src="{{ item.logo }}" style="width: 200px;height: 100px"></a>
+                            {% else %}
+                                <a class="title" href="{% url 'project:dashboard' %}?project_id={{ item.id }}"><img
+                                        src="{{ item.logo }}" style="width: 200px;height: 100px"></a>
+                            {% endif %}
+                        {% else %}
+                            {% if item.isShow == "True" %}
+                                <a href="{% url 'project:dashboard' %}?project_id={{ item.id }}"
+                                   class="title damacontent"
+                                   style="background-color: {{ item.get_color_display }};height: 104px"><strong>{{ item.name }}</strong></a>
+                            {% else %}
+                                <a href="{% url 'project:dashboard' %}?project_id={{ item.id }}" class="title"
+                                   style="background-color: {{ item.get_color_display }};height: 104px"><strong>{{ item.name }}</strong></a>
+                            {% endif %}
+
+                        {% endif %}
+
+
+                        <div class="info">
+                            <div>
+                                <a href="{% url 'project:star' %}?project_type=my&project_id={{ item.id }}">
+                                    <i class="fa fa-star" aria-hidden="true" style="color: #d5d5d5"></i>
+                                </a>
+                                <span>{{ item.creator.username }}</span>
+                            </div>
+                            <div>
+                                <i class="fa fa-user-o" aria-hidden="true"></i>
+                                <span>{{ item.join_count }}</span>
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+        <div class="panel panel-default">
+            <div class="panel-heading"><i class="fa fa-handshake-o" aria-hidden="true"></i> 我参与的</div>
+            <div class="panel-body" style="margin-left: 25px">
+                {% for item in project_dict.join %}
+                    <div class="item" style="margin-left: 30px">
+                        {% if item.logo %}
+                            {% if item.isShow == "True" %}
+                                <a class="title damacontent"
+                                   href="{% url 'project:dashboard' %}?project_id={{ item.id }}"><img
+                                        src="{{ item.logo }}"
+                                        style="width: 200px;height: 100px"></a>
+                            {% else %}
+                                <a class="title" href="{% url 'project:dashboard' %}?project_id={{ item.id }}"><img
+                                        src="{{ item.logo }}"
+                                        style="width: 200px;height: 100px"></a>
+                            {% endif %}
+
+                        {% else %}
+                            {% if item.isShow == "True" %}
+                                <a href="{% url 'project:dashboard' %}?project_id={{ item.id }}"
+                                   class="title damacontent"
+                                   style="background-color: {{ item.get_color_display }};height: 104px"><strong>{{ item.name }}</strong></a>
+                            {% else %}
+                                <a href="{% url 'project:dashboard' %}?project_id={{ item.id }}" class="title"
+                                   style="background-color: {{ item.get_color_display }};height: 104px"><strong>{{ item.name }}</strong></a>
+                            {% endif %}
+
+                        {% endif %}
+
+
+                        <div class="info">
+                            <div>
+                                <a href="{% url 'project:star' %}?project_type=join&project_id={{ item.id }}">
+                                    <i class="fa fa-star" aria-hidden="true" style="color: #d5d5d5"></i>
+                                </a>
+                                <span>{{ item.creator.username }}</span>
+                            </div>
+                            <div>
+                                <i class="fa fa-user-o" aria-hidden="true"></i>
+                                <span>{{ item.join_count }}</span>
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+</div>
+<div class="modal fade" id="addModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
+                        aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title" id="myModalLabel">添加项目</h4>
+            </div>
+            <div class="modal-body">
+                <form id="addForm">
+                    {% csrf_token %}
+                    {% for field in form %}
+                        <div class="form-group">
+                            <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+                            {{ field }}
+                            <span class="error-msg"></span>
+                        </div>
+                    {% endfor %}
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">取 消</button>
+                <button id="btnSubmit" type="button" class="btn btn-primary" style="background-color: #167be0">添 加
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script type="text/javascript" src="/static/aliyun/js/base-all.js"></script>
+<script type="text/javascript" src="/static/aliyun/js/common-header.js"></script>
+<script src="{% static 'js/jquery-3.4.1.min.js' %}"></script>
+<script src="{% static 'plugin/bootstrap/js/bootstrap.min.js' %}"></script>
+<script>
+    $(function () {
+        bindSubmit();
+    });
+
+    function bindSubmit() {
+        $('#btnSubmit').click(function () {
+            $.ajax({
+                url: "{% url 'project:list' %}",
+                type: "POST",
+                data: $('#addForm').serialize(),
+                dataType: "JSON",
+                success: function (res) {
+                    //console.log(res);
+                    if (res.status) {
+                        location.href = location.href;
+                        // location.reload()
+                    } else {
+                        $.each(res.error, function (key, value) {
+                            $("#id_" + key).next().text(value[0]);
+                        })
+                    }
+                }
+            })
+        })
+    }
+</script>
+</body>
+</html>

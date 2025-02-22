@@ -1,0 +1,291 @@
+{% extends 'base/site-base.html' %}
+{% load static %}
+
+{% block title %}
+    FastWork - 文件分发
+{% endblock %}
+
+
+
+{% block css %}
+    <link rel="stylesheet" href="{% static 'global_css/file_depository_search.css' %}">
+    <link rel="stylesheet" href="{% static 'process-step/style.css' %}">
+
+    <style>
+        .content {
+            height: calc(100vh - 120px);
+            overflow: scroll;
+            margin-left: -1px;
+        }
+
+        .modal.left .modal-dialog, .modal.right .modal-dialog {
+            position: fixed;
+            margin: auto;
+            width: 600px;
+            height: 100%;
+            -webkit-transform: translate3d(0, 0, 0);
+            -ms-transform: translate3d(0, 0, 0);
+            -o-transform: translate3d(0, 0, 0);
+            transform: translate3d(0, 0, 0)
+        }
+
+        .modal.left .modal-content, .modal.right .modal-content {
+            height: 100%;
+            overflow-y: auto
+        }
+
+        .modal.left .modal-body, .modal.right .modal-body {
+            padding: 15px 15px 80px
+        }
+
+        .modal.left.fade .modal-dialog {
+            left: -320px;
+            -webkit-transition: opacity .3s linear, left .3s ease-out;
+            -moz-transition: opacity .3s linear, left .3s ease-out;
+            -o-transition: opacity .3s linear, left .3s ease-out;
+            transition: opacity .3s linear, left .3s ease-out
+        }
+
+        .modal.left.fade.in .modal-dialog {
+            left: 0
+        }
+
+        .modal.right.fade .modal-dialog {
+            right: -320px;
+            -webkit-transition: opacity .3s linear, right .3s ease-out;
+            -moz-transition: opacity .3s linear, right .3s ease-out;
+            -o-transition: opacity .3s linear, right .3s ease-out;
+            transition: opacity .3s linear, right .3s ease-out
+        }
+
+        .modal.right.fade.in .modal-dialog {
+            right: 0
+        }
+
+        .modal-content {
+            border-radius: 0;
+            border: none
+        }
+
+        .modal-header {
+            border-bottom-color: #eee;
+            background-color: #fafafa
+        }
+    </style>
+{% endblock %}
+
+
+{% block content %}
+    <div class="container-fluid content" style="margin-top: 20px">
+        <div class="col-sm-12">
+            <div class="panel-heading">
+                <ol class="breadcrumb">
+                    <li><a href="{% url 'project:list' %}" style="color: #337ab7">项目大厅</a></li>
+                    <li>
+                        <a href="{% url 'file_depository:file_depository-files' %}?project_id={{ request.tracer.project.id }}"
+                           style="color: #337ab7">文件仓库</a></li>
+                    <li class="active">文件分发</li>
+                </ol>
+            </div>
+
+            <div class="col-sm-12" style="margin-top: -40px;">
+
+                <div class="row">
+                    <div class="col-md-6 col-md-offset-3">
+                        <form id="msform">
+                            <!-- progressbar -->
+                            <ul id="progressbar">
+                                <li class="active">确认分发文件信息</li>
+                                <li>选择分发服务器</li>
+                                <li>文件待入分发舱</li>
+                            </ul>
+                            <!-- fieldsets -->
+                            <fieldset>
+                                <h2 class="fs-title">确认分发文件信息</h2>
+                                <input type="text" name="name" style="color: black" value="文件名称：{{ file_obj.name }}"
+                                       disabled/>
+                                <input type="text" name="uploaded_at" style="color: black"
+                                       value="文件上传时间：{{ file_obj.uploaded_at }}"
+                                       disabled/>
+                                <input type="text" name="creator" style="color: black"
+                                       value="文件上传人：{{ file_obj.creator.username }}" disabled/>
+                                <input type="button" id="first_next" class="next action-button" value="下一步"/>
+                            </fieldset>
+
+                            <fieldset>
+                                <h2 class="fs-title">请选择分发服务器</h2>
+                                <select class="form-control" id="proj_server_list" multiple>
+                                    {% for foo in accounts_obj %}
+                                        <option>{{ foo.hostname }} ---【{{ foo.desc }}】</option>
+                                    {% endfor %}
+                                </select>
+                                <br>
+                                分发路径<input type="text" id="path" style="color: black" value="/tmp"/>
+
+                                <input type="button" name="previous" class="previous action-button-previous"
+                                       value="上一步"/>
+                                <input type="button" id="second_next" class="next action-button" value="下一步"/>
+                            </fieldset>
+
+                            <fieldset>
+                                <h2 class="fs-title">确认分发信息</h2>
+                                <input type="text" name="name" style="color: black" value="文件名称：{{ file_obj.name }}"
+                                       disabled/>
+                                <input type="text" name="uploaded_at" style="color: black"
+                                       value="文件上传时间：{{ file_obj.uploaded_at }}"
+                                       disabled/>
+                                <input type="text" name="creator" style="color: black"
+                                       value="文件上传人：{{ file_obj.creator.username }}" disabled/>
+                                <input type="text" id="path_dir" style="color: black" disabled/>
+                                <textarea id="selected_server" disabled style="resize: none;color: black">
+
+                                </textarea>
+
+                                <input type="button" name="previous" class="previous action-button-previous"
+                                       value="上一步"/>
+
+                                {#                                <input type="submit" id="btnSubmit" class="submit action-button" value="一键分发" data-toggle="modal" data-target="#myModal"/>#}
+                                <input type="button" class="action-button-previous"
+                                       data-toggle="modal"
+                                       data-target="#myModal" style="color: white;background-color: #167be0"
+                                       value="进入分发舱">
+                            </fieldset>
+                        </form>
+
+                    </div>
+                </div>
+
+
+            </div>
+        </div>
+    </div>
+    <div class="modal right fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel"
+         aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                    <h4 class="modal-title" id="myModalLabel">
+                        <span class="glyphicon glyphicon-plane"></span>
+                        分发舱正在分发文件:【{{ file_obj.name }}】
+                    </h4>
+                </div>
+
+                <div>
+                    <form id="msform">
+                        <fieldset>
+                            <input type="text" value="文件包裹信息：{{ file_obj.name }}" class="form-control" disabled
+                                   id="file_name"
+                                   style="color: black">
+                            <input type="text" value="文件包裹单号：{{ express_info }}" class="form-control" disabled
+                                   id="express_info"
+                                   style="color: black">
+                            目的地<textarea id="selected_serversss" style="resize: none;color: black"
+                                            disabled></textarea>
+                            <input type="text" id="online_path" class="form-control" disabled
+                                   style="color: black">
+                        </fieldset>
+
+                        <button type="button" id="backup_allllll" data-loading-text="包裹分发中..."
+                                class="btn btn-primary" style="margin-top: 20px;color: white;background-color: #167be0">
+                            <span class="glyphicon glyphicon-send"></span> 立即分发
+                        </button>
+
+                    </form>
+
+                    <div id="messagecontainer"
+                         style="margin-top:10px;height: 300px;background-color: #333;overflow: scroll;width: 580px;margin-left:10px;color: whitesmoke">
+                        <h5 style="margin-left: 8px;margin-top: 5px;color: whitesmoke">文件包裹:【{{ express_info }}】分发结果，将会在此处打印。</h5>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+
+{% endblock %}
+
+{% block js %}
+    <script src='/static/process-step/jquery.easing.min.js'></script>
+    <script src="/static/process-step/script.js"></script>
+    <script>
+        $(function () {
+            $('#second_next').click(function () {
+                var proj_server_list = document.getElementById("proj_server_list")
+                var selected_value = ""
+                for (var i = 0; i < proj_server_list.length; i++) {
+                    if (proj_server_list[i].selected == true) {
+                        selected_value += proj_server_list[i].text + "\n"
+                    }
+                }
+                document.getElementById("selected_server").value = selected_value;
+                document.getElementById("selected_serversss").value = selected_value;
+                var path_value = document.getElementById("path").value;
+                document.getElementById("path_dir").value = "分发路径：" + path_value;
+                document.getElementById("online_path").value = "分发路径：" + path_value;
+            })
+        })
+    </script>
+
+    {#    执行逻辑#}
+    <script>
+        $('#backup_allllll').click(function () {
+            var online_path = document.getElementById("online_path").value;
+            var file_name = document.getElementById("file_name").value
+            var express_info = document.getElementById("express_info").value
+
+            var proj_server_list = document.getElementById("proj_server_list")
+            var selected_value = ""
+            for (var i = 0; i < proj_server_list.length; i++) {
+                if (proj_server_list[i].selected == true) {
+                    selected_value += proj_server_list[i].text + "\n"
+                }
+            }
+
+            if (selected_value === "") {
+                alert("文件目的地不能为空");
+                return false;
+            } else {
+                //第一次清空内容
+                $('#messagecontainer').empty();
+                $(this).button('loading').delay(1000).queue(function () {
+                    //开发
+                    var url = "ws://" + window.location.host + "/execution/file/send/"
+                    //生产
+                    //var url = "ws://" + window.location.host + "/execution/file/send/"
+                    //生产环境
+                    //var url = "wss://" + host + "/execution/script/";
+                    var socket = new WebSocket(url);
+                    socket.onopen = function () {
+                        data = {
+                            "cmd": "send_files",
+                            "selected_servers": selected_value,
+                            "project_id": {{ request.tracer.project.id }},
+                            "online_path": online_path,
+                            "file_name": file_name,
+                            "express_info": express_info,
+                            "operator": "{{ request.tracer.user.username }}",
+                        };
+                        socket.send(JSON.stringify(data));//发送数据到服务端
+                    };
+                    socket.onmessage = function (e) {
+                        if (e.data !== "close") {
+                            $('#messagecontainer').append('<p style="margin-left: 8px;margin-top: 6px">' + e.data + '</p>');
+                        } else {
+                            socket.close()
+                            $("#backup_allllll").button('reset');
+                            $("#backup_allllll").dequeue();
+                        }
+                    };
+                    socket.onerror = function (e) {
+                        socket.close()
+                    }
+                })
+
+            }
+        })
+    </script>
+
+
+{% endblock %}

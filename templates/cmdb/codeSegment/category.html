@@ -1,0 +1,314 @@
+{% extends 'base/site-base.html' %}
+{% load static %}
+
+{% block css %}
+    <link rel="stylesheet" href="/static/codemirror_latest/lib/codemirror.css">
+    <link rel="stylesheet" href="/static/codemirror_latest/theme/monokai.css">
+    <link rel="stylesheet" href="/static/global_css/script_details.css">
+    <style>
+        .content {
+            height: calc(100vh - 120px);
+            overflow: scroll;
+            margin-left: -1px;
+        }
+
+        .content1 {
+            height: calc(100vh - 120px);
+            overflow: scroll;
+        }
+
+    </style>
+{% endblock %}
+{% block title %}
+    FastWork - 代码段管理 - {{ category }}
+{% endblock %}
+{% block content %}
+    <div class="container-fluid content" style="margin-top: 20px">
+        <div class="col-sm-12">
+            <div class="panel-heading">
+                <ol class="breadcrumb">
+                    <li><a href="{% url 'project:list' %}" style="color: #337ab7">项目大厅</a></li>
+                    <li><a href="{% url 'cmdb:cmdb-code-segment' %}?project_id={{ request.tracer.project.id }}"
+                           style="color: #337ab7">代码段管理</a></li>
+                    <li class="active">{{ category }}</li>
+                </ol>
+            </div>
+        </div>
+
+
+        <div class="row">
+            <div class="col-xs-2 col-md-2">
+                <div class="content1" style="">
+                    <ul>
+                        {% if finallyResults %}
+                            {% for codeSegment in finallyResults %}
+                                <li>
+                                    <a href="{% url 'cmdb:cmdb-code-segment-category' %}?project_id={{ request.tracer.project.id }}&q={{ codeSegment.label }}"
+                                       style="margin-bottom: 5px;margin-left: 30px;color: black"
+                                       class="btn btn-default">{{ codeSegment.label }}
+                                        <span class="label label-danger"
+                                              style="background-color: #2fc25b">{{ codeSegment.count }}</span>
+                                    </a>
+                                </li>
+                            {% endfor %}
+                        {% else %}
+                            111
+                        {% endif %}
+                    </ul>
+                </div>
+            </div>
+
+            <div class="col-xs-2 col-md-2">
+                {% if category__all %}
+                    <div class="container-fluid content" style="">
+                        <div class="" style="text-align: center">
+                            <div class="panel-body">
+                                {% for xline in category__all %}
+                                    <li style="margin-top: 5px">
+                                        <a href="{% url 'cmdb:cmdb-code-segment-category-codesegement' %}?project_id={{ request.tracer.project.id }}&segement_id={{ xline.pk }}&q={{ xline.label }}"
+                                           style="color: black;font-size: 15px;">{{ xline.codeName }}</a>
+                                    </li>
+                                {% endfor %}
+                            </div>
+                        </div>
+                    </div>
+                {% else %}
+                    <div class="container-fluid" style="">
+                        <div class="" style="text-align: center">
+                            <div class="panel-body">
+
+                            </div>
+                        </div>
+                    </div>
+                {% endif %}
+            </div>
+
+            <div class="col-xs-8 col-md-8">
+                {% if firstObj %}
+                    <div class="container-fluid content">
+                        <a href="" class="btn btn-default btn-sm" data-target="#ADDModal" data-toggle="modal"
+                           style="float: left;margin-bottom:20px;margin-left: 15px;color: #333">
+                            <span class="fa fa-edit"> 新建代码段</span>
+                        </a>
+                    </div>
+                {% else %}
+                    <div class="container-fluid">
+                        <a href="" class="btn btn-primary btn-sm" data-target="#ADDModal" data-toggle="modal"
+                           style="float: left;margin-bottom:20px;margin-left: 15px;background-color: #167be0">
+                            <span class="fa fa-edit">新建代码段</span>
+                        </a>
+
+                        <div class="">
+                            <div class="panel-body">
+                                <div class="col-sm-12 content" style="border: none">
+                                    <div>
+                                        <article>
+
+                                        </article>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+
+    </div>
+
+    <div class="modal fade" id="ADDModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
+                            aria-hidden="true">&times;</span></button>
+                    <h4 class="modal-title" id="myModalLabel">新建代码段</h4>
+                </div>
+                <div class="modal-body">
+                    <form class="form-horizontal form-edit-user">
+                        {% csrf_token %}
+                        <div class="form-group">
+                            <label class="control-label col-md-3">标签名：</label>
+                            <div class="col-md-9">
+                                <input type="text" class="form-control" id="category" value=""/>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="control-label col-md-3">代码段名称：</label>
+                            <div class="col-md-9">
+                                <input type="text" class="form-control" id="codeName" value=""/>
+                            </div>
+                        </div>
+
+
+                        <div class="form-group">
+                            <label class="control-label col-md-3">代码段内容：</label>
+                            <div class="col-md-9">
+                                <textarea class="form-control" id="segementContent"
+                                          style="height: 200px;resize: none"></textarea>
+                            </div>
+                        </div>
+
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+                    <button type="button" class="btn btn-success" id="btnSubmitAdd"
+                            style="background-color: #167be0;border: none">新建
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+{% endblock %}
+
+{% block js %}
+
+    <script src="/static/codemirror_latest/lib/codemirror.js"></script>
+    <script src="/static/codemirror_latest/mode/shell/shell.js"></script>
+    <script src="/static/codemirror_latest/mode/python/python.js"></script>
+    <script src="/static/codemirror_latest/mode/go/go.js"></script>
+    <script src="/static/codemirror_latest/mode/javascript/javascript.js"></script>
+    <script src="/static/codemirror_latest/addon/selection/active-line.js"></script>
+    <script src="/static/codemirror_latest/addon/edit/matchbrackets.js"></script>
+
+    <script>
+
+        $(function () {
+            bindCopyUrl();
+        });
+
+        /*
+        点击拷贝邀请码
+        */
+        function bindCopyUrl() {
+            $('#btnCopyUrl').click(function () {
+                var textInput = $('#inviteUrl')[0]; // document.getElementById('inviteUrl')
+                textInput.select();
+
+                document.execCommand("Copy");
+                alert('复制成功');
+            })
+        }
+    </script>
+
+    <script>
+        var editor = CodeMirror.fromTextArea(document.getElementById("code"), {
+            lineNumbers: true,
+            mode: "python",
+            theme: 'default',
+            readOnly: false,
+        });
+        //595px
+        editor.setSize('auto', 'auto');
+
+    </script>
+
+    <script>
+        function copyText() {
+            var input = document.getElementById("inxxxxxxxx");
+            console.log(input)
+            input.select(); // 选中文本
+            document.execCommand("copy"); // 执行浏览器复制命令
+            alert("复制成功");
+        }
+    </script>
+
+    <script>
+        var shell_editor = CodeMirror.fromTextArea(document.getElementById("shellcode"), {
+            lineNumbers: true,
+            readOnly: false,
+            mode: "shell",
+            theme: 'default',
+        });
+        shell_editor.setSize('auto', 'auto');
+
+    </script>
+
+    <script>
+        var shell_editor = CodeMirror.fromTextArea(document.getElementById("javacode"), {
+            lineNumbers: true,
+            readOnly: "nocursor",
+            mode: "javascript",
+            theme: 'monokai',
+        });
+        shell_editor.setSize('auto', 'auto');
+
+    </script>
+
+    <script>
+        var shell_editor = CodeMirror.fromTextArea(document.getElementById("gocode"), {
+            lineNumbers: true,
+            readOnly: "nocursor",
+            mode: "go",
+            theme: 'default',
+        });
+        shell_editor.setSize('auto', 'auto');
+
+    </script>
+
+    <script>
+        $("#btnSubmitAdd").click(function () {
+            var category = $("#category").val();
+            var segementContent = $("#segementContent").val();
+            var codeName = $("#codeName").val();
+
+            var categorylen, codeNamelen;
+            categorylen = getByteLen(category)
+            codeNamelen = getByteLen(codeName)
+
+
+            if (categorylen > 18) {
+                alert("代码段标签名超过限制")
+                return false
+            }
+
+
+            if (codeNamelen > 40) {
+                alert("代码段名称超过限制")
+                return false
+            }
+
+            $.ajax({
+                url: "{% url 'cmdb:cmdb-code-segment-category-codesegement-add' %}",
+                type: "POST",
+                dataType: 'json',
+                data: {
+                    'category': category,
+                    'segementContent': segementContent,
+                    'codeName': codeName,
+                    'project_id': {{ request.tracer.project.id }},
+                    'user_id': {{ request.tracer.user.id }},
+                    'csrfmiddlewaretoken': '{{ csrf_token }}'
+                },
+                success: function (data) {
+                    if (data.state == 0) {
+                        alert(data.data)
+                        location.href = '{% url 'cmdb:cmdb-code-segment' %}?project_id={{ request.tracer.project.id }}'
+                    } else {
+                        alert(data.data)
+                    }
+                }
+            })
+
+
+        })
+
+        function getByteLen(str) {
+            var len = 0;
+            for (var i = 0; i < str.length; i++) {
+                var a = str.charAt(i);
+                if (a.match(/[^\x00-\xff]/ig) != null) {
+                    len += 2;
+                } else {
+                    len += 1;
+                }
+            }
+            return len;
+        }
+    </script>
+
+{% endblock %}
+

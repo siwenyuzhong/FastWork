@@ -1,0 +1,73 @@
+{% extends 'base/site-base.html' %}
+{% block css %}
+    <style>
+        .content {
+            height: calc(100vh - 120px);
+            overflow: scroll;
+            margin-left: -1px;
+        }
+    </style>
+{% endblock %}
+
+{% block title %}
+    FastWork - 工具库日志中心
+{% endblock %}
+
+{% block content %}
+    <div class="container-fluid content" style="margin-top: 20px">
+
+        <div class="col-sm-12">
+            <div class="panel-heading">
+                <ol class="breadcrumb">
+                    <li><a href="{% url 'project:list' %}" style="color: #337ab7">项目大厅</a></li>
+                    <li><a href="{% url 'journal:journal-logs_management' %}?project_id={{ request.tracer.project.id }}"
+                           style="color: #337ab7">日志中心</a></li>
+                    <li class="active">工具库日志中心</li>
+                </ol>
+            </div>
+        </div>
+
+        <div class="col-sm-12" style="margin-top: -20px">
+            <div class="panel-body">
+                <table class="table table-hover">
+                    <thead>
+                    <tr>
+                        <th scope="col">序号</th>
+                        <th scope="col">执行类型</th>
+                        <th scope="col">执行环境</th>
+                        <th scope="col">执行目标</th>
+                        <th scope="col">执行工具</th>
+                        <th scope="col">执行时间</th>
+                        <th scope="col">执行人</th>
+                        <th scope="col">执行命令</th>
+                        <th scope="col">所属项目</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {% for toollog in toolLogs %}
+                        <tr>
+                            <th scope="row">{{ forloop.counter }}</th>
+                            <td>{{ toollog.target }}</td>
+                            <td>{{ toollog.env }}</td>
+                            <th><span class="label label-warning">{{ toollog.server }}</span></th>
+                            {% if toollog.script == "批量操作模块专用" %}
+                                <td><a disabled style="color: gray;text-decoration: none">{{ toollog.script }}</a></td>
+                            {% else %}
+                                <td><a target="_blank"
+                                       href="{% url 'script:scripts-detail' %}?project_id={{ toollog.project.id }}&script_id={{ toollog.script_id }}">{{ toollog.script }}</a>
+                                </td>
+                            {% endif %}
+                            <td>{{ toollog.date }}</td>
+                            <td>{{ toollog.creator }}</td>
+                            <td>{{ toollog.content }}</td>
+                            <th><span class="label label-success">{{ toollog.project.name }}+</span></th>
+                        </tr>
+                    {% endfor %}
+
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+{% endblock %}

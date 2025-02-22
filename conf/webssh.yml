@@ -1,0 +1,6 @@
+#webssh 配置文件
+webssh:
+  #host: xx.xxx.xxx.xxx
+  host: 0.0.0.0
+  port: 8223
+  logDir: ./logs

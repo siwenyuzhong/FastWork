@@ -1,0 +1,483 @@
+{% extends 'base/site-base.html' %}
+{% block title %}
+    FastWork - 添加 FastTask 任务
+{% endblock %}
+
+{% block css %}
+    <style>
+        .content {
+            height: calc(100vh - 120px);
+            overflow: scroll;
+            margin-left: -1px;
+        }
+
+        .damacontent {
+            filter: blur(3px);
+        }
+    </style>
+{% endblock %}
+
+{% block  content %}
+    <div class="container-fluid content" style="margin-top: 20px">
+
+        <div class="col-sm-12">
+            <div class="panel-heading">
+                <ol class="breadcrumb">
+                    <li><a href="{% url 'project:list' %}" style="color: #337ab7">项目大厅</a></li>
+                    <li>
+                        <a href="{% url 'task_scheduler:task_scheduler-task-list' %}?project_id={{ request.tracer.project.id }}"
+                           style="color: #337ab7">定时任务</a></li>
+                    <li>
+                        <a href="{% url 'task_scheduler:task_scheduler-fast_task-list' %}?project_id={{ request.tracer.project.id }}"
+                           style="color: #337ab7">FastTask广场</a></li>
+                    <li class="active">创建FastTask任务</li>
+                </ol>
+            </div>
+            <div class="panel-body" style="margin-top: -30px">
+                <div class="panel panel-default">
+                    <div class="panel-body">
+                        <h3 style="margin-top: 10px;margin-bottom: 5px;color: gray">
+                            1、任务类型 (提示：Date任务初始化是当前的时间，如果时间小于创建时的真实时间，则会创建失败!)</h3>
+                        <ul id="taskType" class="nav nav-tabs">
+                            <li class="active">
+                                <a href="#date_task"
+                                   style="color: #333"
+                                   data-toggle="tab">
+                                    <strong>Date任务</strong>
+                                </a>
+                            </li>
+                            <li>
+                                <a href="#cron_task"
+                                   style="color: #333"
+                                   data-toggle="tab"><strong>Crontab任务</strong></a>
+                            </li>
+                            <li>
+                                <a href="#interval_task"
+                                   style="color: #333"
+                                   data-toggle="tab"><strong>Interval任务</strong></a>
+                            </li>
+                        </ul>
+
+                        <div id="myTabContent" class="tab-content">
+
+                            <div class="tab-pane fade in active" id="date_task">
+                                <div class="col-md-12">
+                                    <div class="col-md-4">
+                                        <div class="form-group" style="margin-top: 15px">
+                                            <input type="text" style="margin-left: -30px;"
+                                                   class="form-control"
+                                                   id="date_task_cmd"
+                                                   value="{{ now }}">
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="tab-pane fade" id="cron_task">
+                                <div class="col-md-12">
+                                    <div class="col-md-4">
+                                        <input type="text"
+                                               style="margin-top: 15px;margin-left: -30px"
+                                               class="form-control"
+                                               id="cron_task_cmd"
+                                               value="20 10-15 11-15 * * *">
+                                    </div>
+                                    <div class="col-md-2">
+                                        <input type="text" style="margin-top: 15px;margin-left: -40px"
+                                               class="form-control"
+                                               value="提示：(秒 分 时 日 月 周)" disabled>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="tab-pane fade" id="interval_task">
+                                <div class="col-md-12">
+                                    <div class="col-md-4">
+                                        <input type="text"
+                                               style="margin-top: 15px;margin-left: -30px"
+                                               class="form-control"
+                                               id="interval_task_cmd"
+                                               value="10 0 0 0 0 ">
+                                    </div>
+                                    <div class="col-md-2">
+                                        <input type="text" style="margin-top: 15px;margin-left: -40px"
+                                               class="form-control"
+                                               value="提示：(秒 分 时 日 月 周)" disabled>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+
+                        <h3 style="margin-top: 70px;margin-bottom: 5px;color: gray">
+                            2、执行逻辑
+                        </h3>
+
+                        <ul id="myTab" class="nav nav-tabs">
+                            <li class="active">
+                                <a href="#default_env"
+                                   style="color: #333"
+                                   data-toggle="tab"><strong>默认解释器</strong></a>
+                            </li>
+                            <li>
+                                {#如果想打开自定义：href加个diy_env#}
+                                <a href="#" disabled
+                                   style="color: #333"
+                                   data-toggle="tab">
+                                    <strong class="damacontent">自定义解释器</strong>
+                                </a>
+                            </li>
+                        </ul>
+
+                        <div id="myTabContent"
+                             class="tab-content">
+                            <div class="tab-pane fade in active" id="default_env">
+                                <div class="col-md-12">
+                                    <div class="col-md-4">
+                                        <input type="text"
+                                               style="margin-top: 15px;margin-left: -30px"
+                                               class="form-control"
+                                               id="default_env_run_env"
+                                               value="{{ fast_task_env }}" disabled>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="tab-pane fade" id="diy_env">
+                                <div class="col-md-12">
+                                    <div class="col-md-4">
+                                        <div class="form-group"
+                                             style="margin-top: 15px">
+                                            <input type="text" style="margin-left: -30px;"
+                                                   class="form-control"
+                                                   id="diy_env_run_env"
+                                                   placeholder="自定义命令或工具"
+                                                   value="">
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+
+                        <h3 style="margin-top: 70px;margin-bottom: 5px;color: gray">
+                            3、配置邮件参数：{"username":用户名,"password":密码,"subject":主题,"sendTo":收件人}</h3>
+                        {% if all_emails %}
+                            <input id="hidden_email_select" type="text" value="select" hidden>
+                            <div class="row">
+                                <div class="col-md-4">
+                                    <select class="form-control" style="width: 400px" id="dict_settings_select">
+                                        {% for all_email in all_emails %}
+                                            <option id="dict_settings_select">{{ all_email.emails }}</option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="col-md-2" style="margin-left: -40px">
+                                        <button class="btn btn-default form-control"
+                                                data-toggle="modal" data-target="#addEmailArgs">
+                                            <i class="glyphicon glyphicon-plus"></i> 添加
+                                        </button>
+                                    </div>
+                                    <div class="col-md-2" style="margin-left: -20px">
+                                        <button class="btn btn-default form-control"
+                                                onclick="editContent()"
+                                                data-toggle="modal" data-target="#editEmailArgs">
+                                            <i class="glyphicon glyphicon-edit"></i> 编辑
+                                        </button>
+                                    </div>
+                                    <div class="col-md-2" style="margin-left: -20px">
+                                        <button class="btn btn-danger form-control"
+                                                onclick="deleteEmails()">
+                                            <i class="glyphicon glyphicon-trash"></i> 删除
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        {% else %}
+                            <input id="hidden_email_textarea" type="text" value="textarea" hidden>
+                            <textarea class="form-control" style="width: 400px;height: 100px;resize: none"
+                                      id="dict_settings"
+                                      placeholder="将上述配置参数按照格式，配置好之后贴到此处！"></textarea>
+                        {% endif %}
+
+                        <h3 style="margin-top: 30px;margin-bottom: 5px;color: gray">
+                            4、邮件内容</h3>
+                        <textarea class="form-control" id="message-text" placeholder="请在此处输入需要告警的邮件内容"
+                                  style="width: 400px;height: 100px;resize: none"></textarea>
+
+                        <div style="margin-top: 20px">
+                            {% if request.tracer.user.tag == "体验账户" %}
+                                <button class="btn btn-primary" disabled>
+                                    确认创建
+                                </button>
+                            {% else %}
+                                <button class="btn btn-primary"
+                                        id="ensure_create_button" style="background-color: #167be0">
+                                    确认创建
+                                </button>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <div class="modal fade" id="addEmailArgs" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
+                            aria-hidden="true">&times;</span></button>
+                    <h4 class="modal-title" id="myModalLabel">添加页面</h4>
+                </div>
+                <div class="modal-body">
+                    <label for="" class="control-label">添加邮件参数: </label>
+                    <textarea class="form-control" style="height: 100px;resize: none" id="add_dict_settings"
+                              placeholder='按照该格式 {"username":用户名,"password":密码,"subject":主题,"sendTo":收件人} 添加！'></textarea>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">取消
+                    </button>
+                    <button type="button" class="btn btn-primary" id="add_button" style="background-color: #167be0">添加
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="editEmailArgs" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
+                            aria-hidden="true">&times;</span></button>
+                    <h4 class="modal-title" id="myModalLabel">编辑页面</h4>
+                </div>
+                <div class="modal-body">
+                    <label for="" class="control-label">编辑邮件参数: </label>
+                    <input type="text" value="" hidden id="hidden_email_edit">
+                    <textarea class="form-control" style="height: 100px;resize: none"
+                              id="edit_dict_settings"></textarea>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">取消
+                    </button>
+                    <button type="button" class="btn btn-primary" id="edit_button" style="background-color: #167be0">编辑
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block js %}
+    <script>
+        $("#ensure_create_button").click(function () {
+
+            var hidden_email_select = $("#hidden_email_select").val();
+            var hidden_email_textarea = $("#hidden_email_textarea").val();
+
+
+            {#任务类型标识#}
+            var taskTypeNumber = $("ul .active").index();
+            {#任务类型对应的值#}
+            var date_task_cmd_val = $("#date_task_cmd").val();
+            var cron_task_cmd_val = $("#cron_task_cmd").val();
+            var interval_task_cmd_val = $("#interval_task_cmd").val();
+
+            var email_content = $("#message-text").val();
+
+            {#解释器选择#}
+            var default_env_run_env = $("#default_env_run_env").val();
+            var diy_env_run_env = $("#diy_env_run_env").val();
+
+            if (hidden_email_select == "select") {
+                var dict_settings_select_index = document.getElementById("dict_settings_select").selectedIndex;
+                var dict_settings_select = document.getElementById("dict_settings_select").options[dict_settings_select_index].text;
+                //var dict_settings_select_content = JSON.stringify(dict_settings_select_content).replace(/\'/g,'"');
+                var dict_settings_select_content = JSON.stringify(dict_settings_select);
+                if (email_content === "") {
+                    alert("邮件内容不能为空!")
+                    return false;
+                } else {
+                    $.ajax({
+                        url: "{% url 'task_scheduler:task_scheduler-fast_task-add' %}",
+                        type: "POST",
+                        dataType: "json",
+                        data: {
+                            "taskTypeNumber": taskTypeNumber,
+                            "project_id": {{ request.tracer.project.id }},
+                            "date_task_cmd_val": date_task_cmd_val,
+                            "cron_task_cmd_val": cron_task_cmd_val,
+                            "interval_task_cmd_val": interval_task_cmd_val,
+                            "dict_settings_content": "",
+                            "dict_settings_select_content": dict_settings_select_content,
+                            "email_content": email_content,
+                            "default_env_run_env": default_env_run_env,
+                            "diy_env_run_env": diy_env_run_env,
+                            'csrfmiddlewaretoken': '{{ csrf_token }}'
+                        },
+                        success: function (data) {
+                            if (data.code !== 200) {
+                                alert(data.msg)
+                                return false;
+                            } else {
+                                alert(data.msg)
+                                window.location.href = "{% url 'task_scheduler:task_scheduler-task-list' %}?project_id={{ request.tracer.project.id }}"
+                                return true;
+                            }
+                        }
+                    })
+                    return false;
+                }
+            }
+
+            if (hidden_email_textarea == "textarea") {
+                {#参数以及内容#}
+                var dict_settings_content = $("#dict_settings").val();
+                if (email_content === "" || dict_settings_content === "") {
+                    alert("邮件参数或内容不能为空!")
+                    return false;
+                } else {
+                    $.ajax({
+                        url: "{% url 'task_scheduler:task_scheduler-fast_task-add' %}",
+                        type: "POST",
+                        dataType: "json",
+                        data: {
+                            "taskTypeNumber": taskTypeNumber,
+                            "project_id": {{ request.tracer.project.id }},
+                            "date_task_cmd_val": date_task_cmd_val,
+                            "cron_task_cmd_val": cron_task_cmd_val,
+                            "interval_task_cmd_val": interval_task_cmd_val,
+                            "dict_settings_content": dict_settings_content,
+                            "dict_settings_select_content": "",
+                            "email_content": email_content,
+                            "default_env_run_env": default_env_run_env,
+                            "diy_env_run_env": diy_env_run_env,
+                            'csrfmiddlewaretoken': '{{ csrf_token }}'
+                        },
+                        success: function (data) {
+                            if (data.code !== 200) {
+                                alert(data.msg)
+                                return false;
+                            } else {
+                                alert(data.msg)
+                                window.location.href = "{% url 'task_scheduler:task_scheduler-task-list' %}?project_id={{ request.tracer.project.id }}"
+                                return true;
+                            }
+                        }
+                    })
+                    return false;
+                }
+            }
+
+
+        })
+    </script>
+
+    <script>
+        //新增邮件参数
+        $("#add_button").click(function (data) {
+            var add_dict_settings = $("#add_dict_settings").val();
+
+            if (add_dict_settings === '') {
+                alert("邮件参数不能为空！")
+                return false;
+            }
+
+            $.ajax({
+                url: "{% url 'task_scheduler:task_scheduler-fast_task-add-emails' %}",
+                type: "POST",
+                dataType: "json",
+                data: {
+                    "project_id": {{ request.tracer.project.id }},
+                    "add_dict_settings": add_dict_settings,
+                    'csrfmiddlewaretoken': '{{ csrf_token }}'
+                },
+                success: function (data) {
+                    if (data.code == 200) {
+                        alert(data.msg)
+                        window.location.href = "{% url 'task_scheduler:task_scheduler-fast_task-add' %}?project_id={{ request.tracer.project.id }}"
+                    } else {
+                        alert(data.msg)
+                        return false;
+                    }
+                }
+            })
+        })
+    </script>
+
+    <script>
+        function editContent() {
+            var dict_settings_select_index = document.getElementById("dict_settings_select").selectedIndex;
+            var edit_dict_settings_select = document.getElementById("dict_settings_select").options[dict_settings_select_index].text;
+            document.getElementById("edit_dict_settings").value = edit_dict_settings_select;
+            document.getElementById("hidden_email_edit").value = edit_dict_settings_select;
+        }
+
+        //编辑邮件参数
+        $("#edit_button").click(function (data) {
+
+            var edit_dict_settings = $("#edit_dict_settings").val();
+            var hidden_email_edit = $("#hidden_email_edit").val();
+
+            if (edit_dict_settings === '') {
+                alert("邮件参数不能为空！")
+                return false;
+            }
+
+            $.ajax({
+                url: "{% url 'task_scheduler:task_schedulerfast_task-edit-emails' %}",
+                type: "POST",
+                dataType: "json",
+                data: {
+                    "edit_dict_settings": edit_dict_settings,
+                    "hidden_email_edit": hidden_email_edit,
+                    "project_id": {{ request.tracer.project.id }},
+                    'csrfmiddlewaretoken': '{{ csrf_token }}'
+                },
+                success: function (data) {
+                    if (data.code == 200) {
+                        alert(data.msg)
+                        window.location.href = "{% url 'task_scheduler:task_scheduler-fast_task-add' %}?project_id={{ request.tracer.project.id }}"
+                    } else {
+                        alert(data.msg)
+                        return false;
+                    }
+                }
+            })
+        })
+    </script>
+
+    <script>
+        function deleteEmails() {
+            var dict_settings_select_index = document.getElementById("dict_settings_select").selectedIndex;
+            var delete_dict_settings_select = document.getElementById("dict_settings_select").options[dict_settings_select_index].text;
+
+            if (window.confirm('确定要永久删除该邮件配置吗？')) {
+                $.ajax({
+                    url: "{% url 'task_scheduler:task_scheduler-fast_task-delete-emails' %}",
+                    type: "POST",
+                    dataType: "json",
+                    data: {
+                        'project_id': {{ request.tracer.project.id }},
+                        'delete_dict_settings_select': delete_dict_settings_select,
+                        'csrfmiddlewaretoken': '{{ csrf_token }}'
+                    },
+                    success: function (data) {
+                        alert(data.msg)
+                        window.location.href = "{% url 'task_scheduler:task_scheduler-fast_task-add' %}?project_id={{ request.tracer.project.id }}"
+                    }
+                })
+                return true;
+            } else {
+                alert("取消删除！")
+                return false;
+            }
+        }
+    </script>
+
+{% endblock %}

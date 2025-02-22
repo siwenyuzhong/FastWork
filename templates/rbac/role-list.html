@@ -1,0 +1,339 @@
+{% extends 'base/without_project_base.html' %}
+{% load static %}
+{% block title %}
+    角色管理
+{% endblock %}
+
+{% block css %}
+    <link rel="stylesheet" href="{% static 'rbac/css/jquery.dataTables.min.css' %}">
+    <link href="{% static 'layui/2.8.7/layui.css' %}" rel="stylesheet">
+    <style>
+        .content {
+            height: calc(100vh - 120px);
+            overflow: scroll;
+            margin-left: -1px;
+        }
+
+        .damacontent {
+            filter: blur(3px);
+        }
+
+        .choose {
+            border-left: 2px solid #f90 !important;
+        }
+    </style>
+{% endblock %}
+
+
+{% block content %}
+    <div class="container-fluid content" style="margin-top: 20px">
+
+        <div class="col-sm-12">
+            <div class="panel-heading">
+                <ol class="breadcrumb">
+                    <li><a href="{% url 'project:list' %}"
+                           style="color: #337ab7">项目大厅</a></li>
+                    <li class="active">权限中心</li>
+                    <li class="active">角色管理</li>
+                </ol>
+            </div>
+        </div>
+
+        <div class="col-sm-12" style="">
+            <div class="container-fluid">
+                <div class="panel panel-default">
+                    <div class="panel-body">
+                        <div class="wrapper wrapper-content animated fadeInRight">
+                            <div class="wrapper wrapper-content">
+
+                                <div class="col-sm-3">
+                                    <div class="panel panel-default">
+                                        <div class="panel-heading"
+                                             style="background-color:transparent;font-weight: bold;">
+                                            角色管理
+                                        </div>
+                                        <div class="list-group" style="border-radius: 0">
+                                            <div>
+                                                <a href="{% url 'rbac:user' %}"
+                                                   class="list-group-item">用户管理</a>
+                                                <a href="{% url 'rbac:menu' %}"
+                                                   class="list-group-item">菜单管理</a>
+                                                <a href="{% url 'rbac:structure' %}"
+                                                   class="list-group-item">组织管理</a>
+                                                <a href="{% url 'rbac:role' %}"
+                                                   class="choose list-group-item">角色管理</a>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-sm-9">
+                                    <div class="panel panel-default">
+                                        <div class="panel-heading"><i class="fa fa-address-card-o"
+                                                                      aria-hidden="true"></i> 角色管理
+                                        </div>
+
+                                        <div class="panel-body">
+
+
+                                            <div id="devlist" style="margin-bottom: 40px">
+                                                <div class="box box-primary" id="liebiao">
+                                                    <div class="box-header">
+                                                        <div class="btn-group pull-left">
+                                                            <button type="button" id="btnRefresh"
+                                                                    class="btn btn-success btn-sm">
+                                                                <i class="glyphicon glyphicon-repeat"></i>刷新
+                                                            </button>
+                                                        </div>
+                                                        <div class="btn-group pull-left">&nbsp</div>
+                                                        <div class="btn-group pull-left">
+                                                            <button type="button" id="btnCreate"
+                                                                    class="btn btn-primary btn-sm">
+                                                                <i class="glyphicon glyphicon-plus"></i>新增
+                                                            </button>
+
+                                                        </div>
+                                                        <div class="btn-group pull-left">&nbsp</div>
+                                                        <div class="btn-group pull-left">
+                                                            <button type="button" id="btnDelete"
+                                                                    class="btn btn-danger btn-sm">
+                                                                <i class="glyphicon glyphicon-trash"></i>删除
+                                                            </button>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <table id="dtbList" class="display" cellspacing="0"
+                                                   width="100%">
+                                                <thead>
+                                                <tr valign="middle">
+                                                    <th><input type="checkbox" id="checkAll"></th>
+                                                    <th>ID</th>
+                                                    <th>名称</th>
+                                                    <th>操作</th>
+                                                </tr>
+                                                </thead>
+                                                <tbody>
+                                                </tbody>
+                                            </table>
+
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block js %}
+    <script src="{% static 'rbac/js/jquery.dataTables.min.js' %}"></script>
+    <script src="{% static 'rbac/js/dataTables.const.js' %}"></script>
+    <script src="{% static 'layui/2.8.7/layui.js' %}"></script>
+    <!-- iCheck 1.0.1 -->
+    <script type="text/javascript">
+        $(function () {
+            $('#SYSTEM-RBAC').addClass('active');
+            $('#SYSTEM-RBAC-ROLE').addClass('active');
+
+        });
+    </script>
+
+    <script type="text/javascript">
+        var oDataTable = null;
+        $(function () {
+            oDataTable = initTable();
+
+            function initTable() {
+                var oTable = $('#dtbList').DataTable($.extend(true, {},
+                    DATATABLES_CONSTANT.DATA_TABLES.DEFAULT_OPTION,
+                    {
+                        ajax: {
+                            "url": "{% url 'rbac:role-list' %}",
+                            "data": function (d) {
+                                //d.select=$("#select").val();
+                            }
+                        },
+                        columns: [
+                            DATATABLES_CONSTANT.DATA_TABLES.COLUMN.CHECKBOX,
+                            {
+                                data: "id",
+                                width: "5%",
+                            },
+                            {
+                                data: "title",//parent
+                                //width : "20%",
+                            },
+
+                            {
+                                data: "id",
+                                width: "20%",
+                                bSortable: "false",
+                                render: function (data, type, row, meta) {
+                                    var ret = "";
+                                    var ret = "<button title='详情-编辑' onclick='doUpdate("
+                                        + data + ")'><i class='glyphicon glyphicon-pencil btn-sm'></i></button>";
+                                    ret = ret + "<button title='关联用户' onclick='doUpdateUser("
+                                        + data + ")'><i class='glyphicon glyphicon-user btn-sm'></i></button>";
+                                    ret = ret + "<button title='关联菜单' onclick='doUpdateMenu("
+                                        + data + ")'><i class='glyphicon glyphicon-tree-conifer btn-sm'></i></button>";
+                                    ret = ret + "<button title='删除' onclick='doDelete("
+                                        + data + ")'><i class='glyphicon glyphicon-trash btn-sm'></i></button>";
+                                    return ret;
+                                }
+                            }],
+                    }));
+                return oTable;
+            }
+
+            //checkbox全选
+            $("#checkAll").on("click", function () {
+                if ($(this).prop("checked") === true) {
+                    $("input[name='checkList']").prop("checked", $(this).prop("checked"));
+                    $('#example tbody tr').addClass('selected');
+                } else {
+                    $("input[name='checkList']").prop("checked", false);
+                    $('#example tbody tr').removeClass('selected');
+                }
+            });
+
+            //点击刷新，重载页面
+            $("#btnRefresh").click(function () {
+                window.location.reload();
+            })
+
+            $("#btnCreate").click(function () {
+                layer.open({
+                    type: 2,
+                    title: '新增',
+                    shadeClose: false,
+                    maxmin: true,
+                    area: ['800px', '300px'],
+                    content: "{% url 'rbac:role-detail' %}",
+                    end: function () {
+                        //关闭时做的事情
+                        oDataTable.ajax.reload();
+                    }
+                });
+            });
+
+            $("#btnRefresh").click(function () {
+                oDataTable.ajax.reload();
+            });
+
+            //批量删除
+            $("#btnDelete").click(function () {
+                if ($("input[name='checkList']:checked").length == 0) {
+                    layer.msg("请选择要删除的记录");
+                    return;
+                }
+
+                var arrId = new Array();
+                $("input[name='checkList']:checked").each(function () {
+                    //alert($(this).val());
+                    arrId.push($(this).val());
+                });
+
+                sId = arrId.join(',');
+
+                layer.alert('确定删除吗？', {
+                    title: '提示'
+                    , icon: 3 //0:感叹号 1：对号 2：差号 3：问号 4：小锁 5：哭脸 6：笑脸
+                    , time: 0 //不自动关闭
+                    , btn: ['YES', 'NO']
+                    , yes: function (index) {
+                        layer.close(index);
+                        $.ajax({
+                            type: "POST",
+                            url: "{% url 'rbac:role-delete' %}",
+                            data: {"id": sId, csrfmiddlewaretoken: '{{ csrf_token }}'},
+                            cache: false,
+                            success: function (msg) {
+                                if (msg.result) {
+                                    layer.alert("操作成功", {icon: 1});
+                                    oDataTable.ajax.reload();
+                                } else {
+                                    //alert(msg.message);
+                                    layer.alert("操作失败", {icon: 2});
+                                }
+                                return;
+                            }
+                        });
+                    }
+                });
+            });
+
+
+        });
+
+        function doUpdate(id) {
+            layer.open({
+                type: 2,
+                title: '编辑',
+                shadeClose: false,
+                maxmin: true,
+                area: ['800px', '400px'],
+                content: ["{% url 'rbac:role-detail' %}" + '?id=' + id, 'no'],
+            });
+        }
+
+
+        //删除单个数据
+        function doDelete(id) {
+            layer.alert('确定删除吗？', {
+                title: '提示'
+                , icon: 3 //0:感叹号 1：对号 2：差号 3：问号 4：小锁 5：哭脸 6：笑脸
+                , time: 0 //不自动关闭
+                , btn: ['YES', 'NO']
+                , yes: function (index) {
+                    layer.close(index);
+                    $.ajax({
+                        type: "POST",
+                        url: "{% url 'rbac:role-delete' %}",
+                        data: {"id": id, csrfmiddlewaretoken: '{{ csrf_token }}'},  //防止post数据时报 csrf_token 403
+                        cache: false,
+                        success: function (msg) {
+                            if (msg.result) {
+                                layer.alert('删除成功', {icon: 1});
+                                oDataTable.ajax.reload();
+                            } else {
+                                //alert(msg.message);
+                                layer.alert('删除失败', {icon: 2});
+                            }
+                            return;
+                        }
+                    });
+                }
+            });
+
+        }
+
+        function doUpdateMenu(id) {
+            layer.open({
+                type: 2,
+                title: '权限分配',
+                shadeClose: false,
+                maxmin: true,
+                area: ['600px', '600px'],
+                content: ["{% url 'rbac:role-role_menu' %}" + '?id=' + id, 'no'],
+            });
+        }
+
+
+        //关联用户
+        function doUpdateUser(id) {
+            layer.open({
+                type: 2,
+                title: '绑定用户',
+                shadeClose: false,
+                maxmin: true,
+                area: ['800px', '650px'],
+                content: ["{% url 'rbac:role-role_user' %}" + '?id=' + id, 'no'],
+            });
+        }
+
+    </script>
+{% endblock %}
