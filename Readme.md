@@ -15,5 +15,5 @@
 ![设置导航](https://github.com/siwenyuzhong/FastWork/blob/main/show/%E8%AE%BE%E7%BD%AE%E5%AF%BC%E8%88%AA.png)
 
 ### 3、开源不易，打赏请看这👀
-<img src="https://github.com/siwenyuzhong/FastWork/blob/main/show/9671740129005_.pic.jpg" alt="Image text" style="width:300px;height:350px" />
+<img src="https://github.com/siwenyuzhong/FastWork/blob/main/show/wechatPay.jpg" alt="Image text" style="width:300px;height:350px" />
 
