@@ -33,6 +33,7 @@ INSTALLED_APPS = [
     "file_depository",
     "notifications",
     "journal",
+    "todoList"
 ]
 
 MIDDLEWARE = [

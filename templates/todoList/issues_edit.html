@@ -1,0 +1,133 @@
+{% extends 'base/site-base.html' %}
+{% load static %}
+
+{% block title %}
+    FastWork - 编辑代办 - {{ id_issue_id__first.text }}
+{% endblock %}
+
+{% block css %}
+    <style>
+        .list-group-item {
+            text-align: center;
+        }
+    </style>
+{% endblock %}
+
+{% block content %}
+    <div class="container-fluid content" style="margin-top: 20px">
+        <div class="col-sm-12">
+            <div class="panel-heading">
+                <ol class="breadcrumb">
+                    <li class="active">todoList</li>
+                    <li class="active">
+                        <a href="{% url 'todoList:todoList-all' %}?project_id={{ project_id }}"
+                           style="color: #337ab7">待办清单列表</a>
+                        </li>
+                    <li class="active">{{ id_issue_id__first.text }}</li>
+                    <li class="active">编辑模式</li>
+                </ol>
+            </div>
+        </div>
+
+        <div class="col-sm-12" style="margin-top: -20px">
+            <div class="row">
+                <div class="col-md-2">
+                </div>
+
+                <div class="col-md-8" style="margin-top: 20px;height:calc(80vh - 50px);overflow: scroll;">
+
+
+                    <div class="input-group" style="margin-top: 10px">
+                        <input type="text" class="form-control" id="issues_edit" value="{{ id_issue_id__first.text }}"
+                               style="height: 40px">
+                        <span class="input-group-btn">
+                    <button class="btn btn-default" type="button" style="height: 40px" id="submit">修改</button>
+                </span>
+
+                    </div>
+                    <div class="input-group" style="margin-top: 10px">
+                        <input type="radio" name="status" value="待办"
+                               {% if id_issue_id__first.urgency == '待办' %}checked{% endif %}/>待办
+                        <input type="radio" name="status" value="重要"
+                               {% if id_issue_id__first.urgency == '重要' %}checked{% endif %}/>重要
+                        <input type="radio" name="status" value="已完成"
+                               {% if id_issue_id__first.urgency == '已完成' %}checked{% endif %}/>已完成
+                        <input type="radio" name="status" value="紧急"
+                               {% if id_issue_id__first.urgency == '紧急' %}checked{% endif %}/>紧急
+                        <input type="radio" name="status" value="一般"
+                               {% if id_issue_id__first.urgency == '一般' %}checked{% endif %}/>一般
+                        <input type="radio" name="status" value="进行中"
+                               {% if id_issue_id__first.urgency == '进行中' %}checked{% endif %}/>进行中
+                        <input type="radio" name="status" value="确认中"
+                               {% if id_issue_id__first.urgency == '确认中' %}checked{% endif %}/>确认中
+                        <input type="radio" name="status" value="升级要求"
+                               {% if id_issue_id__first.urgency == '升级要求' %}checked{% endif %}/>升级要求
+                        <input type="radio" name="status" value="功能优化"
+                               {% if id_issue_id__first.urgency == '功能优化' %}checked{% endif %}/>功能优化
+                    </div>
+
+
+                </div>
+
+                <div class="col-md-2">
+                </div>
+            </div>
+        </div>
+
+
+        <div class="col-sm-12">
+            <div class="panel-heading">
+                <div class="panel-body">
+
+                </div>
+            </div>
+        </div>
+
+
+        <div class="col-sm-12">
+
+        </div>
+    </div>
+{% endblock %}
+
+{% block js %}
+    <script>
+        $("#submit").click(function () {
+            var issues_edit = $("#issues_edit").val();
+            var checkboxes = document.getElementsByName('status');
+            var selectedStatus = [];
+
+            for (var i = 0; i < checkboxes.length; i++) {
+                if (checkboxes[i].checked) {
+                    selectedStatus.push(checkboxes[i].value);
+                }
+            }
+
+            if (issues_edit === "") {
+                alert("修改内容不能为空！");
+                return false;
+            }
+
+            $.ajax({
+                url: "{% url 'todoList:todoList-edit'%}?project_id={{ project_id }}",
+                type: "POST",
+                dataType: 'json',
+                data: {
+                    'selectedStatus': selectedStatus,
+                    'issues_edit': issues_edit,
+                    'project_id': {{ project_id }},
+                    'issues_id': {{id_issue_id__first.id}},
+                    'csrfmiddlewaretoken': '{{ csrf_token }}'
+                },
+                success: function (data) {
+                    if (data.state === 0) {
+                        {#alert(data.data)#}
+                        window.location.href = "{% url 'todoList:todoList-all' %}?project_id={{ project_id }}"
+                    } else {
+                        alert("修改失败")
+                    }
+                }
+            })
+        })
+    </script>
+{% endblock %}

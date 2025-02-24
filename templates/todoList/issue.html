@@ -1,0 +1,272 @@
+{% extends 'base/site-base.html' %}
+{% load static %}
+
+{% block title %}
+    FastWork - todoList
+{% endblock %}
+
+{% block css %}
+    <style>
+        .list-group-item {
+            text-align: center;
+        }
+    </style>
+{% endblock %}
+
+{% block content %}
+    <div class="container-fluid content" style="margin-top: 20px">
+        <div class="col-sm-12">
+            <div class="panel-heading">
+                <ol class="breadcrumb">
+                    <li><a href="{% url 'todoList:todoList-confirmed' %}?project_id={{  project_id }}"
+                           style="color: #337ab7">已办事项</a></li>
+                    <li><a href="{% url 'todoList:todoList-all' %}?project_id={{ project_id }}"
+                           style="color: #337ab7">todoList</a></li>
+                    <li class="active">待办清单列表</li>
+                </ol>
+            </div>
+        </div>
+
+        <div class="col-sm-12" style="margin-top: -20px">
+            <div class="row">
+                <div class="col-md-2">
+                </div>
+
+                <div class="col-md-8" style="margin-top: 20px;height:calc(80vh - 50px);overflow: scroll;">
+
+                    <div>
+                        <div class="input-group">
+                            <input type="text" class="form-control" id="issues"
+                                   placeholder="在此处登记 问题、待办事项..."
+                                   style="height: 40px">
+                            <span class="input-group-btn">
+                    <button class="btn btn-default" type="button" style="height: 40px" id="submit">提交</button>
+                </span>
+                        </div>
+                        <div>
+                            <select class="form-control" style="margin-top: 5px" id="selected_project_name" disabled>
+                                <option id="selected_project">{{ pObj.name }}</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div style=";height:calc(65vh - 30px);overflow: scroll;">
+                        {% if reply__all %}
+                            {% for foo in reply__all %}
+                                <div class="list-group">
+                                    {% if foo.urgency == "一般" %}
+                                        <button type="button" style="margin-top: 10px"
+                                                class="list-group-item">{{ forloop.counter }}、<a
+                                                href="{% url 'todoList:todoList-detail'%}?project_id={{ project_id }}&id={{ foo.id }}">{{ foo.text }}</a>
+                                            | {{ foo.create_datetime }} | <span
+                                                    class="label label-warning">{{ foo.urgency }}</span>
+                                            <div style="float: right">
+                                                <a href="{% url 'todoList:todoList-edit' %}?project_id={{ project_id }}&id={{ foo.id }}"
+                                                   style="float:left;margin-right: 5px">编辑</a>
+                                                <a href="{% url 'todoList:todoList-delete' %}?project_id={{ project_id }}&issue_id={{ foo.id }}"
+                                                   style="float:right">删除</a>
+                                            </div>
+                                            <span>
+                                | 回复数: <span class="badge">{{ foo.count }}</span>
+                                </span>
+                                        </button>
+                                    {% elif foo.urgency == "紧急" %}
+                                        <button type="button" style="margin-top: 10px"
+                                                class="list-group-item">{{ forloop.counter }}、<a
+                                                href="{% url 'todoList:todoList-detail' %}?project_id={{ project_id }}&id={{ foo.id }}">{{ foo.text }}</a>
+                                            | {{ foo.create_datetime }} | <span
+                                                    class="label label-danger">{{ foo.urgency }}</span>
+                                            <div style="float: right">
+                                                <a href="{% url 'todoList:todoList-edit' %}?project_id={{ project_id }}&id={{ foo.id }}"
+                                                   style="float:left;margin-right: 5px">编辑</a>
+                                                <a href="{% url 'todoList:todoList-delete' %}?project_id={{ project_id }}&issue_id={{ foo.id }}"
+                                                   style="float:right">删除</a></div>
+                                            <span>
+                                    | 回复数: <span class="badge">{{ foo.count }}</span>
+                                </span>
+                                        </button>
+                                    {% elif foo.urgency == "待办" %}
+                                        <button type="button" style="margin-top: 10px"
+                                                class="list-group-item">{{ forloop.counter }}、<a
+                                                href="{% url 'todoList:todoList-detail' %}?project_id={{ project_id }}&id={{ foo.id }}">{{ foo.text }}</a>
+                                            | {{ foo.create_datetime }} | <span
+                                                    class="label label-danger"
+                                                    style="background-color:#1E90FF">{{ foo.urgency }}</span>
+                                            <div style="float: right">
+                                                <a href="{% url 'todoList:todoList-edit' %}?project_id={{ project_id }}&id={{ foo.id }}"
+                                                   style="float:left;margin-right: 5px">编辑</a>
+                                                <a href="{% url 'todoList:todoList-delete' %}?project_id={{ project_id }}&issue_id={{ foo.id }}"
+                                                   style="float:right">删除</a></div>
+                                            <span>
+                                    | 回复数: <span class="badge">{{ foo.count }}</span>
+                                </span>
+                                        </button>
+                                    {% elif foo.urgency == "已确认" %}
+                                        <button type="button" style="margin-top: 10px"
+                                                class="list-group-item">{{ forloop.counter }}、<a
+                                                href="{% url 'todoList:todoList-detail' %}?project_id={{ project_id }}&id={{ foo.id }}">{{ foo.text }}</a>
+                                            | {{ foo.create_datetime }} | <span
+                                                    class="label label-success">{{ foo.urgency }}</span>
+                                            <div style="float: right">
+                                                <a href="{% url 'todoList:todoList-edit' %}?project_id={{ project_id }}&id={{ foo.id }}"
+                                                   style="float:left;margin-right: 5px">编辑</a>
+                                                <a href="{% url 'todoList:todoList-delete' %}?project_id={{ project_id }}&issue_id={{ foo.id }}"
+                                                   style="float:right">删除</a></div>
+                                            <span>
+                                    | 回复数: <span class="badge">{{ foo.count }}</span>
+                                </span>
+                                        </button>
+                                    {% elif foo.urgency == "重要" %}
+                                        <button type="button" style="margin-top: 10px"
+                                                class="list-group-item">{{ forloop.counter }}、<a
+                                                href="{% url 'todoList:todoList-detail' %}?project_id={{ project_id }}&id={{ foo.id }}">{{ foo.text }}</a>
+                                            | {{ foo.create_datetime }} | <span
+                                                    class="label label-info"
+                                                    style="background-color: purple;color: white">{{ foo.urgency }}</span>
+                                            <div style="float: right">
+                                                <a href="{% url 'todoList:todoList-edit' %}?project_id={{ project_id }}&id={{ foo.id }}"
+                                                   style="float:left;margin-right: 5px">编辑</a>
+                                                <a href="{% url 'todoList:todoList-delete' %}?project_id={{ project_id }}&issue_id={{ foo.id }}"
+                                                   style="float:right">删除</a></div>
+                                            <span>
+                                    | 回复数: <span class="badge">{{ foo.count }}</span>
+                                </span>
+                                        </button>
+
+                                    {% elif foo.urgency == "升级要求" %}
+                                        <button type="button" style="margin-top: 10px"
+                                                class="list-group-item">{{ forloop.counter }}、<a
+                                                href="{% url 'todoList:todoList-detail' %}?project_id={{ project_id }}&id={{ foo.id }}">{{ foo.text }}</a>
+                                            | {{ foo.create_datetime }} | <span
+                                                    class="label label-info"
+                                                    style="background-color: #00FF7F;color: white">{{ foo.urgency }}</span>
+                                            <div style="float: right">
+                                                <a href="{% url 'todoList:todoList-edit' %}?project_id={{ project_id }}&id={{ foo.id }}"
+                                                   style="float:left;margin-right: 5px">编辑</a>
+                                                <a href="{% url 'todoList:todoList-delete' %}?project_id={{ project_id }}&issue_id={{ foo.id }}"
+                                                   style="float:right">删除</a></div>
+                                            <span>
+                                    | 回复数: <span class="badge">{{ foo.count }}</span>
+                                </span>
+                                        </button>
+
+                                    {% elif foo.urgency == "功能优化" %}
+                                        <button type="button" style="margin-top: 10px"
+                                                class="list-group-item">{{ forloop.counter }}、<a
+                                                href="{% url 'todoList:todoList-detail' %}?project_id={{ project_id }}&id={{ foo.id }}">{{ foo.text }}</a>
+                                            | {{ foo.create_datetime }} | <span
+                                                    class="label label-info"
+                                                    style="background-color: #40E0D0;color: white">{{ foo.urgency }}</span>
+                                            <div style="float: right">
+                                                <a href="{% url 'todoList:todoList-edit' %}?project_id={{ project_id }}&id={{ foo.id }}"
+                                                   style="float:left;margin-right: 5px">编辑</a>
+                                                <a href="{% url 'todoList:todoList-delete' %}?project_id={{ project_id }}&issue_id={{ foo.id }}"
+                                                   style="float:right">删除</a></div>
+                                            <span>
+                                    | 回复数: <span class="badge">{{ foo.count }}</span>
+                                </span>
+                                        </button>
+
+                                    {% elif foo.urgency == "进行中" %}
+                                        <button type="button" style="margin-top: 10px"
+                                                class="list-group-item">{{ forloop.counter }}、<a
+                                                href="{% url 'todoList:todoList-detail' %}?project_id={{ project_id }}&id={{ foo.id }}">{{ foo.text }}</a>
+                                            | {{ foo.create_datetime }} | <span
+                                                    class="label label-info"
+                                                    style="background-color: deepskyblue;color: white">{{ foo.urgency }}</span>
+                                            <div style="float: right">
+                                                <a href="{% url 'todoList:todoList-edit' %}?project_id={{ project_id }}&id={{ foo.id }}"
+                                                   style="float:left;margin-right: 5px">编辑</a>
+                                                <a href="{% url 'todoList:todoList-delete' %}?project_id={{ project_id }}&issue_id={{ foo.id }}"
+                                                   style="float:right">删除</a></div>
+                                            <span>
+                                    | 回复数: <span class="badge">{{ foo.count }}</span>
+                                </span>
+                                        </button>
+
+                                    {% elif foo.urgency == "确认中" %}
+                                        <button type="button" style="margin-top: 10px"
+                                                class="list-group-item">{{ forloop.counter }}、<a
+                                                href="{% url 'todoList:todoList-detail' %}?project_id={{ project_id }}&id={{ foo.id }}">{{ foo.text }}</a>
+                                            | {{ foo.create_datetime }} | <span
+                                                    class="label label-info"
+                                                    style="background-color: #FF00FF;color: white">{{ foo.urgency }}</span>
+                                            <div style="float: right">
+                                                <a href="{% url 'todoList:todoList-edit' %}?project_id={{ project_id }}&id={{ foo.id }}"
+                                                   style="float:left;margin-right: 5px">编辑</a>
+                                                <a href="{% url 'todoList:todoList-delete' %}?project_id={{ project_id }}&issue_id={{ foo.id }}"
+                                                   style="float:right">删除</a></div>
+                                            <span>
+                                    | 回复数: <span class="badge">{{ foo.count }}</span>
+                                </span>
+                                        </button>
+                                    {% endif %}
+
+                                </div>
+                            {% endfor %}
+                        {% else %}
+                            <div style="margin-top: 80px">
+                                <div class="list-group" style="text-align: center;margin-top: 20px;margin-bottom: 20px">
+                                    <h2>暂无待办</h2>
+                                </div>
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <div class="col-md-2">
+                </div>
+            </div>
+        </div>
+
+
+        <div class="col-sm-12">
+            <div class="panel-heading">
+                <div class="panel-body">
+
+                </div>
+            </div>
+        </div>
+
+
+        <div class="col-sm-12">
+
+        </div>
+    </div>
+{% endblock %}
+
+{% block js %}
+    <script>
+        $("#submit").click(function () {
+            var issues = $("#issues").val();
+            var project_index = document.getElementById("selected_project_name").selectedIndex;
+            var project_result = ""
+            project_result = document.getElementById("selected_project_name").options[project_index].text;
+
+
+            if (issues === "") {
+                alert("问题内容不能为空！");
+                return false;
+            }
+
+            $.ajax({
+                url: "{% url 'todoList:todoList-all'%}?project_id={{ project_id }}",
+                type: "POST",
+                dataType: 'json',
+                data: {
+                    'project_result': project_result,
+                    'issues': issues,
+                    'project_id': {{ project_id }},
+                    'csrfmiddlewaretoken': '{{ csrf_token }}'
+                },
+                success: function (data) {
+                    if (data.state === 0) {
+                        {#alert(data.data)#}
+                        location.href = "{% url 'todoList:todoList-all' %}?project_id={{ project_id }}"
+                    } else {
+                        alert("创建卡片失败，卡片已存在！")
+                    }
+                }
+            })
+        })
+    </script>
+{% endblock %}

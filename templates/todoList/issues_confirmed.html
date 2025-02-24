@@ -1,0 +1,89 @@
+{% extends 'base/site-base.html' %}
+{% load static %}
+
+{% block title %}
+    FastWork - 已办事项
+{% endblock %}
+
+{% block css %}
+
+{% endblock %}
+
+{% block content %}
+    <div class="container-fluid content" style="margin-top: 20px">
+        <div class="col-sm-12">
+            <div class="panel-heading">
+                <ol class="breadcrumb">
+                    <li class="active">
+                        <a href="{% url 'todoList:todoList-all' %}?project_id={{ project_id }}"
+                           style="color: #337ab7">todoList</a>
+                    </li>
+                    <li class="active">已办事项</li>
+                    <li class="active">
+                        <a href="{% url 'todoList:todoList-confirmed' %}?project_id={{ project_id }}"
+                           style="color: #337ab7">已办事项清单</a>
+                    </li>
+                </ol>
+            </div>
+        </div>
+
+        <div class="col-sm-12" style="margin-top: -20px">
+            <div class="row">
+                <div class="col-md-2">
+                </div>
+                <div class="col-md-8" style="margin-top: 20px;height:calc(80vh - 50px);overflow: scroll;">
+
+                    <div style=";height:calc(80vh - 10px);overflow: scroll;">
+                        {% if data %}
+                            {% for foo in data %}
+                                <div class="list-group">
+                                    <button type="button" style="margin-top: 10px"
+                                            class="list-group-item">{{ forloop.counter }}、<a
+                                            href="{% url 'todoList:todoList-detail' %}?project_id={{ project_id }}&id={{ foo.id }}">{{ foo.text }}</a>
+                                        | {{ foo.create_datetime }} | <span
+                                                class="label label-success">{{ foo.urgency }}</span>
+                                        <div style="float: right">
+                                            <a href="{% url 'todoList:todoList-delete' %}?project_id={{ project_id }}&issue_id={{ foo.id }}"
+                                               style="float:right">删除</a>
+                                        </div>
+                                        <span>
+                                | 回复数: <span class="badge">{{ foo.count }}</span>
+                                </span>
+                                    </button>
+                                </div>
+                            {% endfor %}
+                        {% else %}
+                            <div style="margin-top: 170px">
+                                <div class="list-group" style="text-align: center;margin-top: 80px;margin-bottom: 20px">
+                                    <h2>暂无已办</h2>
+                                </div>
+                            </div>
+                        {% endif %}
+                    </div>
+
+                </div>
+                <div class="col-md-2">
+                </div>
+            </div>
+        </div>
+
+
+        <div class="col-sm-12">
+            <div class="panel-heading">
+                <div class="panel-body">
+
+                </div>
+            </div>
+        </div>
+
+
+        <div class="col-sm-12">
+
+        </div>
+    </div>
+{% endblock %}
+
+{% block js %}
+
+
+{% endblock %}

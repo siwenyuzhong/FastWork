@@ -52,5 +52,8 @@ urlpatterns = [
     # 日志管理
     url(r'^journal/', include('journal.urls', namespace='journal')),
 
+    # todoList
+    url(r'^todoList/', include('todoList.urls', namespace='todoList')),
+
     url(r'^$', IndexView.as_view(), name='home'),
 ]

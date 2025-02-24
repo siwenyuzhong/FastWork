@@ -1,0 +1,114 @@
+{% extends 'base/site-base.html' %}
+{% load static %}
+
+{% block title %}
+    FastWork - {{ id_issue_id__first.text }}
+{% endblock %}
+
+{% block css %}
+
+{% endblock %}
+
+{% block content %}
+    <div class="container-fluid content" style="margin-top: 20px">
+        <div class="col-sm-12">
+            <div class="panel-heading">
+                <ol class="breadcrumb">
+                    <li class="active">todoList</li>
+                    <li class="active">
+                        <a href="{% url 'todoList:todoList-all' %}?project_id={{ project_id }}"
+                           style="color: #337ab7">待办清单列表</a>
+                    </li>
+                    <li class="active">{{ id_issue_id__first.text }}</li>
+                </ol>
+            </div>
+        </div>
+
+        <div class="col-sm-12" style="margin-top: -20px">
+            <div class="row">
+                <div class="col-md-2">
+                </div>
+                <div class="col-md-8" style="margin-top: 20px;height:calc(80vh - 50px);overflow: scroll;">
+
+                    <div>
+                        <div class="input-group" style="margin-top: 10px">
+                            <input type="text" class="form-control" id="issues_reply"
+                                   placeholder="在此处回复下方问题..."
+                                   style="height: 40px">
+                            <span class="input-group-btn">
+                    <button class="btn btn-default" type="button" style="height: 40px" id="submit">回复</button>
+                </span>
+                        </div>
+                    </div>
+                    <div style=";height:calc(70vh - 50px);overflow: scroll;">
+
+
+                        <div class="list-group" style="margin-top: 10px">
+                            <a href="#" class="list-group-item disabled">
+                                𝑸:【{{ id_issue_id__first.text }}】
+                            </a>
+                            {% for foo in reply__all %}
+                                <a href="#" class="list-group-item">📢: {{ foo.text }}
+                                    <span style="float: right;font-size: 12px;margin-top: 3px;color: red">⏰: {{ foo.create_datetime }}
+                            </span>
+                                </a>
+                            {% endfor %}
+
+
+                        </div>
+
+                    </div>
+
+                </div>
+                <div class="col-md-2">
+                </div>
+            </div>
+        </div>
+
+
+        <div class="col-sm-12">
+            <div class="panel-heading">
+                <div class="panel-body">
+
+                </div>
+            </div>
+        </div>
+
+
+        <div class="col-sm-12">
+
+        </div>
+    </div>
+{% endblock %}
+
+{% block js %}
+    <script>
+        $("#submit").click(function () {
+            var issues_reply = $("#issues_reply").val();
+
+            if (issues_reply === "") {
+                alert("回复内容不能为空！");
+                return false;
+            }
+
+            $.ajax({
+                url: "{% url 'todoList:todoList-reply' %}?project_id={{ project_id }}",
+                type: "POST",
+                dataType: 'json',
+                data: {
+                    'issues_reply': issues_reply,
+                    'issues_id': {{id_issue_id__first.id}},
+                    'csrfmiddlewaretoken': '{{ csrf_token }}'
+                },
+                success: function (data) {
+                    if (data.state === 0) {
+                        {#alert(data.data)#}
+                        window.location.reload()
+                    } else {
+                        alert("回复失败")
+                    }
+                }
+            })
+        })
+    </script>
+{% endblock %}

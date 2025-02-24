@@ -90,7 +90,27 @@
                                         问题管理
                                     </a>
                                 </div>
+
+                                <div class="module-bd">
+                                    <a href="{% url 'todoList:todoList-all' %}?project_id={{ request.tracer.project.id }}"
+                                       target="_self">
+                                        <span class="glyphicon glyphicon-equalizer" aria-hidden="true"></span>
+                                        todoList
+                                    </a>
+                                </div>
+
+                                <div class="module-bd">
+                                    <a href="{% url 'todoList:todoList-confirmed' %}?project_id={{ request.tracer.project.id }}"
+                                       target="_self">
+                                        <span class="glyphicon glyphicon-thumbs-up" aria-hidden="true"></span>
+                                        已办事项
+                                    </a>
+                                </div>
+
+
                             </div>
+
+
                             <div class="module-wrap " style="width:200px">
                                 <div class="module-hd">
                                     <span class="glyphicon glyphicon-list" aria-hidden="true"></span>
@@ -271,29 +291,29 @@
                     </div>
                 </li>
 
-                <li class="top-menu-item" has-dropdown="true" menu-type="training" data-spm-click="">
-                    <a class="menu-hd" target="">
-                        <strong style="font-size: 14px" class="">功能模块化</strong>
-                    </a>
-
-                    <div class="menu-dropdown solutions training-bg">
-                        <div class="menu-dropdown-inner module-padding common-header-clearfix">
-                            <div class="module-wrap " style="width:150px">
-                                <div class="module-hd">
-                                    <span class="glyphicon glyphicon-export" aria-hidden="true"></span>
-                                    模块化组件
-                                </div>
-                                <div class="module-bd">
-                                    <a href=""
-                                       target="_self">
-                                        <span class="glyphicon glyphicon-credit-card" aria-hidden="true"></span>
-                                        自建模块
-                                    </a>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </li>
+                {#                <li class="top-menu-item" has-dropdown="true" menu-type="training" data-spm-click="">#}
+                {#                    <a class="menu-hd" target="">#}
+                {#                        <strong style="font-size: 14px" class="">功能模块化</strong>#}
+                {#                    </a>#}
+                {##}
+                {#                    <div class="menu-dropdown solutions training-bg">#}
+                {#                        <div class="menu-dropdown-inner module-padding common-header-clearfix">#}
+                {#                            <div class="module-wrap " style="width:150px">#}
+                {#                                <div class="module-hd">#}
+                {#                                    <span class="glyphicon glyphicon-export" aria-hidden="true"></span>#}
+                {#                                    模块化组件#}
+                {#                                </div>#}
+                {#                                <div class="module-bd">#}
+                {#                                    <a href=""#}
+                {#                                       target="_self">#}
+                {#                                        <span class="glyphicon glyphicon-credit-card" aria-hidden="true"></span>#}
+                {#                                        自建模块#}
+                {#                                    </a>#}
+                {#                                </div>#}
+                {#                            </div>#}
+                {#                        </div>#}
+                {#                    </div>#}
+                {#                </li>#}
 
                 <li class="top-menu-item" has-dropdown="true" menu-type="training" data-spm-click="">
                     <a class="menu-hd" target="">

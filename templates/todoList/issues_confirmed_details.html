@@ -1,0 +1,87 @@
+{% extends 'base/site-base.html' %}
+{% load static %}
+
+{% block title %}
+    FastWork - 已办事项
+{% endblock %}
+
+{% block css %}
+
+{% endblock %}
+
+{% block content %}
+    <div class="container-fluid content" style="margin-top: 20px">
+        <div class="col-sm-12">
+            <div class="panel-heading">
+                <ol class="breadcrumb">
+                    <li class="active">已办事项</li>
+                    <li class="active">
+                        <a href="{% url 'todoList:todoList-confirmed' %}?project_id={{ project_id }}"
+                           style="color: #337ab7">已办事项清单</a>
+                    </li>
+                    <li class="active">{{ id_issue_id__first.text }}</li>
+                </ol>
+            </div>
+        </div>
+
+        <div class="col-sm-12" style="margin-top: -20px">
+            <div class="row">
+                <div class="col-md-2">
+                </div>
+                <div class="col-md-8" style="margin-top: 20px;height:calc(80vh - 50px);overflow: scroll;">
+
+
+                    <div>
+                        <div class="input-group" style="margin-top: 10px">
+                            <input type="text" class="form-control" id="issues_reply"
+                                   placeholder="已完结事项，不允许回复..."
+                                   style="height: 40px" disabled>
+                            <span class="input-group-btn">
+                    <button class="btn btn-success" type="button" style="height: 40px" id="submit">回复</button>
+                </span>
+                        </div>
+                    </div>
+                    <div style=";height:calc(70vh - 50px);overflow: scroll;">
+
+
+                        <div class="list-group" style="margin-top: 10px">
+                            <a href="#" class="list-group-item disabled">
+                                𝑸:【{{ id_issue_id__first.text }}】
+                            </a>
+                            {% for foo in reply__all %}
+                                <a href="#" class="list-group-item">📢: {{ foo.text }}
+                                    <span style="float: right;font-size: 12px;margin-top: 3px;color: red">回复时间：{{ foo.create_datetime }}
+                            </span>
+                                </a>
+                            {% endfor %}
+
+                        </div>
+
+                    </div>
+
+                </div>
+                <div class="col-md-2">
+                </div>
+            </div>
+        </div>
+
+
+        <div class="col-sm-12">
+            <div class="panel-heading">
+                <div class="panel-body">
+
+                </div>
+            </div>
+        </div>
+
+
+        <div class="col-sm-12">
+
+        </div>
+    </div>
+{% endblock %}
+
+{% block js %}
+
+
+{% endblock %}
